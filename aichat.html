@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Interaction</title>
+    <link rel="stylesheet" href="src/common/css/aichat.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/kMVqoj8vGmsLg1zyHbxDUY0D3zqosFxlOqHBYnA4eZsfn3ojuycMZV3O6T7oheZlgGo7obdz1yxAQ==" crossorigin="anonymous" />
+</head>
+<body class="bg-gradient-to-b from-indigo-200 via-purple-300 to-blue-200 min-h-screen font-sans flex flex-col items-center">
+    <!-- Navbar -->
+    <nav id="menu" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 p-4 shadow-lg flex items-center justify-between">
+        <div class="bg-gradient-to-tr from-pink-700 via-yellow-400 to-cyan-700 bg-clip-text text-transparent text-2xl font-bold text-center">AI Chat With Skye</div>
+        <!--<ul class="flex space-x-6 text-white font-semibold">
+            <li class="disable"><a href="index.html#" class="hover:text-gray-200">Home</a></li>
+            <li class="disable"><a href="index.html#about" class="hover:text-gray-200">About</a></li>
+            <li class="disable"><a href="index.html#contact" class="hover:text-gray-200">Contact</a></li>
+        </ul>-->
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-full lg:max-w-[98vw] w-full h-full p-6 mt-2 md:mt-4 bg-white bg-opacity-90 rounded-lg shadow-lg">
+        <!-- Header -->
+        <header class="mb-4">
+            <article class="grid grid-cols-1 md:grid-cols-2 justify-between">
+            <span>
+                🌟
+                <select id="mode" class="rounded-lg p-2 font-semibold text-sky-900 rounded-md bg-gradient-to-tr from-purple-300 to-violet-300 hover:from-cyan-400 hover:to-violet-400 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    <option default class="text-gray-600 border border-stone-300">General mode</option>
+                    <option class="text-slate-600 border border-stone-300">Coding mode</option>
+                </select>
+            </span>
+            <label class="flex items-right my-2 ml-[18vw] lg:ml-[24vw]">
+                <input id="CModel" type="checkbox" class="checkbox mr-2 mt-1 h-4 w-4">
+                <span class="text-gray-700 overflow-ellipsis bg-gradient-to-r from-cyan-400 via-blue-400 to-pink-400 bg-clip-text">Use Flux 4 Image generation</span>
+            </label>
+            </article>
+        </header>
+
+        <!-- Chat Area -->
+        <section id="chatArea" class="bg-gray-100 p-4 rounded-lg shadow-inner min-h-[50vh] max-h-[90vh] h-full overflow-y-auto space-y-4">
+
+            <div class="flex justify-start">
+                <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-lg shadow-lg">
+                    <p class="bg-gradient-to-r from-cyan-300 to-indigo-400 bg-clip-text">Hi, how can I assist you today?</p>
+                </div>
+            </div>
+        </section>
+
+       <!-- Message Input Section -->
+        <section class="mt-6 flex space-x-4">
+            <input
+                type="text"
+                id="userInput"
+                class="w-full overflow-wrap p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                autofocus
+                placeholder="Message Skye 💫 To generate an image, start with `/image`"
+                aria-label="Message input">
+            <button
+                id="sendBtn"
+                class="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition ease-in-out duration-200"
+                aria-label="Send message"
+                >
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+        </section>
+
+    </div>
+</body>
+<script src="src/common/js/_aichat.js"></script>
+</html>

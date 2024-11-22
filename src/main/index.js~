@@ -1,0 +1,87 @@
+const { app, BrowserWindow, Tray, Menu } = require('electron');
+const path = require('path');
+
+function createWindow() {
+    // Create the loading window
+    const loadingWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        show: false,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    });
+
+    loadingWindow.loadFile(path.join(__dirname, '../../loading.html'));
+
+    // Create the main window
+    const mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        icon: path.join(process.resourcesPath, 'assets/QuickAi.png'), // Path to your icon file
+        show: false,
+        webPreferences: {
+            nodeIntegration: true, // Enable Node.js integration in the renderer process
+            contextIsolation: false
+        }
+    });
+
+    //console.log(path.join(__dirname, '../assets/QuickAi.png'))
+
+    // Load the main application when it is ready
+    mainWindow.loadFile(path.join(__dirname, '../../aichat.html')); // Load your HTML file
+
+    // Show the main window and close the loading window when the main window is ready to show
+    mainWindow.once('ready-to-show', () => {
+        loadingWindow.close();
+        mainWindow.show();
+    });
+
+    // Return the main window for reference
+    return mainWindow;
+}
+
+app.setAppUserModelId('com.quickai.app'); // Set the app user model ID
+
+app.on('ready', () => {
+    // Create the main window
+    const mainWindow = createWindow();
+
+    // Create the tray icon
+    const tray = new Tray(path.join(process.resourcesPath, 'assets/QuickAi.png')); // Path to your tray icon
+
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Show',
+            click: () => {
+                if (mainWindow) {
+                    mainWindow.show();
+                } else {
+                    createWindow();
+                }
+            }
+        },
+        {
+            label: 'Quit',
+            click: () => {
+                app.quit();
+            }
+        }
+    ]);
+
+    tray.setToolTip('QuickAI');
+    tray.setContextMenu(contextMenu);
+});
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit(); // Quit when all windows are closed, except on macOS
+    }
+});
+
+app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow(); // Recreate a window if none are open on macOS
+    }
+});

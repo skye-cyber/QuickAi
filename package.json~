@@ -1,0 +1,59 @@
+{
+  "name": "QuickAi",
+  "version": "1.0.0",
+  "description": "An application to interact with AI assistants for free.",
+  "main": "src/main/index.js",
+  "homepage": "https://yourprojecthomepage.com",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Wambua aka Skye",
+    "email": "swskye17@gmail.com"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^32.2.5",
+    "electron-packager": "^17.1.2",
+    "highlight": "^0.2.4",
+    "husky": "^9.1.7",
+    "marked": "^15.0.1"
+  },
+  "build": {
+    "appId": "com.quickai.app",
+    "productName": "QuickAi",
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "src/assets/QuickAi.icns"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "src/assets/QuickAi.ico"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility",
+      "icon": "src/assets/QuickAi.png",
+        "extraResources": [
+        {
+          "from": "src/assets/",
+          "to": "assets/"
+        },
+        {
+          "from": "src/assets/QuickAi.png",
+          "to": "/usr/share/icons/quickai.png"
+        }
+      ]
+    }
+  }
+}
