@@ -1,5 +1,7 @@
-const { app, BrowserWindow, Tray, Menu } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
+const { spawn } = require('child_process');
 
 function createWindow() {
     // Create the loading window
@@ -27,7 +29,10 @@ function createWindow() {
         }
     });
 
-    //console.log(path.join(__dirname, '../assets/QuickAi.png'))
+    // Listen for the 'run-python-script' event from the renderer process
+    ipcMain.on('run-python-script', (event) => {
+        runPythonScript(event);
+    });
 
     // Load the main application when it is ready
     mainWindow.loadFile(path.join(__dirname, '../../aichat.html')); // Load your HTML file
@@ -84,4 +89,41 @@ app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow(); // Recreate a window if none are open on macOS
     }
+});
+
+
+function runPythonScript(event) {
+    const python = spawn('python', ['Autohf.py']);
+    const resultFilePath = path.join(app.getPath('temp'), '.h_face.txt');
+
+    python.stdout.on('data', (data) => {
+        console.log(`stdout: ${data.toString()}`);
+        fs.writeFile(resultFilePath, data.toString(), (err) => {
+            if (err) {
+                console.error('Error writing to file:', err);
+                event.sender.send('python-script-result', 'Error writing to file');
+            } else {
+                event.sender.send('python-script-result', resultFilePath);
+            }
+        });
+    });
+
+    python.stderr.on('data', (data) => {
+        console.error(`stderr: ${data.toString()}`);
+        event.sender.send('python-script-result', `Error: ${data.toString()}`);
+    });
+
+    python.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+    });
+}
+
+app.on('will-quit', () => {
+    fs.unlink(resultFilePath, (err) => {
+        if (err) {
+            console.error('Error deleting file:', err);
+        } else {
+            console.log('File deleted successfully');
+        }
+    });
 });

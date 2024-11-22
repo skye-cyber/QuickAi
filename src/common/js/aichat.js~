@@ -1,9 +1,37 @@
 import { HfInference } from "@huggingface/inference";
 import { marked } from "marked";
 import hljs from 'highlight.js';
+const fs = require('fs');
+const { ipcRenderer, remote } = require('electron');
+const path = require('path');
 //import DOMPurify from 'dompurify';
 
-const client = new HfInference("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");
+document.addEventListener('DOMContentLoaded', () => {
+    ipcRenderer.send('run-python-script');
+});
+
+ipcRenderer.on('python-script-result', (event, resultFilePath) => {
+    fs.readFile(resultFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error reading file:', err);
+            console.log('Error reading file');
+            h_faceKey = data;
+        } else {
+            console.log('key:', data);
+        }
+    });
+
+    // Delete the file after reading
+    fs.unlink(resultFilePath, (err) => {
+        if (err) {
+            console.error('Error deleting file:', err);
+        } else {
+            console.log('File deleted successfully');
+        }
+    });
+});
+
+const client = new HfInference(h_faceKey);
 const chatArea = document.getElementById("chatArea");
 const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
@@ -22,7 +50,7 @@ When interacting with the user:
 - In a conversation, not all conversation history is tied together before responding. Ensure that the user's current need or question is tied to the previous interactions to provide helpful feedback. If uncertain, politely request the user for information that would help you ascertain this.
 For drawing table:
 - Default table visualization is html except when user request otherwise.
-- For table visualization
+- For table visualization no code should be shown.
 - For HTML tables, write the HTML code without the 'html' language identifier. For Markdown tables, omit the 'markdown' identifier.
 - Use CSS styling to make the table visually appealing, avoiding TailwindCSS.
 Use colors that are more visible than light gray, such as deep gray or other contrasting colors.
@@ -110,7 +138,7 @@ async function generateImage(data, loadingMessage) {
         "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large",
         {
             headers: {
-                Authorization: "Bearer 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",
+                Authorization: `Bearer ${h_faceKey}`,
                 "Content-Type": "application/json",
             },
             method: "POST",
@@ -128,7 +156,7 @@ async function generateImageFlux(data, loadingMessage) {
         "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev",
         {
             headers: {
-                Authorization: "Bearer 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",
+                Authorization: `Bearer ${h_faceKey}",
                 "Content-Type": "application/json",
             },
             method: "POST",
@@ -157,7 +185,7 @@ function implementUserCopy() {
 
             const textToCopy = TextBlock.innerText;
 
-            if (textToCopy.length >= 50){
+            if (textToCopy.length >= 50) {
                 try {
                     await navigator.clipboard.writeText(textToCopy);
                     this.textContent = 'Copied!';
@@ -166,8 +194,8 @@ function implementUserCopy() {
                     }, 3000);
                 } catch (err) {
                     console.error('Failed to copy: ', err);
+                }
             }
-        }
         });
     });
 }
@@ -175,11 +203,11 @@ function implementUserCopy() {
 // escape html so that it is displayed as plaintext
 function escapeHTML(unsafe) {
     return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 // Function to classify text or generate image based on user input
@@ -268,7 +296,7 @@ async function classifyText(text) {
 
         // Create button element to contain the download link
         const downloadButtonContainer = document.createElement("button");
-        downloadButtonContainer.classList.add("text-white","rounded-b-md", "bg-gradient-to-r", "from-blue-500", "to-purple-500", "hover:from-blue-600", "hover:to-purple-600", "font-semibold", "py-2", "px-4", "inline-block", "focus:outline-none", "shadow-md", "w-fit", "h-fit", "mt-0", "ml-2"
+        downloadButtonContainer.classList.add("text-white", "rounded-b-md", "bg-gradient-to-r", "from-blue-500", "to-purple-500", "hover:from-blue-600", "hover:to-purple-600", "font-semibold", "py-2", "px-4", "inline-block", "focus:outline-none", "shadow-md", "w-fit", "h-fit", "mt-0", "ml-2"
         );
 
         // Create anchor (link) element for download inside button
@@ -303,7 +331,7 @@ async function classifyText(text) {
         if (mode === 'coding mode') {
             var model = "Qwen/Qwen2.5-Coder-32B-Instruct"
         }
-        else{
+        else {
             var model = "Qwen/Qwen2.5-72B-Instruct"
         }
 
