@@ -1,8 +1,23 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
-const fs = require('fs');
-const { spawn } = require('child_process');
 
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+const dotenv = require('dotenv');
+const result = dotenv.config({ path: path.join(__dirname, '.env') });
+
+if (result.error) {
+    console.warn('.env load failed:', result.error);
+} else {
+    console.log('Environment variables loaded:', result.parsed);
+}
+
+ipcMain.handle('get-env', () => {
+    return {
+        IV: process.env.IV,
+        API_OBJ: process.env.API_OBJ,
+        SKEY: process.env.SKEY,
+    };
+});
 function createWindow() {
     // Create the loading window
     const loadingWindow = new BrowserWindow({
@@ -10,12 +25,14 @@ function createWindow() {
         height: 600,
         show: false,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
+            //nodeIntegration: true,
+            contextIsolation: true,
+            enableRemoteModule: false, // Disable remote module if not needed
         }
     });
 
     loadingWindow.loadFile(path.join(__dirname, '../../loading.html'));
+    console.log(path.join(__dirname, '../../loading.html'));
 
     // Create the main window
     const mainWindow = new BrowserWindow({
@@ -24,15 +41,17 @@ function createWindow() {
         icon: path.join(process.resourcesPath, 'assets/QuickAi.png'), // Path to your icon file
         show: false,
         webPreferences: {
+            preload: path.join(__dirname, 'preload.js'), // Use the preload script
             nodeIntegration: true, // Enable Node.js integration in the renderer process
-            contextIsolation: false
+            contextIsolation: true
         }
     });
 
-    // Listen for the 'run-python-script' event from the renderer process
-    ipcMain.on('run-python-script', (event) => {
-        runPythonScript(event);
-    });
+
+    // Send environment variables to the renderer process
+    //mainWindow.webContents.on('did-finish-load', () => {
+      //  mainWindow.webContents.send('env', process.env);
+    //});
 
     // Load the main application when it is ready
     mainWindow.loadFile(path.join(__dirname, '../../aichat.html')); // Load your HTML file
@@ -92,38 +111,3 @@ app.on('activate', () => {
 });
 
 
-function runPythonScript(event) {
-    const python = spawn('python', ['Autohf.py']);
-    const resultFilePath = path.join(app.getPath('temp'), '.h_face.txt');
-
-    python.stdout.on('data', (data) => {
-        console.log(`stdout: ${data.toString()}`);
-        fs.writeFile(resultFilePath, data.toString(), (err) => {
-            if (err) {
-                console.error('Error writing to file:', err);
-                event.sender.send('python-script-result', 'Error writing to file');
-            } else {
-                event.sender.send('python-script-result', resultFilePath);
-            }
-        });
-    });
-
-    python.stderr.on('data', (data) => {
-        console.error(`stderr: ${data.toString()}`);
-        event.sender.send('python-script-result', `Error: ${data.toString()}`);
-    });
-
-    python.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-    });
-}
-
-app.on('will-quit', () => {
-    fs.unlink(resultFilePath, (err) => {
-        if (err) {
-            console.error('Error deleting file:', err);
-        } else {
-            console.log('File deleted successfully');
-        }
-    });
-});

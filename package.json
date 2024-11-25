@@ -16,11 +16,18 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "electron": "^32.2.5",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "dotenv": "^16.4.5",
+    "electron": "^33.2.0",
     "electron-packager": "^17.1.2",
     "highlight": "^0.2.4",
     "husky": "^9.1.7",
-    "marked": "^15.0.1"
+    "marked": "^15.0.1",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "stream-browserify": "^3.0.0",
+    "vm-browserify": "^1.1.2"
   },
   "build": {
     "appId": "com.quickai.app",
@@ -36,6 +43,12 @@
         "nsis"
       ],
       "icon": "src/assets/QuickAi.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true
     },
     "linux": {
       "target": [
@@ -55,5 +68,8 @@
         }
       ]
     }
+  },
+  "dependencies": {
+    "process": "^0.11.10"
   }
 }
