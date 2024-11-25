@@ -1,0 +1,11 @@
+const { contextBridge } = require('electron');
+
+contextBridge.exposeInMainWorld('electron', {
+    getEnv: () => ({
+        IV: process.env.IV,
+        API_OBJ: process.env.API_OBJ,
+        SKEY: process.env.SKEY,
+    }),
+    // You can expose other Node.js functionalities here as needed
+});
+
