@@ -10,53 +10,50 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" />
 </head>
-<body class="bg-gradient-to-b from-indigo-200 via-purple-300 to-blue-200 min-h-screen font-sans flex flex-col items-center">
-    <!-- Navbar -->
-    <nav id="menu" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 p-4 shadow-lg flex items-center justify-between">
-        <div class="bg-gradient-to-tr from-pink-700 via-yellow-400 to-cyan-700 bg-clip-text text-transparent text-2xl font-bold text-center">AI Chat With Skye</div>
-    </nav>
+<body class="bg-gradient-to-b from-indigo-200 via-purple-300 to-blue-200 dark:from-slate-700 dark:to-slate-700 min-h-screen font-sans flex flex-col items-center overflow-x-hidden">
 
     <!-- Main Container -->
-    <div class="max-w-full lg:max-w-[98vw] w-full h-full p-6 mt-2 md:mt-4 bg-white bg-opacity-90 rounded-lg shadow-lg">
+    <div class="h-[100vh] w-[100vw] max-h-[100vh]  max-w-[100vw] p-6 mt-0 bg-white bg-opacity-90 rounded-b-none shadow-lg dark:bg-slate-800 rounded-t-none">
         <!-- Header -->
         <header class="mb-4">
-            <article class="grid grid-cols-1 md:grid-cols-2 justify-between">
+            <article class="flex flex-rows-1 justify-between">
             <span>
                 🌟
-                <select id="mode" class="rounded-lg p-2 font-semibold text-sky-900 rounded-md bg-gradient-to-tr from-purple-300 to-violet-300 hover:from-cyan-400 hover:to-violet-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" title="Change interaction mode">
-                    <option default class="text-gray-600 border border-stone-300">General mode</option>
-                    <option class="text-slate-600 border border-stone-300">Coding mode</option>
+                <select id="mode" class="rounded-lg p-2 font-semibold text-sky-900 dark:text-gray-50 rounded-md bg-gradient-to-tr from-purple-300 to-violet-300 dark:from-gray-700 dark:to-gray-900 hover:from-cyan-400 hover:to-violet-400 dark:hover:from-gray-600 dark:hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-gray-400">
+                    <option default class="bg-gray-600">General mode</option>
+                    <option class="bg-gray-600">Coding mode</option>
                 </select>
             </span>
-            <label class="flex items-right my-2 ml-[18vw] lg:ml-[24vw]" title="Change image generation model to FLUX">
-                <input id="CModel" type="checkbox" class="checkbox mr-2 mt-1 h-4 w-4">
-                <span class="text-gray-700 overflow-ellipsis bg-gradient-to-r from-cyan-400 via-blue-400 to-pink-400 bg-clip-text">Use Flux 4 Image generation</span>
+            <label class="relative inline-flex items-center cursor-pointer my-2 lg:ml-[24vw]" title="Change image generation model to FLUX">
+                <input id="CModel" type="checkbox" class="checkbox sr-only peer mr-2 mt-1 h-4 w-4">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                <span class="hidden md:flex text-gray-700 overflow-ellipsis bg-gradient-to-r from-cyan-400 via-blue-400 to-pink-400 bg-clip-text">Use Flux</span>
             </label>
+            <svg id="settings" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8 fill-current text-gray-800 dark:text-gray-200 transition-colors duration-200">
+                <path d="M19.14 12.936c.06-.437.06-.874 0-1.31l2.007-1.55c.21-.16.27-.44.14-.67l-2.4-4.155c-.12-.21-.36-.29-.57-.21l-2.337 1.017c-.56-.43-1.17-.79-1.83-1.07l-.354-2.6c-.04-.26-.27-.46-.54-.46h-5c-.27 0-.51.2-.54.46l-.354 2.6c-.66.28-1.28.64-1.83 1.07L5.22 5.89c-.21-.08-.45 0-.57.21l-2.4 4.155c-.12.21-.07.51.14.67l2.007 1.55c-.06.437-.06.874 0 1.31l-2.007 1.55c-.21.16-.27.44-.14.67l2.4 4.155c.12.21.36.29.57.21l2.337-1.017c.56.43 1.17.79 1.83 1.07l.354 2.6c.04.26.27.46.54.46h5c.27 0 .51-.2.54-.46l.354-2.6c.66-.28 1.28-.64 1.83-1.07l2.337-1.017c.21-.08.45 0 .57.21l2.4 4.155c.12.21.07.51-.14.67l-2.007 1.55c.06.437.06.874 0 1.31zM12 16a4 4 0 110-8 4 4 0 010 8z"/>
+            </svg>
             </article>
         </header>
 
         <!-- Chat Area -->
-        <section id="chatArea" class="bg-gray-100 p-4 rounded-lg shadow-inner min-h-[50vh] max-h-[90vh] h-full overflow-y-auto space-y-4">
-
+        <section id="chatArea" class="bg-gray-100 dark:bg-slate-900 h-[75vh] p-2 md:p-4 rounded-lg shadow-inner  dark:shadow-gray-950 overflow-y-auto space-y-4">
             <div class="flex justify-start">
-                <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-lg shadow-lg">
+                <div class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl">
                     <p class="bg-gradient-to-r from-cyan-300 to-indigo-400 bg-clip-text">Hi, how can I assist you today?</p>
                 </div>
             </div>
         </section>
 
        <!-- Message Input Section -->
-        <section class="mt-6 flex space-x-4">
-            <input
-                type="text"
-                id="userInput"
-                class="w-full overflow-wrap p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+        <section class="fixed w-[98vw] md:w-[97vw] right-1 lg:right-[2.7%] bottom-[0.5%] flex space-x-4 p-2 rounded-md md:rounded-full dark:bg-gray-700 z-50">
+                <textarea id="userInput"
+                oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';" cols="10"
+                class="w-full rows-10 scrollbar-hide resize-none bottom-2 overflow-wrap p-1 md:p-3 max-h-[15vh] border border-gray-300 dark:border-none rounded-md md:rounded-full focus:outline-none dark:outline-sky-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-gray-900 dark:ring-1 dark:bg-gray-800 dark:text-white"
                 autofocus
-                placeholder="Message Skye 💫 To generate an image, start with `/image`"
-                aria-label="Message input">
+                placeholder="Message QuickAi 💫 To generate an image, start with `/image`" aria-label="Message input"></textarea>
             <button
                 id="sendBtn"
-                class="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition ease-in-out duration-200"
+                class="fixed right-[3%] lg:right-[3%] bottom-[3%] lg:bottom-[2.6%] px-4 py-3 md:px-6 md:py-5 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-sky-600 dark:to-purple-800 text-white rounded-full hover:from-blue-700 hover:to-purple-700 transition ease-in-out duration-200 dark:border dark:border-blue-400 dark:shadow dark:shadow-cyan-200"
                 aria-label="Send message" title="Send message"
                 >
                 <i class="fas fa-paper-plane"></i>
@@ -64,6 +61,47 @@
         </section>
 
     </div>
+
+        <!-- Modal Background -->
+    <div id="settingsModal" class="hidden fixed inset-2 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-50">
+        <!-- Modal Content -->
+        <div class="relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full mx-2 md:mx-auto max-w-md">
+            <!-- Close Button -->
+            <button id="closeModal" class="absolute top-2 right-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            </button>
+
+            <!-- Modal Title -->
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Settings</h2>
+
+            <!-- Theme Switching Option -->
+            <div class="flex items-center mb-4">
+            <label for="themeSwitch" class="mr-3 text-gray-700 dark:text-gray-300">Dark Mode</label>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input id="themeSwitch" type="checkbox" class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+            </label>
+            </div>
+
+            <!-- Additional Settings Options -->
+            <div class="mb-4">
+            <label class="block text-gray-700 dark:text-gray-300 mb-2">Language</label>
+            <select class="form-select w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500">
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+            </select>
+            </div>
+
+            <!-- Save Settings Button -->
+            <button id="saveSettings" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+            Save Settings
+            </button>
+        </div>
+    </div>
 </body>
+<script src="src/renderer/js/script.js"></script>
 <script src="src/renderer/js/_aichat.js"></script>
 </html>

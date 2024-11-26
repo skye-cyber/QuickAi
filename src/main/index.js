@@ -1,5 +1,7 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
+const crypto = require('crypto');
+const { Buffer } = require('buffer');
 
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
@@ -11,6 +13,12 @@ ipcMain.handle('get-env', () => {
         SKEY: process.env.SKEY,
     };
 });
+
+ipcMain.handle('get-buffer-from-iv', (event, iv) => {
+    const ivBuffer = Buffer.from(iv.split(',').map(Number)); // Split string, convert to numbers, and make a buffer
+    return ivBuffer;
+});
+
 function createWindow() {
     // Create the loading window
     const loadingWindow = new BrowserWindow({

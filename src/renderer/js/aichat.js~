@@ -2,12 +2,12 @@ import { HfInference } from "@huggingface/inference";
 import { marked } from "marked";
 import hljs from 'highlight.js';
 import { get_key } from './Pcrypto.js';
+//import { before } from "node:test";
 //const { ipcRenderer } = require('electron');
 
 //Get api Key
 // Get environment variables using the exposed API
 window.electron.getEnv().then(env => {
-     console.log(env);
     const encryptedOBJ = {
         iv: env.IV,
         encryptedData: env.API_OBJ
@@ -15,7 +15,10 @@ window.electron.getEnv().then(env => {
 
 const SKEY = env.SKEY;
 
-const h_faceKey = get_key(encryptedOBJ, SKEY);
+const keyObject = get_key(encryptedOBJ, SKEY);
+
+keyObject.then(result => {
+    const h_faceKey = result; // This will log the resolved value
 
 const client = new HfInference(h_faceKey);
 const chatArea = document.getElementById("chatArea");
@@ -24,7 +27,7 @@ const sendBtn = document.getElementById("sendBtn");
 
 //Set custom intruction for the model
 let customInstructions = `
-Your name is Skye. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. Wambua is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).
+Your name is QuickAi. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. Wambua is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).
 
 Your primary goal is to assist the user in all the questions they ask. You should be brief and direct to the point based on the user's needs. You are required to use TailwindCSS for styling unless the user requests otherwise.
 
@@ -80,10 +83,10 @@ renderer.code = function(code, language) {
     // Return HTML with highlighted code and a copy button
     return `
     <div class="relative my-auto p-2 border border-gray-300 bg-white rounded-md">
-    <button id="${copyButtonId}" class="copy-button absolute rounded-md px-2 py-2 right-2 top-2 bg-gradient-to-r from-sky-800 to-purple-600 hover:bg-blue-400 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50">
+    <button id="${copyButtonId}" class="copy-button absolute rounded-md px-2 py-2 right-2 top-2 bg-gradient-to-r from-sky-800 to-purple-600 hover:bg-blue-400 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50 dark:bg-gray-800">
     Copy
     </button>
-    <pre class="rounded-md"><code class="hljs ${validLanguage}">${highlighted}</code></pre>
+    <pre class="rounded-md dark:bg-gray-800"><code class="hljs ${validLanguage}">${highlighted}</code></pre>
     </div>
     `;
 };
@@ -211,9 +214,9 @@ async function classifyText(text) {
 
     const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
     userMessage.innerHTML = `
-    <div data-id="${userMSGId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 text-white p-3 rounded-lg max-w-3xl shadow-lg">
+    <div data-id="${userMSGId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 max-w-3xl shadow-md">
         <p class="pre-line break-words">${escapedText}</p>
-        <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-1 bg-gradient-to-r from-indigo-400 to-pink-400 hover:bg-indigo-200 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50">
+        <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-80 hover:opacity-50">
         Copy
         </button>
     </div>`;
@@ -237,7 +240,7 @@ async function classifyText(text) {
         // Display loading message with timer
         const loadingMessage = document.createElement("div");
         loadingMessage.classList.add("flex", "justify-start", "mb-4");
-        loadingMessage.innerHTML = `<div id="${imageId}" class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-xs shadow-lg">Generating image... <span id="${tId}" class="text-sm text-gray-600">(0s)</span></div>`;
+        loadingMessage.innerHTML = `<div id="${imageId}" class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl mb-4">Generating image... <span id="${tId}" class="text-sm text-gray-600">(0s)</span></div>`;
 
         //append loading message to the chatArea
         chatArea.appendChild(loadingMessage);
@@ -304,21 +307,20 @@ async function classifyText(text) {
         targetTemplate.innerText = '';
         // Remove all classes
         targetTemplate.className = '';
-        targetTemplate.appendChild(imageContainer); // Append the entire container instead of using innerHTML
+        targetTemplate.appendChild(imageContainer); // Append the entire container instead of using innerHTML relative
 
         chatArea.scrollTop = chatArea.scrollHeight;
     } else {
-        const mode = document.getElementById('mode')
+        const mode = document.getElementById('mode').value;
         const aiMessage = document.createElement("div");
         aiMessage.classList.add("flex", "justify-start", "mb-4");
-        aiMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-2xl shadow-xl">Thinking...</div>`;
+        aiMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl mb-4"></div>`;
         chatArea.appendChild(aiMessage);
         chatArea.scrollTop = chatArea.scrollHeight;
-        if (mode === 'coding mode') {
-            var model = "Qwen/Qwen2.5-Coder-32B-Instruct"
-        }
-        else {
-            var model = "Qwen/Qwen2.5-72B-Instruct"
+
+        let model = "Qwen/Qwen2.5-72B-Instruct"
+        if (mode === 'Coding mode') {
+             model = "Qwen/Qwen2.5-Coder-32B-Instruct"
         }
 
         try {
@@ -332,12 +334,21 @@ async function classifyText(text) {
             for await (const chunk of stream) {
                 if (chunk.choices && chunk.choices.length > 0) {
                     output += chunk.choices[0].delta.content;
-                    aiMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-3xl overflow-x-auto pre-line break-words shadow-lg border border-gray-300">${marked(output)}</div>`;
+
+                    //console.log(marked(output));
+                    aiMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-blue-900 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl mb-4">${marked(output)}</div>`;
+                    aiMessage.querySelectorAll('pre').forEach(pre => {
+                        pre.querySelectorAll('code').forEach(code =>{
+                            code.classList.add('dark:bg-green-200')
+                            code.parentElement.classList.add('dark:border-black')
+                        });
+                    });
                 }
                 addCopyListeners(); // Add event listeners after rendering content
             }
 
             conversationHistory.push({ role: "assistant", content: output });
+            console.log(conversationHistory);
         } catch (error) {
             aiMessage.innerHTML = `<div class="bg-red-200 text-red-800 p-3 rounded-lg max-w-xs shadow-lg">Error: ${error.message}</div>`;
             conversationHistory.pop({ role: "user", content: text });
@@ -363,4 +374,19 @@ userInput.addEventListener("keydown", async function(e) {
         }
     }
 });
+});
+
+
+function AddDarkClasses(result) {
+    // Apply styles to <pre> and <code> elements
+    const preElements = result.querySelectorAll('pre');
+    //const codeElements = result.querySelectorAll('code');
+    preElements.forEach(pre => {
+        pre.classList.add('dark:bg-black'); // Add custom class for styling
+    });
+    return preElements
+}
+
+}).catch(error => {
+    console.error("Error:", error); // Log any error if the promise is rejected
 });

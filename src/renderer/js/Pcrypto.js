@@ -24,27 +24,29 @@ function hide_key(apiKey, password) {
 
 
 export function get_key(encryptedObject, password) {
-
     // Destructure IV and encrypted data
     const { iv, encryptedData } = encryptedObject;
-
-    // Convert the comma-separated string to a buffer
-    const ivBuffer = Buffer.from(iv.split(',').map(Number)); // Split string, convert to numbers, and make a buffer
 
     // Check if the IV exists
     if (!iv) {
         throw new Error("IV is missing or undefined");
     }
 
-    // Derive the same key from the password
-    const key = crypto.scryptSync(password, 'PhantomJoker15', 32);
+    // Convert the comma-separated string to a buffer
+    return window.electron.getBufferFromIV(iv).then(ivBuffer => {
+        // Derive the same key from the password
+        const key = window.electron.scryptSync(password, 'PhantomJoker15', 32);
 
-    // Create the decipher
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, ivBuffer);
+        // Create the decipher
+        const decipher = crypto.createDecipheriv('aes-256-cbc', key, ivBuffer);
 
-    // Decrypt the data
-    let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
+        // Decrypt the data
+        let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
 
-    return decrypted;
+        return decrypted;
+    }).catch(error => {
+        console.error("Error in get_key:", error);
+        throw error;
+    });
 }

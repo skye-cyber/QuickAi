@@ -1,11 +1,10 @@
-const { contextBridge } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
+const crypto = require('crypto');
+const { Buffer } = require('buffer');
 
 contextBridge.exposeInMainWorld('electron', {
-    getEnv: () => ({
-        IV: process.env.IV,
-        API_OBJ: process.env.API_OBJ,
-        SKEY: process.env.SKEY,
-    }),
-    // You can expose other Node.js functionalities here as needed
+    getEnv: () => ipcRenderer.invoke('get-env'),
+    getBufferFromIV: (iv) => ipcRenderer.invoke('get-buffer-from-iv', iv),
+    scryptSync: (password, salt, keylen) => crypto.scryptSync(password, salt, keylen),
+                                Buffer
 });
-
