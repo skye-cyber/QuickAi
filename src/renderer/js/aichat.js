@@ -214,7 +214,7 @@ async function classifyText(text) {
 
     const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
     userMessage.innerHTML = `
-    <div data-id="${userMSGId}" class="bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 shadow-md max-w-3xl">
+    <div data-id="${userMSGId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 shadow-md max-w-3xl">
         <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapedText}</p>
         <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-80 hover:opacity-50">
         Copy
