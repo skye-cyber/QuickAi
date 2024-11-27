@@ -11,15 +11,3 @@
         display: none;  /* Hide scrollbar for Chrome, Safari, and Edge */
     }
 }
-@keyframes dots {
-    0% {opacity: 1;}
-    50% {opacity: 0.5; }
-    100% {opacity: 1; }
-}
-.loader div {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin: 0 5px;
-    animation: dots 1s infinite;
-}
