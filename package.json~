@@ -7,7 +7,10 @@
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "NODE_ENV=production npx tailwindcss -i ./src/renderer/css/css.css -o ./src/renderer/css/styles.css --minify",
+    "watch": "npx tailwindcss -i ./src/renderer/css/css.css -o ./src/renderer/css/styles.css --watch",
+    "package": "electron-packager ."
   },
   "keywords": [],
   "author": {
@@ -16,13 +19,48 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "electron": "^32.2.5",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "dotenv": "^16.4.5",
+    "dotenv-expand": "^10.0.0",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
     "electron-packager": "^17.1.2",
     "highlight": "^0.2.4",
     "husky": "^9.1.7",
     "marked": "^15.0.1",
-    "dotenv": "^16.1.0"
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "stream-browserify": "^3.0.0",
+    "vm-browserify": "^1.1.2"
   },
+  "dependecies": {
+    "dotenv": "^16.4.5",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "dotenv": "^16.4.5",
+    "dotenv-expand": "^10.0.0",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "electron-packager": "^17.1.2",
+    "highlight": "^0.2.4",
+    "husky": "^9.1.7",
+    "marked": "^15.0.1",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "stream-browserify": "^3.0.0",
+    "vm-browserify": "^1.1.2"
+  },
+ "files": [
+     "aichat.html",
+     "home.html",
+     "loading.html",
+     "README.md",
+     "package.json",
+     "!.dist",
+     "node_modules/**/*",
+     "src/**/*"
+ ],
   "build": {
     "appId": "com.quickai.app",
     "productName": "QuickAi",
@@ -43,7 +81,7 @@
       "perMachine": true,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true
-    }
+    },
     "linux": {
       "target": [
         "AppImage",
@@ -62,5 +100,8 @@
         }
       ]
     }
+  },
+  "dependencies": {
+    "process": "^0.11.10"
   }
 }

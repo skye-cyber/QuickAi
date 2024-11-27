@@ -215,7 +215,7 @@ async function classifyText(text) {
     const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
     userMessage.innerHTML = `
     <div data-id="${userMSGId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 max-w-3xl shadow-md">
-        <p class="pre-line break-words">${escapedText}</p>
+        <p class="pre-word break-words">${escapedText}</p>
         <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-80 hover:opacity-50">
         Copy
         </button>
@@ -240,7 +240,14 @@ async function classifyText(text) {
         // Display loading message with timer
         const loadingMessage = document.createElement("div");
         loadingMessage.classList.add("flex", "justify-start", "mb-4");
-        loadingMessage.innerHTML = `<div id="${imageId}" class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl mb-4">Generating image... <span id="${tId}" class="text-sm text-gray-600">(0s)</span></div>`;
+        loadingMessage.innerHTML = `<div id="${imageId}" class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl mb-4">
+        mb-4"><div class="loader space-x-2 flex">
+        <div class="loader div bg-blue-500 dark:bg-cyan-400 animate-pulse delay-0"></div>
+        <div class="loader div bg-blue-300 dark:bg-sky-400 delay-100"></div>
+        <div class="loader div bg-brown-400 dark:bg-brown-400 animate-pulse delay-200"></div>
+        </div>
+        <span id="${tId}" class="text-sm text-gray-600">(0s)</span>
+        </div>`;
 
         //append loading message to the chatArea
         chatArea.appendChild(loadingMessage);
@@ -315,7 +322,7 @@ async function classifyText(text) {
         const aiMessage = document.createElement("div");
         aiMessage.classList.add("flex", "justify-start", "mb-4");
         aiMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl mb-4"><div class="loader space-x-2 flex">
-        <div class="loader div" style="background-color: #4a90e2; animation-delay: 0s;"></div>
+        <div class="loader div" style="background-color: #244de2; animation-delay: 0s;"></div>
         <div class="loader div" style="Background-color: #2a90e2;animation-delay: 0.1s;"></div>
         <div class="loader div" style="background-color: #e67c52;animation-delay: 0.2s;"></div>
         </div>
@@ -342,6 +349,8 @@ async function classifyText(text) {
 
                     //console.log(marked(output));
                     aiMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-blue-900 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl mb-4">${marked(output)}</div>`;
+
+                    //change code Background in darkMode
                     aiMessage.querySelectorAll('pre').forEach(pre => {
                         pre.querySelectorAll('code').forEach(code =>{
                             code.classList.add('dark:bg-green-200')

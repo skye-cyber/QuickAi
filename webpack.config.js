@@ -17,6 +17,11 @@ module.exports = {
       Buffer: ['buffer', 'Buffer']
     })
   ],
+  optimization: {
+    usedExports: true,
+    minimize: true,
+    //minimizer: [new TerserPlugin()],
+  },
 
   resolve: {
     fallback: {
@@ -30,5 +35,5 @@ module.exports = {
       fs: require.resolve('fs')
     }
   },
-  mode: 'development',
+  mode: 'production',
 };

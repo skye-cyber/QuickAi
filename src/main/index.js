@@ -2,8 +2,9 @@ const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
 const crypto = require('crypto');
 const { Buffer } = require('buffer');
+const dotenv = require('dotenv')
 
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 
 ipcMain.handle('get-env', () => {
