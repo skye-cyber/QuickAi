@@ -246,9 +246,9 @@ async function classifyText(text) {
         loadingMessage.innerHTML = `
         <div id="${imageId}" class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 p-3 max-w-3xl mb-4">
         <div class="space-x-2 flex">
-        <div class="bg-blue-500 dark:bg-cyan-400 w-3 h-3 rounded-full animate-bounce"></div>
-        <div class="bg-blue-400 dark:bg-sky-400 w-3 h-3 rounded-full animate-bounce-200"></div>
-        <div class="bg-rose-700 dark:bg-orange-700 w-3 h-3 rounded-full animate-bounce-400"></div>
+        <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 xl:w-4 xl:h-4 rounded-full animate-bounce"></div>
+        <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-200"></div>
+        <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-400"></div>
         </div>
         <span id="${tId}" class=" text-sm text-gray-600">(0s)</span>
         </div>
@@ -330,9 +330,9 @@ async function classifyText(text) {
         aiMessage.classList.add("flex", "justify-start", "mb-4");
         aiMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl mb-4">
         <div class="loader space-x-2 flex">
-        <div class="bg-blue-500 dark:bg-cyan-400 w-3 h-3 rounded-full animate-bounce"></div>
-        <div class="bg-blue-400 dark:bg-sky-400 w-3 h-3 rounded-full animate-bounce-200"></div>
-        <div class="bg-rose-700 dark:bg-orange-700 w-3 h-3 rounded-full animate-bounce-400"></div>
+        <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
+        <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  lg:w-3 lg:h-3  rounded-full animate-bounce-200"></div>
+        <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  lg:w-3 lg:h-3  rounded-full animate-bounce-400"></div>
         </div>
         </div>`;
         chatArea.appendChild(aiMessage);
