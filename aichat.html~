@@ -56,7 +56,7 @@ window.MathJax = {
                     <div class="relative inline-flex justify-center text-center text-2xl font-semibold leading-9 dark:text-white">
                         <h1>What can I help you with? </h1><h1 class="result-streaming absolute left-full transition-opacity" style="opacity: 0;"><span></span></h1>
                     </div>
-                    <div class="h-" style="opacity: 1; will-change: auto;">
+                    <div class="h-fit" style="opacity: 1; will-change: auto;">
                         <div class="mt-5 flex items-center justify-center gap-x-2 transition-opacity xl:gap-x-2.5 opacity-100 flex-wrap">
                             <ul class="relative flex items-stretch gap-x-2 gap-y-4 overflow-hidden py-2 sm:gap-y-2 xl:gap-x-2.5 xl:gap-y-2.5 flex-wrap justify-center">
                                 <li id="create-image" style="opacity: 1; will-change: auto; transform: none;">
@@ -105,6 +105,11 @@ window.MathJax = {
                         class="w-full rows-10 scrollbar-hide resize-none overflow-wrap p-1 md:p-3 max-h-[15vh] border border-gray-500 dark:border-none rounded-lg focus:outline-none dark:outline-sky-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-gray-900 dark:ring-1 dark:bg-gray-800 dark:text-white"
                         autofocus
                         placeholder="Message QuickAi 💫 To generate an image, start with `/image`" aria-label="Message input"></textarea>
+
+                    <div class="flex">
+                        <button aria-label="Attach files" class="flex items-center justify-center h-8 w-8 rounded-lg rounded-bl-xl text-token-text-primary dark:text-white focus-visible:outline-black dark:focus-visible:outline-white hover:bg-black/10"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 7C9 4.23858 11.2386 2 14 2C16.7614 2 19 4.23858 19 7V15C19 18.866 15.866 22 12 22C8.13401 22 5 18.866 5 15V9C5 8.44772 5.44772 8 6 8C6.55228 8 7 8.44772 7 9V15C7 17.7614 9.23858 20 12 20C14.7614 20 17 17.7614 17 15V7C17 5.34315 15.6569 4 14 4C12.3431 4 11 5.34315 11 7V15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15V9C13 8.44772 13.4477 8 14 8C14.5523 8 15 8.44772 15 9V15C15 16.6569 13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z" fill="currentColor"></path></svg></button><input multiple="" tabindex="-1" class="hidden" type="file" style="display: none;">
+                        </div>
+
                     <button
                         id="sendBtn"
                         class="absolute right-2 bottom-2 md:bottom-5 opacity-50 hover:opacity-90 px-4 py-3 md:px-6 md:py-5 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-sky-600 dark:to-purple-800 text-white rounded-full hover:from-blue-700 hover:to-purple-700 transition ease-in-out duration-200 dark:border dark:border-blue-400 dark:shadow dark:shadow-cyan-200 z-60"
