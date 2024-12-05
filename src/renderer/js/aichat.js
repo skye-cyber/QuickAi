@@ -143,7 +143,6 @@ function initChat(client) {
     }
 
     function escapeHTML(unsafe) {
-        console.log(typeof(unsafe));
         if (typeof unsafe !== 'string') {
             return '';
         }
@@ -254,7 +253,7 @@ function initChat(client) {
             </div>
             </div>`;
 
-            const aiMessageUId = `msg_${Math.random().toString(34).substring(3,9)}`;
+            const aiMessageUId = `msg_${Math.random().toString(30).substring(3,9)}`;
             aiMessage.classList.add(aiMessageUId, "flex", "justify-start", "mb-4");
             chatArea.appendChild(aiMessage);
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -290,9 +289,8 @@ function initChat(client) {
                 conversationHistory.push({ role: "assistant", content: output });
 
             } catch (error) {
-                console.error(error);
                 // Handle request error appropriately
-                handleRequestError(error, conversationHistory);
+                handleRequestError(error, userMessage, aiMessage, conversationHistory);
             }
         }
 
@@ -309,38 +307,44 @@ function initChat(client) {
         }
     }
 
-    function handleRequestError(error, conversationHistory) {
-        try{
-            console.log(`${error}Intercepted`);
+    function handleRequestError(error, userMessage, aiMessage, conversationHistory) {
+        try {
+            console.log(`${error} Intercepted`);
             const errorContainer = document.getElementById('errorContainer');
             const errorArea = document.getElementById('errorArea');
             const closeModal = document.getElementById('closeEModal');
             const retry = document.getElementById('retry');
-            const lastMessage = conversationHistory.slice(-1)[0].content;
+            const lastMessage = conversationHistory.slice(-1)[0]?.content; // Safely access the last message
+
+            // Remove existing event listeners before adding a new one
+            const retryHandler = () => {
+                if (aiMessage) aiMessage.remove();
+                if (userMessage) userMessage.remove();
+
+                // Retry action
+                classifyText(lastMessage);
+                console.log('Retry action triggered with:', lastMessage);
+                errorContainer.classList.add('hidden');
+            };
+
+            retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
+            const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
+            newRetry.addEventListener('click', retryHandler);
 
             closeModal.addEventListener('click', () => errorContainer.classList.add('hidden'));
-
-            retry.addEventListener('click', () => {
-                // Handle retry action
-                classifyText(lastMessage);
-                console.log('Retry action triggered with:', conversationHistory);
-                errorContainer.classList.add('hidden');
-            });
 
             // Function to show the modal with an error message
             function showError() {
                 errorContainer.classList.remove('hidden');
-                errorArea.textContent = error;
-                conversationHistory.pop();
+                errorArea.textContent = "An error occurred during response. Retry?";
+                conversationHistory.pop(); // Remove the last conversation entry
             }
 
             showError();
-
-        } catch (err){
-            console.error(err);
+        } catch (err) {
+            console.error('Error handling request error:', err);
         }
     }
-
 
     function implementUserCopy() {
         document.querySelectorAll('.user-copy-button').forEach(button => {
