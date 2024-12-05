@@ -34,7 +34,7 @@ function createWindow() {
     });
 
     loadingWindow.loadFile(path.join(__dirname, '../../loading.html'));
-    console.log(path.join(__dirname, '../../loading.html'));
+    //console.log(path.join(__dirname, '../../loading.html'));
 
     // Create the main window
     const mainWindow = new BrowserWindow({
@@ -44,6 +44,7 @@ function createWindow() {
         show: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'), // Use the preload script
+            preload: path.join(__dirname, "script.js"),
             nodeIntegration: true, // Enable Node.js integration in the renderer process
             contextIsolation: true
         }
