@@ -22,8 +22,28 @@ module.exports = {
     minimize: true,
     //minimizer: [new TerserPlugin()],
   },
-
+  /*module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader'
+        }
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: 'javascript/auto'
+      }
+    ]
+  },*/
   resolve: {
+    //extensions: ['.js', '.mjs', '.json'],
     fallback: {
       buffer: require.resolve('buffer/'),
       path: require.resolve('path-browserify'),

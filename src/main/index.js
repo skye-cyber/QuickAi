@@ -34,7 +34,7 @@ function createWindow() {
     });
 
     loadingWindow.loadFile(path.join(__dirname, '../../loading.html'));
-    console.log(path.join(__dirname, '../../loading.html'));
+    //console.log(path.join(__dirname, '../../loading.html'));
 
     // Create the main window
     const mainWindow = new BrowserWindow({

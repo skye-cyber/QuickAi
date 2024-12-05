@@ -6,7 +6,6 @@ const dotenv = require('dotenv')
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-console.log(process.env); // Check if your variables are loaded
 
 ipcMain.handle('get-env', () => {
     return {

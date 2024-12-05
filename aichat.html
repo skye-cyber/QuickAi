@@ -8,8 +8,21 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.2/katex.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.12.1/polyfill.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 </head>
+<script>
+window.MathJax = {
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)'], ['[', ']']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        }
+};
+//hljs.highlightAll();
+</script>
 <body class="bg-gradient-to-b from-indigo-200 via-purple-300 to-blue-200 dark:from-slate-700 dark:to-slate-700 min-h-screen font-sans flex flex-col items-center overflow-x-hidden">
 
     <!-- Main Container -->
@@ -68,21 +81,40 @@
         </section>
 
        <!-- Message Input Section -->
-        <section class="fixed w-[98vw] md:w-[97vw] right-1 lg:right-[2.7%] bottom-[0.5%] flex space-x-4 p-2 rounded-md md:rounded-full dark:bg-gray-700 z-50">
-                <textarea id="userInput"
-                oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';" cols="10"
-                class="w-full rows-10 scrollbar-hide resize-none bottom-2 overflow-wrap p-1 md:p-3 max-h-[15vh] border border-gray-300 dark:border-none rounded-md md:rounded-full focus:outline-none dark:outline-sky-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-gray-900 dark:ring-1 dark:bg-gray-800 dark:text-white"
-                autofocus
-                placeholder="Message QuickAi 💫 To generate an image, start with `/image`" aria-label="Message input"></textarea>
-            <button
-                id="sendBtn"
-                class="fixed right-[3%] lg:right-[3%] bottom-[3%] lg:bottom-[2.6%] px-4 py-3 md:px-6 md:py-5 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-sky-600 dark:to-purple-800 text-white rounded-full hover:from-blue-700 hover:to-purple-700 transition ease-in-out duration-200 dark:border dark:border-blue-400 dark:shadow dark:shadow-cyan-200"
-                aria-label="Send message" title="Send message"
-                >
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </section>
+        <div class="fixed flex left-0 lg:left-auto items-end w-full lg:items-center lg:justify-center z-50 bottom-[1%]">
+            <section class="w-full lg:w-[80vw] flex space-x-4 z-50">
+                <section class="relative w-full p-2 border dark:border-black dark:bg-gray-700 rounded-lg">
+                    <textarea id="userInput"
+                        oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';" cols="10"
+                        class="w-full rows-10 scrollbar-hide resize-none overflow-wrap p-1 md:p-3 max-h-[15vh] border border-gray-400 dark:border-none rounded-lg focus:outline-none dark:outline-sky-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-gray-900 dark:ring-1 dark:bg-gray-800 dark:text-white"
+                        autofocus
+                        placeholder="Message QuickAi 💫 To generate an image, start with `/image`" aria-label="Message input"></textarea>
+                    <button
+                        id="sendBtn"
+                        class="absolute right-2 bottom-2 md:bottom-5 opacity-50 hover:opacity-90 px-4 py-3 md:px-6 md:py-5 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-sky-600 dark:to-purple-800 text-white rounded-full hover:from-blue-700 hover:to-purple-700 transition ease-in-out duration-200 dark:border dark:border-blue-400 dark:shadow dark:shadow-cyan-200 z-60"
+                        aria-label="Send message" title="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </section>
+            </section>
+        </div>
+    </div>
 
+    <!-- Error Modal -->
+    <div id="errorContainer" class="hidden fixed flex items-center justify-center z-50 p-4" role="alert" aria-modal="true">
+        <div class="bg-rose-400 dark:bg-rose-900 bg-opacity-70 dark:bg-opacity-50 max-w-md lg:max-w-lg rounded-lg shadow-lg border border-yellow-300 dark:border-gray-900 text-red-900 dark:text-red-500 p-6 relative">
+            <button id="closeEModal" class="absolute top-1 right-1 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-400" aria-label="Close">
+                <svg class="fill-current h-6 w-6" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.65-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+                </svg>
+            </button>
+            <p id="errorArea" class="block sm:inline"></p>
+            <button id="retry" class="block sm:inline text-gray-400 dark:text-zinc-500 hover:text-violet-600 dark:hover:text-teal-600" aria-label="Retry">
+                <svg class="fill-current h-6 w-6" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm4-9.5L12 10l-4-4.5L8 6l4 5 5-4.5L19 6z"/>
+                </svg>
+            </button>
+        </div>
     </div>
 
         <!-- Modal Background -->

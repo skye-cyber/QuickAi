@@ -1,9 +1,9 @@
 {
   "name": "QuickAi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An application to interact with AI assistants for free.",
   "main": "src/main/index.js",
-  "homepage": "https://yourprojecthomepage.com",
+  "homepage": "home.com",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder",
@@ -19,6 +19,7 @@
   },
   "license": "ISC",
   "devDependencies": {
+    "babel-loader": "^9.2.1",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
     "dotenv": "^16.4.5",
@@ -28,39 +29,29 @@
     "electron-packager": "^17.1.2",
     "highlight": "^0.2.4",
     "husky": "^9.1.7",
-    "marked": "^15.0.1",
+    "marked": "^15.0.3",
+    "mathjax": "^3.2.2",
+    "mathjax-electron": "^3.0.0",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "stream-browserify": "^3.0.0",
     "vm-browserify": "^1.1.2"
   },
-  "dependecies": {
+  "dependencies": {
     "dotenv": "^16.4.5",
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.1",
-    "dotenv": "^16.4.5",
-    "dotenv-expand": "^10.0.0",
-    "electron": "^33.2.0",
-    "electron-builder": "^25.1.8",
-    "electron-packager": "^17.1.2",
-    "highlight": "^0.2.4",
-    "husky": "^9.1.7",
-    "marked": "^15.0.1",
-    "os-browserify": "^0.3.0",
-    "path-browserify": "^1.0.1",
-    "stream-browserify": "^3.0.0",
-    "vm-browserify": "^1.1.2"
+    "katex": "^0.16.11",
+    "process": "^0.11.10"
   },
- "files": [
-     "aichat.html",
-     "home.html",
-     "loading.html",
-     "README.md",
-     "package.json",
-     "!.dist",
-     "node_modules/**/*",
-     "src/**/*"
- ],
+  "files": [
+    "aichat.html",
+    "home.html",
+    "loading.html",
+    "README.md",
+    "package.json",
+    "!.dist",
+    "node_modules/**/*",
+    "src/**/*"
+  ],
   "build": {
     "appId": "com.quickai.app",
     "productName": "QuickAi",
@@ -100,8 +91,5 @@
         }
       ]
     }
-  },
-  "dependencies": {
-    "process": "^0.11.10"
   }
 }

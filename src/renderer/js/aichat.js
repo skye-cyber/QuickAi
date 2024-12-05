@@ -2,179 +2,112 @@ import { HfInference } from "@huggingface/inference";
 import { marked } from "marked";
 import hljs from 'highlight.js';
 import { get_key } from './Pcrypto.js';
-//import { before } from "node:test";
-//const { ipcRenderer } = require('electron');
 
-//Get api Key
-// Get environment variables using the exposed API
+let h_faceKey = null; // Define h_faceKey globally
+
 window.electron.getEnv().then(env => {
     const encryptedOBJ = {
         iv: env.IV,
         encryptedData: env.API_OBJ
     };
 
-const SKEY = env.SKEY;
+    const SKEY = env.SKEY;
+    const keyObject = get_key(encryptedOBJ, SKEY);
 
-const keyObject = get_key(encryptedOBJ, SKEY);
-
-keyObject.then(result => {
-    const h_faceKey = result; // This will log the resolved value
-
-const client = new HfInference(h_faceKey);
-const chatArea = document.getElementById("chatArea");
-const userInput = document.getElementById("userInput");
-const sendBtn = document.getElementById("sendBtn");
-
-//Set custom intruction for the model
-let customInstructions = `
-Your name is QuickAi. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. Wambua is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).
-Your primary goal is to assist the user in all the needs. You should be brief and direct to the point based on the user's needs. You are required to use TailwindCSS for styling unless the user requests otherwise.
-When interacting with the user:
-- You are allowed but not required to begin by introducing yourself and optionally mentioning your: deployer/creator, goal unless you've done previous done so. However, if the user starts the interaction by directly diving into the problem/question at hand, you can skip the introduction.
-- Further information about yourself or your creator(wambua) shoild only be revealed when explicitly requested for.
-- If the user needs to visualize/preview diagrams or generate images, inform them that you cannot directly generate diagrams or images. Instead, come up with a query describing what you or the user would wish to visualize, and instruct them to paste this prompt in the text area starting with '/image' to generate the image.
-- If it is not clear what image the user wants to generate, ask them for a description of what they want, and then restructure it to form a clear prompt for the user.
-- For diagrams, if the user is not satisfied with the image generation method, offer to provide them with DOT code and instructions on how to use it. You can also inform them to activate the checkbox with the text 'Use Flux 4 Image Generation' appearing at the top of the chat area, which will use a different approach to generate the image or diagram.
-- In a conversation, accertain the relationship between previous conversation to the currect interraction.
-- Engage user by asking questions.
-For drawing table:
-- Default table preview/visuualization is html except when user request otherwise.
-- For table previews no code should be shown.
-- For HTML tables, write the HTML code without the 'html' language identifier. For Markdown tables, omit the 'markdown' identifier.
-- Use CSS styling to make the table visually appealing, avoiding TailwindCSS.
-Use colors that are more visible than light gray, such as deep gray or other contrasting colors.
-- Ensure the table has a more visible outer border to distinguish it from the rest of the content.
-- For prompts starting with "create a table" or "draw a table," provide a visually appealing table unless otherwise instructed.
-
-- You're adviced to use visualy apealing tables to explain concepts in cases where user prefers so or in where concepts are better understood in table form.
-- When generating html codes in cases where you are not using tailwindcss, you can use the concept of tables mentioned earlier to show the user how the result will look like, this you can do by writting the same html code but omiting the langauge identifier 'html'.
-- You can use html to make the your response more ellegant and appealing to te user in wich case you would omit the html identifier and use inline css for styling.
-`
-
-// Initialize conversation history
-let conversationHistory = [];
-
-//Push custom instructions
-conversationHistory.push({ role: "system", content: customInstructions });
-// Initialize highlight.js
-hljs.configure({ ignoreUnescapedHTML: true });
-
-// Custom renderer for syntax highlighting
-const renderer = new marked.Renderer();
-
-// Custom renderer for code blocks
-renderer.code = function(code, language) {
-    // If language is not provided, try to extract it from the raw block
-    if (!language) {
-        language = code['lang']
-    }
-
-    const text = code['text']
-
-    // Use highlight.js to apply syntax highlighting
-    const validLanguage = language && hljs.getLanguage(language) ? language : 'plaintext';
-
-    // Highlight the code using the correct API
-    const highlighted = hljs.highlight(text, { language: validLanguage }).value;
-
-    // Create a unique ID for the copy button
-    const copyButtonId = `copy-button-${Math.random().toString(36).substring(2, 9)}`;
-
-    // Return HTML with highlighted code and a copy button
-    return `
-    <div class="relative my-auto p-2 border border-gray-300 bg-white rounded-md">
-    <button id="${copyButtonId}" class="copy-button absolute rounded-md px-2 py-2 right-2 top-2 bg-gradient-to-r from-sky-800 to-purple-600 hover:bg-blue-400 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50 dark:bg-gray-800">
-    Copy
-    </button>
-    <pre class="rounded-md dark:bg-gray-800"><code class="hljs ${validLanguage}">${highlighted}</code></pre>
-    </div>
-    `;
-};
-
-// Set the renderer in marked options
-marked.setOptions({
-    renderer: renderer,
-    highlight: function(code, lang) {
-        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-        return hljs.highlight(code, { language }).value;
-    },
-    breaks: true // Enables line breaks for Markdown
+    keyObject.then(result => {
+        h_faceKey = result;
+        const client = new HfInference(h_faceKey);
+        initChat(client);
+    }).catch(error => {
+        console.error("Error:", error);
+    });
 });
 
-// Add event listeners to dynamically created copy buttons
-function addCopyListeners() {
-    document.querySelectorAll('.copy-button').forEach(button => {
-        button.addEventListener('click', async function() {
-            const codeBlock = this.nextElementSibling.querySelector('code');
-            const textToCopy = codeBlock.innerText;
+function initChat(client) {
+    const chatArea = document.getElementById("chatArea");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const modeSelect = document.getElementById('mode');
+
+    // Custom instructions
+    const customInstructions = `Your name is QuickAi...`; // full instructions omitted for brevity
+    let conversationHistory = [{ role: "system", content: customInstructions }];
+
+    // Initialize highlight.js
+    hljs.configure({ ignoreUnescapedHTML: true });
+
+    // Custom renderer for syntax highlighting
+    const renderer = new marked.Renderer();
+    renderer.code = function (code, language) {
+        // Handle case where `code` is an object
+        const validLanguage = code.lang || 'plaintext';
+        console.log(`Language: ${validLanguage}`);
+        if (typeof code === "object" && code.text !== undefined) {
+            code = code.text; // Extract the actual code
+        }
+
+        if (typeof code !== "string" || code.trim() === "") {
+            console.warn("Empty or invalid code provided:", code);
+            code = "// No code provided"; // Default fallback for empty code
+        }
+
+        // Highlight the code
+        let highlighted;
+        try {
+            highlighted = hljs.highlight(code, { language: validLanguage }).value;
+        } catch (error) {
+            console.error("Highlighting error:", error);
+            highlighted = hljs.highlightAuto(code).value; // Fallback to auto-detection
+        }
+
+        // Generate unique ID for the copy button
+        const copyButtonId = `copy-button-${Math.random().toString(36).substring(2, 9)}`;
+
+        return `
+        <div class="relative my-auto p-2 border border-gray-300 bg-white rounded-md">
+        <button id="${copyButtonId}"
+        class="copy-button absolute rounded-md px-2 py-2 right-2 top-2 bg-gradient-to-r from-sky-800 to-purple-600 hover:bg-blue-400 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50 dark:bg-gray-800">
+        Copy
+        </button>
+        <pre class="rounded-md dark:bg-gray-800">
+        <code class="hljs ${validLanguage}">${highlighted}</code>
+        </pre>
+        </div>
+        `;
+    };
+
+    // Configure marked.js
+    marked.setOptions({
+        renderer: renderer,
+        highlight: function (code, lang) {
+            // Handle case where `code` is an object
+            const validLanguage = code.lang || 'plaintext';
+            if (typeof code === "object" && code.text !== undefined) {
+                code = code.text; // Extract the actual code
+            }
+
+            if (typeof code !== "string" || code.trim() === "") {
+                console.warn("Empty or invalid code provided:", code);
+                code = "// No code provided"; // Default fallback for empty code
+            }
 
             try {
-                await navigator.clipboard.writeText(textToCopy);
-                this.textContent = 'Copied!';
-                setTimeout(() => {
-                    this.textContent = 'Copy';
-                }, 3000);
-            } catch (err) {
-                console.error('Failed to copy: ', err);
+                return hljs.highlight(code, { language: validLanguage }).value;
+            } catch (error) {
+                console.error("Highlighting error:", error);
+                return hljs.highlightAuto(code).value; // Fallback to auto-detection
             }
-        });
+        },
+        breaks: true,
     });
-}
 
-// Function to generate an image
-async function generateImage(data) {
-    const response = await fetch(
-        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large",
-        {
-            headers: {
-                Authorization: `Bearer ${h_faceKey}`,
-                "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify(data),
-        }
-    );
-    const result = await response.blob();
-    //loadingMessage.remove(); // Remove loading message once image is ready
-    return URL.createObjectURL(result); // Return blob URL for the generated image
-}
 
-// Function to generate an image
-async function generateImageFlux(data) {
-    const response = await fetch(
-        "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev",
-        {
-            headers: {
-                Authorization: `Bearer ${h_faceKey}`,
-                "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify(data),
-        }
-    );
-    const result = await response.blob();
-    //loadingMessage.remove(); // Remove loading message once image is ready
-    return URL.createObjectURL(result); // Return blob URL for the generated image
-}
 
-//implement copy for the user messags
-function implementUserCopy() {
-    document.querySelectorAll('.user-copy-button').forEach(button => {
-        const buttonParent = button.parentElement;
-        // Find the <p> element within the parent
-        const TextBlock = buttonParent.querySelector('p');
-
-        // Hide the copy button if the user text is less than 50 characters
-        if (TextBlock && TextBlock.innerHTML.length < 50) {
-            button.style.display = 'none';
-        }
-
-        button.addEventListener('click', async function() {
-            // Select the parent of the button (excluding the button itself)
-
-            const textToCopy = TextBlock.innerText;
-
-            if (textToCopy.length >= 50) {
+    function addCopyListeners() {
+        document.querySelectorAll('.copy-button').forEach(button => {
+            button.addEventListener('click', async function() {
+                const codeBlock = this.nextElementSibling.querySelector('code');
+                const textToCopy = codeBlock.innerText;
                 try {
                     await navigator.clipboard.writeText(textToCopy);
                     this.textContent = 'Copied!';
@@ -184,231 +117,276 @@ function implementUserCopy() {
                 } catch (err) {
                     console.error('Failed to copy: ', err);
                 }
-            }
+            });
         });
-    });
-}
+    }
 
-// escape html so that it is displayed as plaintext
-function escapeHTML(unsafe) {
-    return unsafe
+    async function generateImage(data, useFlux = false) {
+        const url = useFlux ? "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev" :
+        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large";
+        //console.log(url);
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${h_faceKey}`,
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: JSON.stringify(data),
+            });
+            const blob = await response.blob();
+            return URL.createObjectURL(blob);
+        } catch (error) {
+            console.error("Image generation error:", error);
+            return null;
+        }
+    }
+
+    function escapeHTML(unsafe) {
+        console.log(typeof(unsafe));
+        if (typeof unsafe !== 'string') {
+            return '';
+        }
+        return unsafe
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-}
+    }
 
-// Function to classify text or generate image based on user input
-async function classifyText(text) {
-    const isImageRequest = text.startsWith("/image");
+    async function classifyText(text) {
+        const isImageRequest = text.startsWith("/image");
+        const escapedText = escapeHTML(text);
 
-    const escapedText = escapeHTML(text);
-
-    // Display user message
-    const userMessage = document.createElement("div");
-    userMessage.classList.add("flex", "justify-end", "mb-4", "overflow-wrap");
-
-    //unique id for userMessage this will help append response directly below the corresponding request
-    const userMSGId = `msg_${Math.random().toString(34).substring(3, 9)}`;
-
-    const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
-    userMessage.innerHTML = `
-    <div data-id="${userMSGId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 shadow-md max-w-3xl">
+        // Display user message
+        const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
+        const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
+        const userMessage = document.createElement("div");
+        userMessage.innerHTML = `
+        <div data-id="${userMessageId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 shadow-md max-w-full md:lg:max-w-4xl lg:max-w-5xl">
         <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapedText}</p>
         <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-80 hover:opacity-50">
         Copy
         </button>
-    </div>`;
+        </div>`;
+        userMessage.classList.add("flex", "justify-end", "mb-4", "overflow-wrap");
+        chatArea.appendChild(userMessage);
+        implementUserCopy();
+        chatArea.scrollTop = chatArea.scrollHeight;
+        if (!isImageRequest) {
+            conversationHistory.push({ role: "user", content: text });
+        }
 
-    chatArea.appendChild(userMessage);
-    const suggestions = document.getElementById('suggestions');
-    suggestions.classList.add('hidden');
+        if (isImageRequest) {
+            const imageData = { inputs: text.replace("/image", "").trim() };
+            const imageId = `image_${Math.random().toString(36).substring(2, 7)}`;
+            const loadingMessage = document.createElement("div");
+            loadingMessage.innerHTML = `
+            <div id="${imageId}" class="w-fit bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 max-w-3xl mb-4">
+            <div class="space-x-2 flex">
+            <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 xl:w-4 xl:h-4 rounded-full animate-bounce"></div>
+            <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-200"></div>
+            <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-400"></div>
+            <span class="text-sm text-gray-50">0s</span>
+            </div>
+            </div>
+            `;
+            chatArea.appendChild(loadingMessage);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            let secondsElapsed = 0;
+            const timerInterval = setInterval(() => {
+                secondsElapsed++;
+                loadingMessage.querySelector('span').textContent = `${secondsElapsed}s`;
+            }, 1000);
 
-    chatArea.scrollTop = chatArea.scrollHeight;
-    implementUserCopy();  //enable copy
-    // Only add to conversation history if it's a text request
-    if (!isImageRequest) {
-        conversationHistory.push({ role: "user", content: text });
+            const useFlux = document.getElementById('CModel').checked;
+            const imageUrl = await generateImage(imageData, useFlux);
+            clearInterval(timerInterval);
+
+            if (imageUrl) {
+                const imageContainer = document.createElement("div");
+                const imageElement = document.createElement("img");
+                imageElement.src = imageUrl;
+                imageElement.classList.add("rounded-lg", "shadow-lg", "mt-4", "max-w-xs", "cursor-pointer");
+                imageElement.addEventListener("click", () => {
+                    if (imageElement.requestFullscreen) {
+                        imageElement.requestFullscreen();
+                    } else if (imageElement.webkitRequestFullscreen) {
+                        imageElement.webkitRequestFullscreen();
+                    } else if (imageElement.msRequestFullscreen) {
+                        imageElement.msRequestFullscreen();
+                    }
+                });
+
+                const downloadButtonContainer = document.createElement("button");
+                downloadButtonContainer.classList.add("text-white", "rounded-b-md", "bg-gradient-to-r", "from-blue-500", "to-purple-500", "hover:from-blue-600", "hover:to-purple-600", "font-semibold", "py-2", "px-4", "inline-block", "focus:outline-none", "shadow-md", "w-fit", "h-fit", "mt-0", "ml-2");
+
+                const downloadButton = document.createElement("a");
+                downloadButton.href = imageUrl;
+                downloadButton.download = "generated_image.png";
+                downloadButton.classList.add("text-white", "no-underline");
+                downloadButton.innerText = "Download Image";
+
+                downloadButtonContainer.appendChild(downloadButton);
+                imageContainer.appendChild(imageElement);
+                imageContainer.appendChild(downloadButtonContainer);
+
+                loadingMessage.innerHTML = '';
+                loadingMessage.appendChild(imageContainer);
+            } else {
+                loadingMessage.textContent = 'Image generation failed';
+            }
+        } else {
+            const mode = modeSelect.value;
+            let model = "Qwen/Qwen2.5-72B-Instruct";
+            if (mode === 'Coding mode') {
+                model = "Qwen/Qwen2.5-Coder-32B-Instruct";
+            }
+
+            const aiMessage = document.createElement("div");
+            aiMessage.innerHTML = `
+            <div class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-black rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 p-3 max-w-3xl mb-4">
+            <div class="loader space-x-2 flex">
+            <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
+            <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
+            <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-400"></div>
+            </div>
+            </div>`;
+
+            const aiMessageUId = `msg_${Math.random().toString(34).substring(3,9)}`;
+            aiMessage.classList.add(aiMessageUId, "flex", "justify-start", "mb-4");
+            chatArea.appendChild(aiMessage);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            try {
+                const stream = client.chatCompletionStream({
+                    model: model,
+                    messages: conversationHistory,
+                    max_tokens:10000
+                });
+
+                let output = "";
+                for await (const chunk of stream) {
+                    if (chunk?.choices?.length > 0) {
+                        output += chunk.choices[0].delta.content;
+                        // Update innerHTML with marked output
+                        aiMessage.innerHTML = `<div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 p-3 max-w-full md:lg:max-w-5xl lg:max-w-6xl mb-6">${marked(output)}</div>`;
+
+                        // Add styles to code blocks
+                        aiMessage.querySelectorAll('pre').forEach(pre => {
+                            pre.querySelectorAll('code').forEach(code => {
+                                code.classList.add('dark:bg-green-200');
+                                code.parentElement.classList.add('dark:border-gray-100');
+                            });
+                        });
+
+                        addCopyListeners(); // Assuming this function adds copy functionality to code blocks
+                    }
+                    renderMathJax();
+                }
+
+                // Store conversation history
+                conversationHistory.push({ role: "assistant", content: output });
+
+            } catch (error) {
+                console.error(error);
+                // Handle request error appropriately
+                handleRequestError(error, conversationHistory);
+            }
+        }
+
     }
 
-    if (isImageRequest) {
-        const imageData = { inputs: text.replace("/image", "").trim() };
-
-        // Create a unique ID for the timer display to avoid overlaping timers incase of multiple requests
-        const tId = `timer_${Math.random().toString(32).substring(2, 7)}`;
-        //image container unique id
-        const imageId = `image_${Math.random().toString(36).substring(2, 7)}`;
-
-        // Display loading message with timer
-        const loadingMessage = document.createElement("div");
-        loadingMessage.classList.add("flex", "justify-start", "mb-4");
-        loadingMessage.innerHTML = `
-        <div id="${imageId}" class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 p-3 max-w-3xl mb-4">
-        <div class="space-x-2 flex">
-        <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 xl:w-4 xl:h-4 rounded-full animate-bounce"></div>
-        <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-200"></div>
-        <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-400"></div>
-        </div>
-        <span id="${tId}" class=" text-sm text-gray-600">(0s)</span>
-        </div>
-        `;
-        //append loading message to the chatArea
-        chatArea.appendChild(loadingMessage);
-
-        suggestions.classList.add('hidden');
-        chatArea.scrollTop = chatArea.scrollHeight;
-
-        // Start timer
-        let secondsElapsed = 0;
-        const timerInterval = setInterval(() => {
-            secondsElapsed++;
-            document.getElementById(tId).textContent = `(${secondsElapsed}s)`;
-        }, 1000);
-        //console.log(document.getElementById(tId));
-        const ModelCheckbox = document.getElementById('CModel');
-        let imageUrl
-        if (ModelCheckbox.checked) {
-            imageUrl = await generateImageFlux(imageData, loadingMessage);
+    // Function to ensure MathJax renders dynamically injected content
+    function renderMathJax() {
+        if (window.MathJax) {
+            MathJax.typesetPromise()
+            .then(() => console.log("MathJax rendering complete"))
+            .catch((err) => console.error("MathJax rendering failed:", err));
         } else {
-            imageUrl = await generateImage(imageData, loadingMessage);
+            console.error("MathJax is not loaded or available.");
         }
+    }
 
+    function handleRequestError(error, conversationHistory) {
+        try{
+            console.log(`${error}Intercepted`);
+            const errorContainer = document.getElementById('errorContainer');
+            const errorArea = document.getElementById('errorArea');
+            const closeModal = document.getElementById('closeEModal');
+            const retry = document.getElementById('retry');
+            const lastMessage = conversationHistory.slice(-1)[0].content;
 
-        clearInterval(timerInterval); // Stop timer once image is ready
+            closeModal.addEventListener('click', () => errorContainer.classList.add('hidden'));
 
-        // Create image element with save option
-        const imageContainer = document.createElement("div");
-        imageContainer.classList.add("flex", "justify-start", "mb-4", "flex-col");
-
-        const imageElement = document.createElement("img");
-        imageElement.src = imageUrl;
-        imageElement.classList.add("rounded-lg", "shadow-lg", "mt-4", "max-w-xs", "cursor-pointer");
-
-        // Event listener to enable fullscreen on click
-        imageElement.addEventListener("click", () => {
-            if (imageElement.requestFullscreen) {
-                imageElement.requestFullscreen(); // Standard method
-            } else if (imageElement.webkitRequestFullscreen) { // Safari
-                imageElement.webkitRequestFullscreen();
-            } else if (imageElement.msRequestFullscreen) { // IE/Edge
-                imageElement.msRequestFullscreen();
-            }
-        });
-
-        // Create button element to contain the download link
-        const downloadButtonContainer = document.createElement("button");
-        downloadButtonContainer.classList.add("text-white", "rounded-b-md", "bg-gradient-to-r", "from-blue-500", "to-purple-500", "hover:from-blue-600", "hover:to-purple-600", "font-semibold", "py-2", "px-4", "inline-block", "focus:outline-none", "shadow-md", "w-fit", "h-fit", "mt-0", "ml-2"
-        );
-
-        // Create anchor (link) element for download inside button
-        const downloadButton = document.createElement("a");
-        downloadButton.href = imageUrl;
-        downloadButton.download = "generated_image.png"; // Default filename
-        downloadButton.classList.add("text-white", "no-underline");
-        downloadButton.innerText = "Download Image";
-
-        // Append anchor to button container
-        downloadButtonContainer.appendChild(downloadButton);
-
-        // Append image and download button to container
-        imageContainer.appendChild(imageElement);
-        imageContainer.appendChild(downloadButtonContainer);
-
-        const targetTemplate = document.getElementById(imageId);
-
-        targetTemplate.innerText = '';
-        // Remove all classes
-        targetTemplate.className = '';
-        targetTemplate.appendChild(imageContainer); // Append the entire container instead of using innerHTML relative
-
-        chatArea.scrollTop = chatArea.scrollHeight;
-    } else {
-        //console.log(conversationHistory);
-        const mode = document.getElementById('mode').value;
-        const aiMessage = document.createElement("div");
-        aiMessage.classList.add("flex", "justify-start", "mb-4");
-        aiMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl mb-4">
-        <div class="loader space-x-2 flex">
-        <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
-        <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  lg:w-3 lg:h-3  rounded-full animate-bounce-200"></div>
-        <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  lg:w-3 lg:h-3  rounded-full animate-bounce-400"></div>
-        </div>
-        </div>`;
-        chatArea.appendChild(aiMessage);
-        chatArea.scrollTop = chatArea.scrollHeight;
-
-        let model = "Qwen/Qwen2.5-72B-Instruct"
-        if (mode === 'Coding mode') {
-             model = "Qwen/Qwen2.5-Coder-32B-Instruct"
-        }
-
-        try {
-            const stream = client.chatCompletionStream({
-                model: model,
-                messages: conversationHistory,
-                max_tokens: 10_000
+            retry.addEventListener('click', () => {
+                // Handle retry action
+                classifyText(lastMessage);
+                console.log('Retry action triggered with:', conversationHistory);
+                errorContainer.classList.add('hidden');
             });
 
-            let output = "";
-            for await (const chunk of stream) {
-                if (chunk.choices && chunk.choices.length > 0) {
-                    output += chunk.choices[0].delta.content;
-
-                    //console.log(marked(output));
-                    aiMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-blue-900 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500/50 p-3 max-w-3xl mb-4">${marked(output)}</div>`;
-
-                    //change code Background in darkMode
-                    aiMessage.querySelectorAll('pre').forEach(pre => {
-                        pre.querySelectorAll('code').forEach(code =>{
-                            code.classList.add('dark:bg-green-200')
-                            code.parentElement.classList.add('dark:border-black')
-                        });
-                    });
-                }
-                addCopyListeners(); // Add event listeners after rendering content
+            // Function to show the modal with an error message
+            function showError() {
+                errorContainer.classList.remove('hidden');
+                errorArea.textContent = error;
+                conversationHistory.pop();
             }
 
-            conversationHistory.push({ role: "assistant", content: output });
+            showError();
 
-        } catch (error) {
-            aiMessage.innerHTML = `<div class="bg-red-200 text-red-800 p-3 rounded-lg max-w-xs shadow-lg">Error: ${error.message}</div>`;
-            conversationHistory.pop({ role: "user", content: text });
+        } catch (err){
+            console.error(err);
         }
     }
-}
 
-// Send message on button click or Enter key
-sendBtn.addEventListener("click", async function() {
-    const inputText = userInput.value.trim();
-    if (inputText) {
-        userInput.value = ""; // Clear input field
-        await classifyText(inputText);
+
+    function implementUserCopy() {
+        document.querySelectorAll('.user-copy-button').forEach(button => {
+            const buttonParent = button.parentElement;
+            const textBlock = buttonParent.querySelector('p');
+
+            if (textBlock && textBlock.innerHTML.length < 50) {
+                button.style.display = 'none';
+            }
+
+            button.addEventListener('click', async function() {
+                const textToCopy = textBlock.innerText;
+
+                if (textToCopy.length >= 50) {
+                    try {
+                        await navigator.clipboard.writeText(textToCopy);
+                        this.textContent = 'Copied!';
+                        setTimeout(() => {
+                            this.textContent = 'Copy';
+                        }, 3000);
+                    } catch (err) {
+                        console.error('Failed to copy: ', err);
+                    }
+                }
+            });
+        });
     }
-});
 
-userInput.addEventListener("keydown", async function(e) {
-    if (e.key === "Enter" && !e.shiftKey) {
+    sendBtn.addEventListener("click", () => {
         const inputText = userInput.value.trim();
         if (inputText) {
-            userInput.value = ""; // Clear input field
-            await classifyText(inputText);
+            userInput.value = "";
+            classifyText(inputText);
+            document.getElementById('suggestions').classList.add('hidden')
         }
-    }
-});
-});
-
-
-function AddDarkClasses(result) {
-    // Apply styles to <pre> and <code> elements
-    const preElements = result.querySelectorAll('pre');
-    //const codeElements = result.querySelectorAll('code');
-    preElements.forEach(pre => {
-        pre.classList.add('dark:bg-black'); // Add custom class for styling
     });
-    return preElements
-}
 
-}).catch(error => {
-    console.error("Error:", error); // Log any error if the promise is rejected
-});
+    userInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            const inputText = userInput.value.trim();
+            if (inputText) {
+                userInput.value = "";
+                classifyText(inputText);
+                document.getElementById('suggestions').classList.add('hidden')
+            }
+        }
+    });
+
+}
