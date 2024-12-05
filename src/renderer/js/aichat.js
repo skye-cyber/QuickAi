@@ -188,7 +188,7 @@ function initChat(client) {
             <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 xl:w-4 xl:h-4 rounded-full animate-bounce"></div>
             <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-200"></div>
             <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-400"></div>
-            <span class="text-sm text-gray-50">0s</span>
+            <span class="text-sm text-gray-200">0s</span>
             </div>
             </div>
             `;

@@ -188,7 +188,7 @@ function initChat(client) {
             <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 xl:w-4 xl:h-4 rounded-full animate-bounce"></div>
             <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-200"></div>
             <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-400"></div>
-            <span class="text-sm text-gray-50">0s</span>
+            <span class="text-sm text-gray-20">0s</span>
             </div>
             </div>
             `;
@@ -271,7 +271,7 @@ function initChat(client) {
                     if (chunk?.choices?.length > 0) {
                         output += chunk.choices[0].delta.content;
                         // Update innerHTML with marked output
-                        aiMessage.innerHTML = `<div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-00 dark:text-black rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 p-3 max-w-full md:lg:max-w-5xl lg:max-w-6xl mb-6">${marked(output)}</div>`;
+                        aiMessage.innerHTML = `<div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 p-3 max-w-full md:lg:max-w-5xl lg:max-w-6xl mb-6">${marked(output)}</div>`;
 
                         // Add styles to code blocks
                         aiMessage.querySelectorAll('pre').forEach(pre => {
