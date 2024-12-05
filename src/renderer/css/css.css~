@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.scrollbar-hide {
+    /* Hide scrollbar for Chrome, Safari, and Edge */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+    overflow: -moz-scrollbars-none; /* Older Firefox */
+    overflow-y: scroll; /* Add this to ensure the content is scrollable */
+    &::-webkit-scrollbar {
+        display: none;  /* Hide scrollbar for Chrome, Safari, and Edge */
+    }
+}
+
+@keyframes bounce {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
