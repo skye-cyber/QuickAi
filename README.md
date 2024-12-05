@@ -63,7 +63,7 @@ npm start
 We welcome contributions from the community! If you have ideas for improvements or new features, feel free to open an issue or submit a pull request.
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the GNU GPL Version 3. See the LICENSE file for more details.
 
 ## Contact
 If you have any questions or need further assistance, please contact us at:
