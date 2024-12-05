@@ -234,7 +234,11 @@ function initChat(client) {
                 loadingMessage.innerHTML = '';
                 loadingMessage.appendChild(imageContainer);
             } else {
-                loadingMessage.textContent = 'Image generation failed';
+                loadingMessage.innerHTML = `
+                <div id="${imageId}" class="w-fit bg-red-400 text-gray-950 dark:bg-rose-500 rounded-lg p-2 font-normal shadow-lg dark:shadow-red-500 max-w-3xl mb-4">
+                <span class="text-sm text-gray-950 dark:text-black">Could not Process request!⚠️</span>
+                </div>
+                `;
             }
         } else {
             const mode = modeSelect.value;

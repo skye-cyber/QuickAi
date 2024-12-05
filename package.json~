@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "An application to interact with AI assistants for free.",
   "main": "src/main/index.js",
-  "homepage": "home.com",
+  "homepage": "home.html",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder",
