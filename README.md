@@ -2,14 +2,15 @@
 
 ## About
 
-QuickAi is a powerful and versatile AI application designed to assist with a variety of tasks. It leverages advanced machine learning techniques to provide accurate and efficient solutions. Whether you are building a new application or integrating AI capabilities into an existing project, QuickAi is here to help.
+QuickAi is a powerful and versatile AI application designed to assist with a variety of tasks. It leverages advanced machine models to provide accurate and efficient solutions. Whether you are building a new application or integrating AI capabilities into an existing project, QuickAi is here to help.
 
 ## Capabilities
 
 - **Natural Language Processing (NLP):** Understand and generate human-like text.
 - **Image Recognition:** Identify and classify objects within images.
+- **Image Generation:** Can Generate Images of your liking.
 - **Data Analysis:** Process and analyze large datasets to extract meaningful insights.
-- **Machine Learning:** Train and deploy custom machine learning models.
+- **Machine Learning:** Can help you Train and deploy custom machine learning models.
 - **API Integration:** Easily integrate with other services and platforms.
 
 ## Repository
