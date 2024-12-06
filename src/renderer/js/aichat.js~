@@ -64,13 +64,13 @@ function initChat(client) {
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(2, 9)}`;
 
         return `
-        <div class="relative my-auto p-2 border border-gray-300 bg-white rounded-md">
+        <div class="relative my-auto p-2 border border-gray-900 bg-white dark:bg-gray-800 rounded-md">
         <button id="${copyButtonId}"
         class="copy-button absolute rounded-md px-2 py-2 right-2 top-2 bg-gradient-to-r from-sky-800 to-purple-600 hover:bg-blue-400 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50 dark:bg-gray-800">
         Copy
         </button>
-        <pre class="rounded-md dark:bg-gray-800">
-        <code class="hljs ${validLanguage}">${highlighted}</code>
+        <pre class="rounded-md dark:bg-gray-700">
+        <code class="hljs ${validLanguage} dark:bg-gray-950">${highlighted}</code>
         </pre>
         </div>
         `;
@@ -182,11 +182,11 @@ function initChat(client) {
             const imageId = `image_${Math.random().toString(36).substring(2, 7)}`;
             const loadingMessage = document.createElement("div");
             loadingMessage.innerHTML = `
-            <div id="${imageId}" class="w-fit bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 max-w-3xl mb-8">
+            <div id="${imageId}" class="w-fit bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 max-w-3xl mb-[5%]">
             <div class="space-x-2 flex">
-            <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 xl:w-4 xl:h-4 rounded-full animate-bounce"></div>
-            <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-200"></div>
-            <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-400"></div>
+            <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 xl:w-3 xl:h-3 rounded-full animate-bounce"></div>
+            <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  xl:w-3 xl:h-3 rounded-full animate-bounce-200"></div>
+            <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  xl:w-3 xl:h-3 rounded-full animate-bounce-400"></div>
             <span class="text-sm text-gray-200">0s</span>
             </div>
             </div>
@@ -205,6 +205,7 @@ function initChat(client) {
 
             if (imageUrl) {
                 const imageContainer = document.createElement("div");
+                ima
                 const imageElement = document.createElement("img");
                 imageElement.src = imageUrl;
                 imageElement.classList.add("rounded-lg", "shadow-lg", "mt-4", "max-w-xs", "cursor-pointer");
@@ -235,7 +236,7 @@ function initChat(client) {
                 loadingMessage.appendChild(imageContainer);
             } else {
                 loadingMessage.innerHTML = `
-                <div id="${imageId}" class="w-fit bg-red-400 text-gray-950 dark:bg-rose-500 rounded-lg p-2 font-normal shadow-lg dark:shadow-red-500 max-w-3xl mb-4">
+                <div id="${imageId}" class="w-fit bg-red-400 text-gray-950 dark:bg-rose-500 rounded-lg p-2 font-normal shadow-lg dark:shadow-red-500 max-w-3xl mb-[5%]">
                 <span class="text-sm text-gray-950 dark:text-black">Could not Process request!⚠️</span>
                 </div>
                 `;
@@ -258,7 +259,7 @@ function initChat(client) {
             </div>`;
 
             const aiMessageUId = `msg_${Math.random().toString(30).substring(3,9)}`;
-            aiMessage.classList.add(aiMessageUId, "flex", "justify-start", "mb-8");
+            aiMessage.classList.add(aiMessageUId, "flex", "justify-start", "mb-[5%]");
             chatArea.appendChild(aiMessage);
             chatArea.scrollTop = chatArea.scrollHeight;
 
@@ -277,12 +278,12 @@ function initChat(client) {
                         aiMessage.innerHTML = `<div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 p-3 max-w-full md:lg:max-w-5xl lg:max-w-6xl mb-6">${marked(output)}</div>`;
 
                         // Add styles to code blocks
-                        aiMessage.querySelectorAll('pre').forEach(pre => {
+                        /*aiMessage.querySelectorAll('pre').forEach(pre => {
                             pre.querySelectorAll('code').forEach(code => {
                                 code.classList.add('dark:bg-green-200');
                                 code.parentElement.classList.add('dark:border-gray-100');
                             });
-                        });
+                        });*/
 
                         addCopyListeners(); // Assuming this function adds copy functionality to code blocks
                     }

@@ -67,6 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Attach scroll event listener to chatArea
     chatArea.addEventListener("scroll", updateScrollButtonVisibility);
+    window.addEventListener("resize", updateScrollButtonVisibility);
+
 
     // Initial check when content is loaded or dynamically updated
     updateScrollButtonVisibility();
