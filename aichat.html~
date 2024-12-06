@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chat Interaction</title>
+    <title>QuickA</title>
     <link rel="stylesheet" href="src/renderer/css/aichat.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
@@ -49,7 +49,7 @@ window.MathJax = {
         </header>
 
         <!-- Chat Area -->
-        <section id="chatArea" class="bg-gray-100 dark:bg-slate-900 h-[75vh] p-2 md:p-4 rounded-lg shadow-inner  dark:shadow-gray-950 overflow-y-auto space-y-4">
+        <section id="chatArea" class="bg-gray-100 dark:bg-slate-900 h-[75vh] p-2 md:p-4 rounded-lg shadow-inner  dark:shadow-gray-950 overflow-y-auto overflow-x-hidden space-y-4">
             <!-- Quick query options -->
             <section id='suggestions' class="mx-auto">
                 <div class="justify-center mt-[var(--screen-optical-compact-offset-amount)] flex h-full flex-shrink flex-col items-center overflow-hidden text-token-text-primary" style="opacity: 1; will-change: auto;">
@@ -58,7 +58,7 @@ window.MathJax = {
                     </div>
                     <div class="h-fit" style="opacity: 1; will-change: auto;">
                         <div class="mt-5 flex items-center justify-center gap-x-2 transition-opacity xl:gap-x-2.5 opacity-100 flex-wrap">
-                            <ul class="relative flex items-stretch gap-x-2 gap-y-4 overflow-hidden py-2 sm:gap-y-2 xl:gap-x-2.5 xl:gap-y-2.5 flex-wrap justify-center">
+                            <ul id="SQ-UL" class="relative flex items-stretch gap-x-2 gap-y-4 overflow-hidden py-2 sm:gap-y-2 xl:gap-x-2.5 xl:gap-y-2.5 flex-wrap justify-center">
                                 <li id="create-image" class="SG" style="opacity: 1; will-change: auto; transform: none;">
                                     <button class="group relative flex h-[42px] items-center gap-1.5 rounded-full border border-token-border-light px-3 py-2 text-start text-[13px] shadow-xxs transition enabled:hover:bg-token-main-surface-secondary disabled:cursor-not-allowed xl:gap-2 xl:text-[14px]"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-md" style="color: rgb(53, 174, 71);"><path d="M4.5 17.5L7.56881 14.3817C8.32655 13.6117 9.55878 13.5826 10.352 14.316L16.5 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 12H18.3798C17.504 12 16.672 11.6173 16.102 10.9524L11.898 6.04763C11.328 5.38269 10.496 5 9.6202 5H6C4.89543 5 4 5.89543 4 7V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 5H18.3798C17.504 5 16.672 5.38269 16.102 6.04763L14 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="8.5" cy="9.5" r="1.5" fill="currentColor"></circle><path d="M18 14V10C18 9.58798 18.4704 9.35279 18.8 9.6L21.4667 11.6C21.7333 11.8 21.7333 12.2 21.4667 12.4L18.8 14.4C18.4704 14.6472 18 14.412 18 14Z" fill="currentColor"></path><path d="M18 7V3C18 2.58798 18.4704 2.35279 18.8 2.6L21.4667 4.6C21.7333 4.8 21.7333 5.2 21.4667 5.4L18.8 7.4C18.4704 7.64721 18 7.41202 18 7Z" fill="currentColor"></path></svg><span class="max-w-full select-none whitespace-nowrap text-gray-600 transition group-hover:text-token-text-primary dark:text-gray-500">Create image</span></button>
                                 </li>
