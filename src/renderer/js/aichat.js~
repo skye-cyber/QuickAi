@@ -182,7 +182,7 @@ function initChat(client) {
             const imageId = `image_${Math.random().toString(36).substring(2, 7)}`;
             const loadingMessage = document.createElement("div");
             loadingMessage.innerHTML = `
-            <div id="${imageId}" class="w-fit bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 max-w-3xl mb-4">
+            <div id="${imageId}" class="w-fit bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 max-w-3xl mb-8">
             <div class="space-x-2 flex">
             <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 xl:w-4 xl:h-4 rounded-full animate-bounce"></div>
             <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  xl:w-4 xl:h-4 rounded-full animate-bounce-200"></div>
@@ -236,7 +236,7 @@ function initChat(client) {
             } else {
                 loadingMessage.innerHTML = `
                 <div id="${imageId}" class="w-fit bg-red-400 text-gray-950 dark:bg-rose-500 rounded-lg p-2 font-normal shadow-lg dark:shadow-red-500 max-w-3xl mb-4">
-                <span class="text-sm text-gray-">Could not Process request!⚠️</span>
+                <span class="text-sm text-gray-950 dark:text-black">Could not Process request!⚠️</span>
                 </div>
                 `;
             }
@@ -258,7 +258,7 @@ function initChat(client) {
             </div>`;
 
             const aiMessageUId = `msg_${Math.random().toString(30).substring(3,9)}`;
-            aiMessage.classList.add(aiMessageUId, "flex", "justify-start", "mb-4");
+            aiMessage.classList.add(aiMessageUId, "flex", "justify-start", "mb-8");
             chatArea.appendChild(aiMessage);
             chatArea.scrollTop = chatArea.scrollHeight;
 
@@ -286,7 +286,8 @@ function initChat(client) {
 
                         addCopyListeners(); // Assuming this function adds copy functionality to code blocks
                     }
-                    renderMathJax();
+                    // Debounce MathJax rendering to avoid freezing
+                    debounceRenderMathJax();
                 }
 
                 // Store conversation history
@@ -301,15 +302,21 @@ function initChat(client) {
     }
 
     // Function to ensure MathJax renders dynamically injected content
-    function renderMathJax() {
-        if (window.MathJax) {
-            MathJax.typesetPromise()
-            .then(() => console.log("MathJax rendering complete"))
-            .catch((err) => console.error("MathJax rendering failed:", err));
-        } else {
-            console.error("MathJax is not loaded or available.");
-        }
+    let renderTimeout;
+
+    function debounceRenderMathJax(delay = 300) {
+        if (renderTimeout) clearTimeout(renderTimeout);
+        renderTimeout = setTimeout(() => {
+            if (window.MathJax) {
+                MathJax.typesetPromise()
+                .then(() => console.log("MathJax rendering complete"))
+                .catch((err) => console.error("MathJax rendering failed:", err));
+            } else {
+                console.error("MathJax is not loaded or available.");
+            }
+        }, delay);
     }
+
 
     function handleRequestError(error, userMessage, aiMessage, conversationHistory) {
         try {

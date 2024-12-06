@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const { Buffer } = require('buffer');
 const dotenv = require('dotenv')
 
+app.disableHardwareAcceleration()
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 

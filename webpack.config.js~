@@ -15,33 +15,15 @@ module.exports = {
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    })
+    }),
+
   ],
+
   optimization: {
     usedExports: true,
     minimize: true,
-    //minimizer: [new TerserPlugin()],
   },
-  /*module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader'
-        }
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      },
-      {
-        test: /\.mjs$/,
-        include: /node_modules/,
-        type: 'javascript/auto'
-      }
-    ]
-  },*/
+
   resolve: {
     //extensions: ['.js', '.mjs', '.json'],
     fallback: {
@@ -50,10 +32,10 @@ module.exports = {
       os: require.resolve('os-browserify/browser'),
       crypto: require.resolve('crypto-browserify'),
       vm: require.resolve('vm-browserify'),
-      buffer: require.resolve('buffer/'),
       stream: require.resolve('stream-browserify'),
       fs: require.resolve('fs')
     }
   },
-  mode: 'produc',
+  //devtool: false,
+  mode: 'product',
 };

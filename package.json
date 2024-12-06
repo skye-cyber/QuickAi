@@ -21,6 +21,7 @@
   "devDependencies": {
     "babel-loader": "^9.2.1",
     "buffer": "^6.0.3",
+    "compression-webpack-plugin": "^11.1.0",
     "crypto-browserify": "^3.12.1",
     "dotenv": "^16.4.5",
     "dotenv-expand": "^10.0.0",
