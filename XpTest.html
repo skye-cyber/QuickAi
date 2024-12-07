@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML to DOCX, PDF, and PNG</title>
+    <script src="https://cdn.jsdelivr.net/npm/html-to-docx@1.2.0/dist/html-to-docx.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-to-pdfjs@1.0.1/dist/html-to-pdf.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+</head>
+<body>
+    <h1>Convert HTML to DOCX, PDF, and PNG</h1>
+    <div id="content">
+        <h1>Heading 1</h1>
+        <p>This is a paragraph.</p>
+    </div>
+    <button id="docxButton">Generate DOCX</button>
+    <button id="pdfButton">Generate PDF</button>
+    <button id="pngButton">Generate PNG</button>
+
+    <script>
+        document.getElementById('docxButton').addEventListener('click', HTML2Word);
+        document.getElementById('pdfButton').addEventListener('click', HTML2Pdf);
+        document.getElementById('pngButton').addEventListener('click', HTML2Png);
+
+        const htmlContent = document.getElementById('content').innerHTML;
+
+        function HTML2Word() {
+            const input = document.getElementById('content');
+            const docx = htmlToDocx(input, { filename: 'output.docx' });
+            saveAs(docx, 'output.docx');
+        }
+
+        function HTML2Pdf() {
+            const input = document.getElementById('content');
+            const options = {
+                filename: 'output.pdf',
+                jsPDF: { format: 'a4' }
+            };
+            htmlToPdf(input, options).then((pdf) => {
+                saveAs(pdf, 'output.pdf');
+            }).catch((err) => {
+                console.error('Error creating PDF:', err);
+            });
+        }
+
+        function HTML2Png() {
+            htmlToImage.toPng(document.getElementById('content'), { width: 800, height: 600 })
+                .then((dataUrl) => {
+                    const link = document.createElement('a');
+                    link.download = 'output.png';
+                    link.href = dataUrl;
+                    link.click();
+                })
+                .catch((error) => {
+                    console.error('Error creating image:', error);
+                });
+        }
+    </script>
+</body>
+</html>

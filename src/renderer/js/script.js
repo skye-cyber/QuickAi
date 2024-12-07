@@ -171,4 +171,21 @@ document.addEventListener('DOMContentLoaded', function() {
          }
      }
 
+     /* Fix The heading verriding by <p> tag wrap
+     // Find all p elements in the document
+     const paragraphs = document.querySelectorAll('p');
+
+     paragraphs.forEach(p => {
+         // Check if the p element contains a heading (h1 to h6)
+         const heading = p.querySelector('h1, h2, h3, h4, h5, h6');
+         if (heading) {
+             // Move the heading out of the p element
+             p.parentNode.insertBefore(heading, p);
+
+             // Remove the p element if it is now empty
+             if (p.innerHTML.trim() === '') {
+                 p.remove();
+             }
+         }
+     });*/
 });

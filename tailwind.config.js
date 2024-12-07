@@ -17,8 +17,22 @@ module.exports = {
     },
 
     extend: {
-      colors: {
-        'custom-green': '#00ff00',
+      fontSize: {
+        'h1': '36', // Adjust as needed
+        'h2': '2rem',   // Adjust as needed
+        'h3': '1.75rem', // Adjust as needed
+        'h4': '1.5rem',  // Adjust as needed
+        'h5': '1.25rem', // Adjust as needed
+        'h6': '1rem',    // Adjust as needed
+      },
+      fontWeight: {
+        'h1': '700',  // Adjust as needed
+        'h2': '600',  // Adjust as needed
+        'h3': '500',  // Adjust as needed
+        'h4': '400',  // Adjust as needed
+        'h5': '300',  // Adjust as needed
+        'h6': '200',  // Adjust as needed
+      },
       },
 
       animation: {
@@ -40,6 +54,5 @@ module.exports = {
         },
       },
     },
-  },
   plugins: [],
 };

@@ -11,9 +11,40 @@
         display: none;  /* Hide scrollbar for Chrome, Safari, and Edge */
     }
 }
+/* global.css or within a Tailwind plugin */
+@layer utilities {
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 1rem;
+        font-weight: 400;
+    }
 
-@keyframes bounce {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+    h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    h2 {
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    h3 {
+        font-size: 1.75rem;
+        font-weight: 500;
+    }
+
+    h4 {
+        font-size: 1.5rem;
+        font-weight: 400;
+    }
+
+    h5 {
+        font-size: 1.25rem;
+        font-weight: 300;
+    }
+
+    h6 {
+        font-size: 1rem;
+        font-weight: 200;
+    }
 }

@@ -3,7 +3,8 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    aichat: './src/renderer/js/aichat.js'
+    aichat: './src/renderer/js/aichat.js',
+    utility: './src/renderer/js/aichat.js'
   },
   output: {
     filename: '_[name].js', // This will generate files named after the entry points
