@@ -108,8 +108,12 @@ window.MathJax = {
                         placeholder="Message QuickAi 💫 To generate an image, start with `/image`" aria-label="Message input">
                     </textarea>
 
-                    <div class="flex absolute left-2 bottom-3 opacity-70 hover:opacity-90" title="Attach files">
-                        <button aria-label="Attach files" class="flex items-center justify-center h-8 w-8 rounded-lg rounded-bl-xl text-token-text-primary dark:text-white focus-visible:outline-black dark:focus-visible:outline-white hover:bg-black/10"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 7C9 4.23858 11.2386 2 14 2C16.7614 2 19 4.23858 19 7V15C19 18.866 15.866 22 12 22C8.13401 22 5 18.866 5 15V9C5 8.44772 5.44772 8 6 8C6.55228 8 7 8.44772 7 9V15C7 17.7614 9.23858 20 12 20C14.7614 20 17 17.7614 17 15V7C17 5.34315 15.6569 4 14 4C12.3431 4 11 5.34315 11 7V15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15V9C13 8.44772 13.4477 8 14 8C14.5523 8 15 8.44772 15 9V15C15 16.6569 13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z" fill="currentColor"></path></svg></button><input multiple="" tabindex="-1" class="hidden" type="file" style="display: none;">
+                    <div id="AttachFiles" class="absolute left-3 bottom-5 flex rounded-lg opacity-70 hover:opacity-90" title="Attach files">
+                        <button aria-label="Attach files" class="items-center justify-center h-8 w-8 rounded-lg rounded-bl-xl text-token-text-primary dark:text-white focus-visible:outline-black dark:focus-visible:outline-white hover:bg-black/10">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M9 7C9 4.23858 11.2386 2 14 2C16.7614 2 19 4.23858 19 7V15C19 18.866 15.866 22 12 22C8.13401 22 5 18.866 5 15V9C5 8.44772 5.44772 8 6 8C6.55228 8 7 8.44772 7 9V15C7 17.7614 9.23858 20 12 20C14.7614 20 17 17.7614 17 15V7C17 5.34315 15.6569 4 14 4C12.3431 4 11 5.34315 11 7V15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15V9C13 8.44772 13.4477 8 14 8C14.5523 8 15 8.44772 15 9V15C15 16.6569 13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z" fill="currentColor"></path>
+                            </svg>
+                        </button>
                     </div>
 
                     <button
@@ -120,6 +124,21 @@ window.MathJax = {
                     </button>
                 </section>
             </section>
+        </div>
+    </div>
+
+    <!--Attachment modal -->
+    <div class="hidden fixed flex inset-4 z-50 items-center justify-center h-64 w-64 border-2 border-dashed border-gray-300 bg-black bg-opacity-50 dark:bg-slate-950 dark:bg-opacity-50" id="dropZone" title="Attach files" onclick="document.getElementById('fileInput').click()">
+    <!-- Modal Content -->
+        <div class="relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full h-full md:mx-auto max-w-md">
+            <button id="closeFileEModal" title="Close" class="absolute top-1 right-1 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-400" aria-label="Close">
+                <svg class="fill-current h-6 w-6" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.65-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+                </svg>
+            </button>
+            <input multiple="" class="absolute opacity-0" type="file" id="fileInput" />
+            <p class="text-gray-600" id="dropZoneText">Drag and drop files here or click to select</p>
+            <div id="uploadedFiles" class="mt-4 bg-blue-400"></div>
         </div>
     </div>
 

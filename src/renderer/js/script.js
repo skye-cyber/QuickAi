@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById("settingsModal");
     const themeSwitch = document.getElementById("themeSwitch");
     const rootElement = document.documentElement;
@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatArea = document.getElementById("chatArea");
     const inputArea = document.getElementById("userInput");
     const moreButton = document.getElementById("more");
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const dropZoneText = document.getElementById('dropZoneText');
+    const uploadedFilesContainer = document.getElementById('uploadedFiles');
 
     // Query map for button actions
     const queryMap = {
@@ -57,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setTheme(newTheme);
     });
 
-    // Function to check if the content is scrollable or not at the bottom
+    // Function to update scroll button visibility
     function updateScrollButtonVisibility() {
         const isScrollable = chatArea.scrollHeight > chatArea.clientHeight;
         const isAtBottom = chatArea.scrollTop + chatArea.clientHeight >= chatArea.scrollHeight;
@@ -68,7 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Attach scroll event listener to chatArea
     chatArea.addEventListener("scroll", updateScrollButtonVisibility);
     window.addEventListener("resize", updateScrollButtonVisibility);
-
 
     // Initial check when content is loaded or dynamically updated
     updateScrollButtonVisibility();
@@ -89,9 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Add event listeners to buttons using delegation
     document.getElementById('SQ-UL').addEventListener('click', (event) => {
-
         const target = event.target.closest('.SG'); // Find closest button clicked
-        console.log(target)
         if (target) { // If a button was clicked
             const queryKey = target.id; // Get the ID of the button
             if (queryMap[queryKey]) {
@@ -102,4 +103,72 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
+
+    document.getElementById("AttachFiles").addEventListener("click", OpenFileModal);
+    document.getElementById("closeFileEModal").addEventListener("click", CloseFileModal);
+
+    function OpenFileModal(){
+        console.log("Opening")
+        dropZone.classList.remove('hidden')
+    }
+
+    function CloseFileModal(){
+        console.log("Closing")
+        dropZone.classList.add('hidden')
+    }
+
+     // Handle file selection
+     fileInput.addEventListener('change', handleFileSelect);
+
+     // Handle drag and drop
+     dropZone.addEventListener('dragover', handleDragOver, false);
+     dropZone.addEventListener('drop', handleFileDrop, false);
+
+     // Handle click on drop zone to trigger file input
+     dropZone.addEventListener('click', function(event) {
+         // Prevent the default click behavior
+         event.stopPropagation();
+         event.preventDefault();
+         fileInput.click();
+     });
+
+     function handleFileSelect(event) {
+         const files = event.target.files;
+         handleFiles(files);
+     }
+
+     function handleDragOver(event) {
+         event.stopPropagation();
+         event.preventDefault();
+         event.dataTransfer.dropEffect = 'copy';
+     }
+
+     function handleFileDrop(event) {
+         event.stopPropagation();
+         event.preventDefault();
+         const files = event.dataTransfer.files;
+         handleFiles(files);
+     }
+
+     function handleFiles(files) {
+         for (let i = 0; i < files.length; i++) {
+             const file = files[i];
+             console.log('File uploaded:', file.name, file.type, file.size);
+
+             // Create a list item for the file
+             const fileElement = document.createElement('div');
+             fileElement.classList.add('flex', 'items-center', 'mb-2', 'text-gray-700');
+             fileElement.innerHTML = `
+             <span class="mr-2">${file.name}</span>
+             <span class="text-sm text-gray-500">(${file.size} bytes)</span>
+             `;
+             uploadedFilesContainer.appendChild(fileElement);
+         }
+
+         // Update the drop zone text if files are uploaded
+         if (files.length > 0) {
+             dropZoneText.textContent = 'Files uploaded successfully';
+         }
+     }
+
 });
