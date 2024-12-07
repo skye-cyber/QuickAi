@@ -21,7 +21,6 @@ window.MathJax = {
         displayMath: [['$$', '$$'], ['\\[', '\\]']]
         }
 };
-//hljs.highlightAll();
 </script>
 <body class="bg-gradient-to-b from-indigo-200 via-purple-300 to-blue-200 dark:from-slate-700 dark:to-slate-700 min-h-screen font-sans flex flex-col items-center overflow-x-hidden">
 
@@ -30,21 +29,23 @@ window.MathJax = {
         <!-- Header -->
         <header class="mb-4">
             <article class="flex flex-rows-1 justify-between">
-            <span>
-                🌟
-                <select id="mode" class="rounded-lg p-2 font-semibold text-sky-900 dark:text-gray-50 rounded-md bg-gradient-to-tr from-purple-300 to-violet-300 dark:from-gray-700 dark:to-gray-900 hover:from-cyan-400 hover:to-violet-400 dark:hover:from-gray-600 dark:hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-gray-400">
-                    <option default class="bg-gray-100 dark:bg-gray-600">General mode</option>
-                    <option class="bg-gray-100 dark:bg-gray-600">Coding mode</option>
-                </select>
-            </span>
-            <label class="relative inline-flex items-center cursor-pointer my-2 lg:ml-[24vw]" title="Change image generation model to FLUX">
-                <input id="CModel" type="checkbox" class="checkbox sr-only peer mr-2 mt-1 h-4 w-4">
-                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                <span class="hidden md:flex text-gray-700 overflow-ellipsis bg-gradient-to-r from-cyan-400 via-blue-400 to-pink-400 bg-clip-text">Use Flux</span>
-            </label>
-            <svg id="settings" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8 fill-current text-gray-800 dark:text-gray-200 transition-colors duration-200">
-                <path d="M19.14 12.936c.06-.437.06-.874 0-1.31l2.007-1.55c.21-.16.27-.44.14-.67l-2.4-4.155c-.12-.21-.36-.29-.57-.21l-2.337 1.017c-.56-.43-1.17-.79-1.83-1.07l-.354-2.6c-.04-.26-.27-.46-.54-.46h-5c-.27 0-.51.2-.54.46l-.354 2.6c-.66.28-1.28.64-1.83 1.07L5.22 5.89c-.21-.08-.45 0-.57.21l-2.4 4.155c-.12.21-.07.51.14.67l2.007 1.55c-.06.437-.06.874 0 1.31l-2.007 1.55c-.21.16-.27.44-.14.67l2.4 4.155c.12.21.36.29.57.21l2.337-1.017c.56.43 1.17.79 1.83 1.07l.354 2.6c.04.26.27.46.54.46h5c.27 0 .51-.2.54-.46l.354-2.6c.66-.28 1.28-.64 1.83-1.07l2.337-1.017c.21-.08.45 0 .57.21l2.4 4.155c.12.21.07.51-.14.67l-2.007 1.55c.06.437.06.874 0 1.31zM12 16a4 4 0 110-8 4 4 0 010 8z"/>
-            </svg>
+                <span>
+                    🌟
+                    <select id="mode" class="rounded-lg p-2 font-semibold text-sky-900 dark:text-gray-50 rounded-md bg-gradient-to-tr from-purple-300 to-violet-300 dark:from-gray-700 dark:to-gray-900 hover:from-cyan-400 hover:to-violet-400 dark:hover:from-gray-600 dark:hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-gray-400">
+                        <option default class="bg-gray-100 dark:bg-gray-600">General mode</option>
+                        <option class="bg-gray-100 dark:bg-gray-600">Coding mode</option>
+                    </select>
+                </span>
+                <label class="relative inline-flex items-center cursor-pointer my-2 lg:ml-[24vw]" title="Change image generation model to FLUX">
+                    <input id="CModel" type="checkbox" class="checkbox sr-only peer mr-2 mt-1 h-4 w-4">
+                    <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <span class="hidden md:flex text-gray-700 overflow-ellipsis bg-gradient-to-r from-cyan-400 via-blue-400 to-pink-400 bg-clip-text">Use Flux</span>
+                </label>
+                <button id="settings" title="Settings">
+                    <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8 fill-current text-gray-800 dark:text-gray-200 transition-colors duration-200">
+                        <path d="M19.14 12.936c.06-.437.06-.874 0-1.31l2.007-1.55c.21-.16.27-.44.14-.67l-2.4-4.155c-.12-.21-.36-.29-.57-.21l-2.337 1.017c-.56-.43-1.17-.79-1.83-1.07l-.354-2.6c-.04-.26-.27-.46-.54-.46h-5c-.27 0-.51.2-.54.46l-.354 2.6c-.66.28-1.28.64-1.83 1.07L5.22 5.89c-.21-.08-.45 0-.57.21l-2.4 4.155c-.12.21-.07.51.14.67l2.007 1.55c-.06.437-.06.874 0 1.31l-2.007 1.55c-.21.16-.27.44-.14.67l2.4 4.155c.12.21.36.29.57.21l2.337-1.017c.56.43 1.17.79 1.83 1.07l.354 2.6c.04.26.27.46.54.46h5c.27 0 .51-.2.54-.46l.354-2.6c.66-.28 1.28-.64 1.83-1.07l2.337-1.017c.21-.08.45 0 .57.21l2.4 4.155c.12.21.07.51-.14.67l-2.007 1.55c.06.437.06.874 0 1.31zM12 16a4 4 0 110-8 4 4 0 010 8z"/>
+                    </svg>
+                </button>
             </article>
         </header>
 
@@ -102,11 +103,12 @@ window.MathJax = {
                 <section class="relative w-full p-2 border dark:border-black dark:bg-gray-700 rounded-lg">
                     <textarea id="userInput"
                         oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';" cols="10"
-                        class="w-full rows-10 scrollbar-hide resize-none overflow-wrap p-1 md:p-3 max-h-[15vh] border border-gray-500 dark:border-none rounded-lg focus:outline-none dark:outline-sky-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-gray-900 dark:ring-1 dark:bg-gray-800 dark:text-white"
+                        class="w-full rows-10 scrollbar-hide resize-none overflow-wrap py-1 px-[10%] md:py-3 md:pl-[4%] md:pr-[7%] max-h-[15vh] border border-gray-500 dark:border-none rounded-lg focus:outline-none dark:outline-sky-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-gray-900 dark:ring-1 dark:bg-gray-800 dark:text-white"
                         autofocus
-                        placeholder="Message QuickAi 💫 To generate an image, start with `/image`" aria-label="Message input"></textarea>
+                        placeholder="Message QuickAi 💫 To generate an image, start with `/image`" aria-label="Message input">
+                    </textarea>
 
-                    <div class="flex hidden">
+                    <div class="flex absolute left-2 bottom-3 opacity-70 hover:opacity-90" title="Attach files">
                         <button aria-label="Attach files" class="flex items-center justify-center h-8 w-8 rounded-lg rounded-bl-xl text-token-text-primary dark:text-white focus-visible:outline-black dark:focus-visible:outline-white hover:bg-black/10"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 7C9 4.23858 11.2386 2 14 2C16.7614 2 19 4.23858 19 7V15C19 18.866 15.866 22 12 22C8.13401 22 5 18.866 5 15V9C5 8.44772 5.44772 8 6 8C6.55228 8 7 8.44772 7 9V15C7 17.7614 9.23858 20 12 20C14.7614 20 17 17.7614 17 15V7C17 5.34315 15.6569 4 14 4C12.3431 4 11 5.34315 11 7V15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15V9C13 8.44772 13.4477 8 14 8C14.5523 8 15 8.44772 15 9V15C15 16.6569 13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z" fill="currentColor"></path></svg></button><input multiple="" tabindex="-1" class="hidden" type="file" style="display: none;">
                     </div>
 

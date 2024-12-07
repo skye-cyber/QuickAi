@@ -31,11 +31,11 @@ function initChat(client) {
 
     // Custom instructions
     const customInstructions = `
-    Your name is QuickAi. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. Wambua is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).
+    Your name is QuickAi. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).
     Your primary goal is to assist the user in all the needs. You should be brief and direct to the point based on the user's needs. You are required to use TailwindCSS for styling unless the user requests otherwise.
     When interacting with the user:
     - You are allowed but not required to begin by introducing yourself and optionally mentioning your: deployer/creator, goal unless you've done previous done so. However, if the user starts the interaction by directly diving into the problem/question at hand, you can skip the introduction.
-    - Further information about yourself or your creator(wambua) shoild only be revealed when explicitly requested for.
+    - Further information about yourself or your creator(wambua) shall only be revealed when explicitly requested for.
     - If the user needs to visualize/preview diagrams or generate images, inform them that you cannot directly generate diagrams or images. Instead, come up with a query describing what you or the user would wish to visualize, and instruct them to paste this prompt in the text area starting with '/image' to generate the image.
     - If it is not clear what image the user wants to generate, ask them for a description of what they want, and then restructure it to form a clear prompt for the user.
     - For diagrams, if the user is not satisfied with the image generation method, offer to provide them with DOT code and instructions on how to use it. You can also inform them to activate the checkbox with the text 'Use Flux 4 Image Generation' appearing at the top of the chat area, which will use a different approach to generate the image or diagram.
@@ -306,17 +306,20 @@ function initChat(client) {
 
                 let output = "";
                 for await (const chunk of stream) {
+                    /*
                     if (chunk?.choices?.length > 0) {
-                        output += chunk.choices[0].delta.content;
+                        output += chunk.choices[0].delta.content;*/
+                    const choice = chunk?.choices?.[0];
+                    if (choice?.delta?.content) {
+                        output += choice.delta.content;
                         // Update innerHTML with marked output
                         aiMessage.innerHTML = `<div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 p-3 w-fit max-w-full lg:max-w-6xl mb-6">${marked(output)}</div>`;
 
-
-
+                        addCopyListeners(); // Assuming this function adds copy functionality to code blocks
+                        // Debounce MathJax rendering to avoid freezing
+                        debounceRenderMathJax();
                     }
-                    addCopyListeners(); // Assuming this function adds copy functionality to code blocks
-                    // Debounce MathJax rendering to avoid freezing
-                    debounceRenderMathJax();
+
                 }
 
                 // Store conversation history
@@ -324,7 +327,11 @@ function initChat(client) {
 
             } catch (error) {
                 // Handle request error appropriately
-                handleRequestError(error, userMessage, aiMessage, conversationHistory);
+                if (error.message === "Failed to fetch") {
+                    handleRequestError(error, userMessage, aiMessage, conversationHistory);
+                } else {
+                    console.log(error.message)
+                }
             }
         }
 
@@ -337,9 +344,9 @@ function initChat(client) {
         if (renderTimeout) clearTimeout(renderTimeout);
         renderTimeout = setTimeout(() => {
             if (window.MathJax) {
-                MathJax.typesetPromise()
+                MathJax.typesetPromise(Array.from(document.querySelectorAll('[class^="msg_"], [class*=" msg_"]'))) //Apply mathjax to only the specified field
                 .then(() => console.log("MathJax rendering complete"))
-                .catch((err) => console.error("MathJax rendering failed:", err));
+                .catch((err) => console.error("MathJax rendering error:", err.message));
             } else {
                 console.error("MathJax is not loaded or available.");
             }
@@ -349,7 +356,7 @@ function initChat(client) {
 
     function handleRequestError(error, userMessage, aiMessage, conversationHistory) {
         try {
-            console.log(`${error} Intercepted`);
+            console.log(`Intercepted '${error}'`);
             const errorContainer = document.getElementById('errorContainer');
             const errorArea = document.getElementById('errorArea');
             const closeModal = document.getElementById('closeEModal');
