@@ -31,12 +31,12 @@ function initChat(client) {
 
     // Custom instructions
     const customInstructions = `
-    Your name is QuickAi. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/s善基/skye-cy伯) or [Huggingface Profile](https://huggingface.co/skye-waves).
+    Your name is QuickAi. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Electron, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).
 
     Your primary goal is to assist the user in all their needs. You should be brief and direct to the point based on the user's needs. You are required to use TailwindCSS for styling unless the user requests otherwise.
 
     Definition of terms:
-    - Language identifier: Shall include the language and both the opening and closing backticks, for example, (\`\`\`html and \`\`\`).
+    - Language identifier: Shall include the language and both the opening and closing backticks, for example, \`\`\`html\`\`\`.
 
     When interacting with the user:
     - You are allowed but not required to begin by introducing yourself and optionally mentioning your deployer/creator, goal unless you've done so previously. However, if the user starts the interaction by directly diving into the problem/question at hand, you can skip the introduction.
@@ -45,30 +45,41 @@ function initChat(client) {
     - If it is not clear what image the user wants to generate, ask them for a description of what they want, and then restructure it to form a clear prompt for the user.
     - For diagrams, if the user is not satisfied with the image generation method, offer to provide them with DOT code and instructions on how to use it. You can also inform them to activate the checkbox with the text 'Use Flux 4 Image Generation' appearing at the top of the chat area, which will use a different approach to generate the image or diagram.
     - In a conversation, ascertain the relationship between previous conversations and the current interaction.
-    - Engage the user by asking questions.
+    - Engage the user by asking questions. The choice of how to do this is at your discretion.
+    - Use colors that are more visible than light gray, such as deep gray or other contrasting colors.
 
     For drawing tables:
     - The default table preview/visualization is HTML except when the user requests otherwise.
     - For table previews, no code should be shown.
-    - For HTML tables, write the HTML code without the 'html' language identifier. For Markdown tables, omit the 'markdown' identifier.
+    - For HTML tables, write the HTML code without the '\`\`\`html\`\`\`' language identifier. For Markdown tables, omit the '\`\`\`markdown\`\`\`' identifier.
     - Use CSS styling to make the table visually appealing, avoiding TailwindCSS.
-    - Use colors that are more visible than light gray, such as deep gray or other contrasting colors.
     - Ensure the table has a more visible outer border to distinguish it from the rest of the content.
-    - For prompts starting with "create a table" or "draw a table," provide a visually appealing table unless otherwise instructed.
+    - For prompts starting with "create a table" or "draw a table," the goal is to provide a visually appealing table unless otherwise instructed.
     - Use headings, subheadings, and bullet points to make the content more scannable.
-    - Add images or icons or SVGs to visually break up the text and make it more engaging. You can do this by following the same approach used in previews, e.g., "## Hello \`\`\`<svg>svg goes here</svg>\`\`\`".
+    - Add images or icons or SVGs to visually break up the text and make it more engaging. You can do this by following the same approach used in previews, e.g., "## <span style='display:flex;'>Hello <svg>svg goes here</svg></span>".
     - You are advised to use visually appealing tables to explain concepts in cases where the user prefers so or in where concepts are better understood in table form.
     - Use HTML to align text where you want, in which case you will remove the language identifier, all HTML resources are at your disposal, so make use of it efficiently as you deem fit, provided that omitting the language identifier (html) is not forgotten.
-    - When generating HTML codes in cases where you are not using Tailwind CSS, you can use the concept of tables mentioned earlier to show the user how the result will look, this you can do by writing the same HTML code but omitting the language identifier 'html'.
+    - When generating HTML codes in cases where you are not using TailwindCSS, you can use the concept of tables mentioned earlier to show the user how the result will look, this you can do by writing the same HTML code but omitting the language identifier '\`\`\`html\`\`\`'.
     - You can use HTML to make your response more elegant and appealing to the user, in which case you would omit the HTML identifier and use inline CSS for styling.
+    - Use different text and background colors that contrast well with lightgray and skyblue backgrounds.
+
+    Color choices:
+    - Alway use CSS with both dark and light color for compartibility.
+    - Dark theme background color is lightgray.
+    - Light theme background color is a gradient from-blue-500 to-sky-500.
+    - Use color gradient for even more elegance.
+
     - Important:
-    1. Never forget to remove the language identifier in (previews, tables, svgs, icons, etc).
+    1. Always remove the language identifier (e.g., \`\`\`\`html\`\`\`) when providing previews, tables, svgs, icons, diagrams, etc.
     2. Strictly adhere to decisions like size, color, placement, and alignment choices.
     3. Using the same alignment throughout unless necessary might become monotonous to the user.
     4. By default, all your responses are rendered in dark text. Use HTML to change that as you deem fit.
-    5. By default, all your responses are aligned to the left. Use HTML to change that as needed, for example, \`\`\`<h1 style="text-align: Center;">Content goes here</h1>\`\`\` for heading 1 center placement.
+    5. By default, all your responses are aligned to the left. Use HTML to change that as needed, for example, <h1 style="text-align: Center;">Content goes here</h1> for heading 1 center placement.
     6. Use flex style to align related content for example a div enclosing svg and its text should use flex style.
     7. TailwindCSS shall not be used in previews or in any instance where the goal is to provide visual appeal, such as when the language identifier has been removed.
+    8. Always double check your response to ensure it adheres to the guidelines.
+    9. In color choices you are not restricted to any colors as long as the you use both light and dark them variant that a well visible in the respective background color as informed earlier.
+    10. All links should open in new tabs meaning they should have traget as _blank and a title describing their purpose.
     `;
 
     let conversationHistory = [{ role: "system", content: customInstructions }];
@@ -339,16 +350,17 @@ function initChat(client) {
 
                 }
                 console.log(output);
+                //console.log(JSON.stringify(output, null, 2));
                 // Store conversation history
                 conversationHistory.push({ role: "assistant", content: output });
 
             } catch (error) {
                 // Handle request error appropriately
-                if (error.message === "Failed to fetch") {
-                    handleRequestError(error, userMessage, aiMessage, conversationHistory);
-                } else {
-                    console.log(error.message)
-                }
+                //if (error.message === "Failed to fetch") {
+                handleRequestError(error, userMessage, aiMessage, conversationHistory);
+                //} else {
+                //  console.log(error.message)
+                //}
             }
         }
 
@@ -373,38 +385,44 @@ function initChat(client) {
 
     function handleRequestError(error, userMessage, aiMessage, conversationHistory) {
         try {
-            console.log(`Intercepted '${error}'`);
-            const errorContainer = document.getElementById('errorContainer');
-            const errorArea = document.getElementById('errorArea');
-            const closeModal = document.getElementById('closeEModal');
-            const retry = document.getElementById('retry');
-            const lastMessage = conversationHistory.slice(-1)[0]?.content; // Safely access the last message
+            if (!error.message === "Failed to fetch" && !error.message === "network error") {
+                console.log("Unknown error ->", error);
+                console.log("History length:", conversationHistory.length);
+                console.log("History size:", conversationHistory.length * 1.024, "KB");
+            } else {
+                console.log(`Intercepted '${error}'`);
+                const errorContainer = document.getElementById('errorContainer');
+                const errorArea = document.getElementById('errorArea');
+                const closeModal = document.getElementById('closeEModal');
+                const retry = document.getElementById('retry');
+                const lastMessage = conversationHistory.slice(-1)[0]?.content; // Safely access the last message
 
-            // Remove existing event listeners before adding a new one
-            const retryHandler = () => {
-                if (aiMessage) aiMessage.remove();
-                if (userMessage) userMessage.remove();
+                // Remove existing event listeners before adding a new one
+                const retryHandler = () => {
+                    if (aiMessage) aiMessage.remove();
+                    if (userMessage) userMessage.remove();
 
-                // Retry action
-                classifyText(lastMessage);
-                console.log('Retry action triggered with:', lastMessage);
-                errorContainer.classList.add('hidden');
-            };
+                    // Retry action
+                    classifyText(lastMessage);
+                    console.log('Retry action triggered with:', lastMessage);
+                    errorContainer.classList.add('hidden');
+                };
 
-            retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
-            const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
-            newRetry.addEventListener('click', retryHandler);
+                retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
+                const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
+                newRetry.addEventListener('click', retryHandler);
 
-            closeModal.addEventListener('click', () => errorContainer.classList.add('hidden'));
+                closeModal.addEventListener('click', () => errorContainer.classList.add('hidden'));
 
-            // Function to show the modal with an error message
-            function showError() {
-                errorContainer.classList.remove('hidden');
-                errorArea.textContent = "An error occurred during response. Retry?";
-                conversationHistory.pop(); // Remove the last conversation entry
+                // Function to show the modal with an error message
+                function showError() {
+                    errorContainer.classList.remove('hidden');
+                    errorArea.textContent = "An error occurred during response. Retry?";
+                    conversationHistory.pop(); // Remove the last conversation entry
+                }
+
+                showError();
             }
-
-            showError();
         } catch (err) {
             console.error('Error handling request error:', err);
         }
@@ -435,6 +453,21 @@ function initChat(client) {
                 }
             });
         });
+    }
+
+    // Function to remove the first conversation pairs to maintain conversation size limit
+    function removeFirstConversationPairs(count = 2) {
+        let removed = 0;
+        while (removed < count && conversationHistory.length > 0) {
+            const firstPair = conversationHistory[0];
+            if (firstPair.role !== "system") {
+                conversationHistory.shift();
+                removed++;
+            } else {
+                // Skip system instructions
+                break;
+            }
+        }
     }
 
     sendBtn.addEventListener("click", () => {
