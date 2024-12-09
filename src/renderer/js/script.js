@@ -105,15 +105,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById("AttachFiles").addEventListener("click", OpenFileModal);
-    document.getElementById("closeFileEModal").addEventListener("click", CloseFileModal);
+
+    const FileModalClose = document.getElementById("closeFileEModal");
+    FileModalClose.addEventListener("click", (e) => {
+        e.stopPropagation();
+        CloseFileModal();
+    });
 
     function OpenFileModal(){
-        console.log("Opening")
         dropZone.classList.remove('hidden')
     }
 
     function CloseFileModal(){
-        console.log("Closing")
         dropZone.classList.add('hidden')
     }
 
@@ -129,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
          // Prevent the default click behavior
          event.stopPropagation();
          event.preventDefault();
-         fileInput.click();
+        fileInput.click();
      });
 
      function handleFileSelect(event) {
@@ -147,10 +150,12 @@ document.addEventListener('DOMContentLoaded', function() {
          event.stopPropagation();
          event.preventDefault();
          const files = event.dataTransfer.files;
-         handleFiles(files);
+        handleFiles(files);
      }
 
      function handleFiles(files) {
+         console.log("Handling files")
+
          for (let i = 0; i < files.length; i++) {
              const file = files[i];
              console.log('File uploaded:', file.name, file.type, file.size);

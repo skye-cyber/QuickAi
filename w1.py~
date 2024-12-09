@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import tkinter as tk
 from tkinter import scrolledtext
-import markdown.inline
+import markdown.inlinepatterns
 from huggingface_hub import InferenceClient
 
 # Initialize the Inference Client

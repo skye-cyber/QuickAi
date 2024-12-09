@@ -42,19 +42,14 @@ function createWindow() {
         width: 800,
         height: 600,
         icon: path.join(process.resourcesPath, 'assets/QuickAi.png'), // Path to your icon file
-        show: false,
-        webPreferences: {
-            preload: path.join(__dirname, 'preload.js'), // Use the preload script
-            nodeIntegration: true, // Enable Node.js integration in the renderer process
-            contextIsolation: true
-        }
+                                         show: false,
+                                         webPreferences: {
+                                             preload: path.join(__dirname, 'preload.js'), // Use the preload script
+                                         nodeIntegration: true, // Enable Node.js integration in the renderer process
+                                         contextIsolation: true
+                                         }
     });
 
-
-    // Send environment variables to the renderer process
-    //mainWindow.webContents.on('did-finish-load', () => {
-      //  mainWindow.webContents.send('env', process.env);
-    //});
 
     // Load the main application when it is ready
     mainWindow.loadFile(path.join(__dirname, '../../aichat.html')); // Load your HTML file

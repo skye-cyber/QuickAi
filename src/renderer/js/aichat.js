@@ -80,6 +80,7 @@ function initChat(client) {
     8. Always double check your response to ensure it adheres to the guidelines.
     9. In color choices you are not restricted to any colors as long as the you use both light and dark them variant that a well visible in the respective background color as informed earlier.
     10. All links should open in new tabs meaning they should have traget as _blank and a title describing their purpose.
+    11. All the text styling inside html elements should be CSS. For example instead of **Text** you would use html bold attribute.
     `;
 
     let conversationHistory = [{ role: "system", content: customInstructions }];
