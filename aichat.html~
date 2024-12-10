@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuickAi</title>
     <link rel="stylesheet" href="src/renderer/css/aichat.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous"/>
@@ -139,7 +139,7 @@ window.MathJax = {
                     </svg>
                 </button>
                 <p class="text-gray-600" id="dropZoneText">Drag and drop files here or click to select</p>
-                <div id="uploadedFiles" class="mt-4 text-slate- bg-blue-400 dark:bg-blue-100 dark:bg-gradient-to-r dark:from-cyan-900 dark:via-pink-800 dark:to-amber-700 bg-clip-text"></div>
+                <div id="uploadedFiles" class="mt-4 text-slate-900 bg-blue-400 dark:bg-blue-100 dark:bg-gradient-to-r dark:from-cyan-900 dark:via-pink-800 dark:to-amber-700 bg-clip-text"></div>
             </div>
         </div>
         <!-- File Input -->
@@ -205,4 +205,5 @@ window.MathJax = {
 </body>
 <script src="src/renderer/js/script.js"></script>
 <script src="src/renderer/js/_aichat.js"></script>
+
 </html>

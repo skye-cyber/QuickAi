@@ -28,6 +28,7 @@ function initChat(client) {
     const userInput = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
     const modeSelect = document.getElementById('mode');
+    let check = false;
 
     // Custom instructions
     const customInstructions = `
@@ -80,7 +81,9 @@ function initChat(client) {
     8. Always double check your response to ensure it adheres to the guidelines.
     9. In color choices you are not restricted to any colors as long as the you use both light and dark them variant that a well visible in the respective background color as informed earlier.
     10. All links should open in new tabs meaning they should have traget as _blank and a title describing their purpose.
-    11. All the text stylling inside html elements should be CSS. For example instead of **Text** you would use html bold attribute.
+    11. All the text styling inside html elements should be CSS. For example instead of **Text** you would use html bold attribute.
+    12. Bullet points should be indented inwards and have different color from their parent.
+    13. Major headings/titles should have a different color other than black.
     `;
 
     let conversationHistory = [{ role: "system", content: customInstructions }];
@@ -342,7 +345,32 @@ function initChat(client) {
                     if (choice?.delta?.content) {
                         output += choice.delta.content;
                         // Update innerHTML with marked output
-                        aiMessage.innerHTML = `<div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-blue-500 p-3 w-fit max-w-full lg:max-w-6xl">${marked(output)}</div>`;
+                        aiMessage.innerHTML = `
+                        <section class="relative">
+                            <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-blue-500 p-3 w-fit max-w-full lg:max-w-6xl">${marked(output)}
+                            </div>
+
+                            <div class="absolute bottom-0 left-0 opacity-50 hover:opacity-100 border-none z-60" id="exportButton" onclick="toggleExportOptions(this);">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 5a2 2 0 100 4 2 2 0 000-4zm0 8v.01M12 13a2 2 0 100 4 2 2 0 000-4zm0-8a2 2 0 100 4 2 2 0 000-4z" />
+                                </svg>
+                                </div>
+
+                                <div id="exportOptions" class="hidden block absolute bottom-0 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50">
+                                <ul class="list-none p-0">
+                                    <li class="mb-2">
+                                        <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">1. Export to PDF</a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Png(event, '.${aiMessageUId}')">2. Export to PNG</a>
+                                    </li>
+                                    <li>
+                                        <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">3. Export to DOCX</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </section>
+                        `;
 
                         addCopyListeners(); // Assuming this function adds copy functionality to code blocks
                         // Debounce MathJax rendering to avoid freezing
@@ -350,22 +378,30 @@ function initChat(client) {
                     }
 
                 }
-                console.log(output);
-                //console.log(JSON.stringify(output, null, 2));
+                if (check === false) {
+                    addUtilityScript();
+                    check = true;
+                }
                 // Store conversation history
                 conversationHistory.push({ role: "assistant", content: output });
 
             } catch (error) {
-                // Handle request error appropriately
-                //if (error.message === "Failed to fetch") {
+
                 handleRequestError(error, userMessage, aiMessage, conversationHistory);
-                //} else {
-                //  console.log(error.message)
-                //}
+
             }
         }
 
     }
+
+    function addUtilityScript() {
+        console.log("Added Utility script");
+        const script = document.createElement('script');
+        script.src = 'src/renderer/js/_utility.js';
+        script.async = true; // Optional: load the script asynchronously
+        document.body.appendChild(script);
+    }
+
 
     // Function to ensure MathJax renders dynamically injected content
     let renderTimeout;
