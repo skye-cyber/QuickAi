@@ -22,10 +22,10 @@ window.MathJax = {
         }
 };
 </script>
-<body class="bg-gradient-to-b from-indigo-200 via-purple-300 to-blue-200 dark:from-slate-700 dark:to-slate-700 min-h-screen font-sans flex flex-col items-center overflow-x-hidden">
+<body class="bg-gradient-to-b from-indigo-200 via-purple-300 to-blue-200 dark:from-slate-700 dark:to-slate-700 min-h-screen font-sans flex flex-col items-center overflow-hidden">
 
     <!-- Main Container -->
-    <div class="h-[100vh] w-[100vw] max-h-[100vh]  max-w-[100vw] p-6 mt-0 bg-white bg-opacity-90 rounded-b-none shadow-lg dark:bg-slate-800 rounded-t-none">
+    <div id="mainclass="h-[100vh] w-[100vw] max-h-[100vh]  max-w-[100vw] p-6 mt-0 bg-white bg-opacity-90 rounded-b-none shadow-lg dark:bg-slate-800 rounded-t-none overflow-y-hidden">
         <!-- Header -->
         <header class="mb-4">
             <article class="flex flex-rows-1 justify-between">
@@ -205,5 +205,4 @@ window.MathJax = {
 </body>
 <script src="src/renderer/js/script.js"></script>
 <script src="src/renderer/js/_aichat.js"></script>
-
 </html>
