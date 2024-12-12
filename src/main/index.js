@@ -28,7 +28,7 @@ function createWindow() {
         height: 600,
         show: false,
         webPreferences: {
-            //nodeIntegration: true,
+            nodeIntegration: true,
             contextIsolation: true,
             enableRemoteModule: false, // Disable remote module if not needed
         }
@@ -42,12 +42,12 @@ function createWindow() {
         width: 800,
         height: 600,
         icon: path.join(process.resourcesPath, 'assets/QuickAi.png'), // Path to your icon file
-                                         show: false,
-                                         webPreferences: {
-                                             preload: path.join(__dirname, 'preload.js'), // Use the preload script
-                                         nodeIntegration: true, // Enable Node.js integration in the renderer process
-                                         contextIsolation: true
-                                         }
+        show: false,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'), // Use the preload script
+        nodeIntegration: true, // Enable Node.js integration in the renderer process
+        contextIsolation: true
+        }
     });
 
 

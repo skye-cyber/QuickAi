@@ -120,7 +120,7 @@ function initChat(client) {
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(2, 9)}`;
 
         return `
-        <div class="relative my-auto p-2 border border-gray-300 dark:border-gray-900 bg-white dark:bg-gray-800 rounded-md w-fit max-w-full lg:max-w-6xl">
+        <div class="relative my-auto p-2 border border-gray-300 dark:border-gray-900 bg-white dark:bg-gray-800 rounded-md max-w-full">
         <button id="${copyButtonId}"
         class="copy-button absolute rounded-md px-2 py-2 right-2 top-2 bg-gradient-to-r from-sky-800 to-purple-600 hover:bg-blue-400 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50 dark:bg-gray-800">
         Copy
@@ -326,7 +326,7 @@ function initChat(client) {
             </div>`;
 
             const aiMessageUId = `msg_${Math.random().toString(30).substring(3,9)}`;
-            aiMessage.classList.add("flex", "justify-start", "mb-[6%]");
+            aiMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
             chatArea.appendChild(aiMessage);
             chatArea.scrollTop = chatArea.scrollHeight;
 
@@ -347,8 +347,8 @@ function initChat(client) {
                         output += choice.delta.content;
                         // Update innerHTML with marked output
                         aiMessage.innerHTML = `
-                        <section class="relative">
-                            <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(output)}
+                        <section class="relative w-fit max-w-full lg:max-w-6xl">
+                            <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full md:max lg:max-w-6xl overflow-wrap">${marked(output)}
                             </div>
                             <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
                                 <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
@@ -370,10 +370,13 @@ function initChat(client) {
                                     <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">1. Export to PDF</svg></a>
                                     </li>
                                     <li class="mb-2">
-                                        <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2J(event, '.${aiMessageUId}')">2. Export to JPG</a>
+                                        <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">2. Export to JPG</a>
                                     </li>
                                     <li>
                                         <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">3. Export to DOCX</a>
+                                    </li>
+                                    <li>
+                                        <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageUId}')">4. Word Export Advance</a>
                                     </li>
                                 </ul>
                             </div>

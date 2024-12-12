@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const { Buffer } = require('buffer');
 const fs = require('fs');
 const path = require('path');
+const readFileSync = require('read-file-relative');
+
 
 contextBridge.exposeInMainWorld('electron', {
     getEnv: () => ipcRenderer.invoke('get-env'),
@@ -14,7 +16,22 @@ contextBridge.exposeInMainWorld('electron', {
         const downloadsPath = path.join(homedir, 'Downloads');
         return downloadsPath;
     },
-    saveAndOpenImage: (downl, dataUrl) => {
+    /*asBlob: (html, options = {}) => {
+        return new Promise((resolve, reject) => {
+            try {
+                // Simulate the original behavior using readFileSync
+                //const content = readFileSync(path.join(__dirname, 'output-template.docx'));
+                // Pass the content to the original asBlob function
+                SuperhtmlDocx.asBlob(html, options)
+                .then((docx) => resolve(docx))
+                .catch((err) => reject(err));
+            } catch (err) {
+                reject(err);
+            }
+        });
+    },*/
+
+    saveAndOpenImage: (downloadsPath, dataUrl) => {
         fetch(dataUrl)
         .then(res => res.blob())
         .then(blob => {
@@ -38,4 +55,3 @@ contextBridge.exposeInMainWorld('electron', {
         });
     },
 });
-
