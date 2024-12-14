@@ -445,14 +445,14 @@ function initChat(client) {
     });
 
     async function VisionChat(text, fileType, fileDataUrl = null) {
-        console.log(fileDataUrl)
+        //console.log(fileType)
         //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
         //switch to vission model
         modeSelect.value = "Vision"
         // Determine the content based on fileDataUrl
         let userContent;
         if (fileDataUrl) {
-            console.log("Image url present", fileDataUrl);
+            console.log("Image url present");
             if (fileType == "image") {
                 userContent = [
                     {
@@ -499,7 +499,7 @@ function initChat(client) {
 
         //console.log("Updated VisionHistory:", JSON.stringify(VisionHistory, null, 2));
 
-        console.log(userContent)
+        //console.log(userContent)
         // Store the last message for retry purposes
         const lastMessage = userContent;
 
@@ -573,7 +573,7 @@ function initChat(client) {
                     AutoScroll.checked ? scrollToBottom(chatArea) : null;
                     addCopyListeners();
                     // Debounce MathJax rendering to avoid freezing
-                    debounceRenderMathJax(aiMessageUId);
+                    debounceRenderMathJax(VisionMessageUId);
                 }
             }
 
@@ -583,7 +583,7 @@ function initChat(client) {
         } catch (error) {
             console.log("Error caught:", error);
             // Get elements for error modal
-            console.log(lastMessage)
+            console.log(fileType)
             const errorContainer = document.getElementById('errorContainer');
             const errorArea = document.getElementById('errorArea');
             const closeModal = document.getElementById('closeEModal');
@@ -606,16 +606,16 @@ function initChat(client) {
                 if (lastMessage) {
                     const textItem = lastMessage.find(item => item.type === "text");
                     const text = textItem?.text;
-                    if (fileType == "image"){
+                    let fileDataUrl = null;
+                    if (fileType === "image"){
                         const imageItem = lastMessage.find(item => item.type === "image_url");
-                        var fileDataUrl = imageItem?.image_url?.url;
-                        var fileType ="image"
-                    } else {
+                        fileDataUrl = imageItem?.image_url?.url;
+                    } else if (fileType === "document") {
                         const imageItem = lastMessage.find(item => item.type === "file_url");
                         fileDataUrl = imageItem?.file_url?.url;
-                        fileType ="document"
                     }
-
+                    //console.log(fileType)
+                    //console.log(fileDataUrl)
                     if (VisionMessage) VisionMessage.remove();
                     if (userMessage) userMessage.remove();
                     VisionChat(text, fileType, fileDataUrl);
@@ -663,7 +663,7 @@ function initChat(client) {
         </div>
         `;
         chatArea.appendChild(userMessage);
-        AutoScroll.checked ? scrollToBottom(chatArea) : null;
+        scrollToBottom(chatArea)
         copyBMan();
         return userMessage
     }
