@@ -123,7 +123,7 @@ function initChat(client) {
 
         return `
         <div class="relative my-auto p-2 border border-gray-300 dark:border-gray-900 bg-white dark:bg-gray-800 rounded-md max-w-full">
-        <p class="code-language absolute rounded-md left-2 top-0.5 dark:text-gray-700 dark:text-white rounded-lg font-normal text-sm cursor-pointer opacity-80 hover:opacity-50">
+        <p class="code-language absolute rounded-md left-3 top-1 dark:text-gray-700 dark:text-white rounded-lg font-normal text-sm cursor-pointer opacity-80 hover:opacity-50">
         ${validLanguage}
         </p>
         <button id="${copyButtonId}" class="copy-button absolute rounded-md px-2 py-2 right-2 top-2 bg-gradient-to-r from-sky-800 to-purple-600 hover:bg-blue-400 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50 dark:bg-gray-800">
