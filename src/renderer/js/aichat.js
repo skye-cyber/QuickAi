@@ -325,16 +325,17 @@ function initChat(client) {
 
                 const aiMessage = document.createElement("div");
                 aiMessage.innerHTML = `
-                <div id="loader-parent" class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-blue-500 p-3 max-w-3xl">
+                <div id="loader-parent" class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-blue-500 mb-8 p-3 max-w-3xl">
                 <div class="loader space-x-2 flex">
                 <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
                 <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
                 <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-400"></div>
                 </div>
-                </div>`;
+                </div>
+                `;
 
                 const aiMessageUId = `msg_${Math.random().toString(30).substring(3,9)}`;
-                aiMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
+                aiMessage.classList.add("flex", "justify-start", "mb-12", "overflow-wrap");
                 chatArea.appendChild(aiMessage);
                 AutoScroll.checked ? scrollToBottom(chatArea) : null;
 
@@ -355,7 +356,7 @@ function initChat(client) {
                             output += choice.delta.content;
                             // Update innerHTML with marked output
                             aiMessage.innerHTML = `
-                            <section class="relative w-fit max-w-full lg:max-w-6xl">
+                            <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
                                 <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(output)}
                                 </div>
                                 <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
@@ -507,12 +508,12 @@ function initChat(client) {
         const userMessage = addUserMessage(text, fileType, fileDataUrl);
         const VisionMessage = document.createElement("div");
         const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
-        VisionMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
+        VisionMessage.classList.add("flex", "justify-start", "mb-12", "overflow-wrap");
         chatArea.appendChild(VisionMessage);
 
         // Add loading animation
         VisionMessage.innerHTML = `
-        <div id="loader-parent" class="bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-md dark:shadow-blue-500 p-3 max-w-3xl">
+        <div id="loader-parent" class="bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-md dark:shadow-blue-500 p-3 max-w-3xl mb-8">
         <div class="loader space-x-2 flex">
         <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
         <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
@@ -534,7 +535,7 @@ function initChat(client) {
                 if (choice?.delta?.content) {
                     visionMs += choice.delta.content;
                     VisionMessage.innerHTML = `
-                    <section class="relative w-fit max-w-full lg:max-w-6xl">
+                    <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
                         <div class="${VisionMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full md:max lg:max-w-6xl">${marked(visionMs)}
                         </div>
                         <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
