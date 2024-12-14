@@ -438,7 +438,8 @@ VisionHistory.push({
 
 async function VisionChat(text, imageDataUrl = null) {
     //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
-
+    //switch to vission model
+    modeSelect.value = "Vision"
     // Determine the content based on imageDataUrl
     let userContent;
     if (imageDataUrl !== null) {
@@ -614,7 +615,7 @@ async function VisionChat(text, imageDataUrl = null) {
                 Copy
             </button>
 
-            <div class="bg-blue-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow-md px-4 py-2 w-fit max-w-full">
+            <div class="bg-blue-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow-md px-4 py-2 w-fit max-w-full h-fit md:max-h-md lg:max-h-lg">
                 <p class="${VisionUserMessageUId} whitespace-pre-wrap break-words w-fit max-full md:max-w-full bg-blue-400 dark:bg-gradient-to-tr dark:from-pink-700 dark:via-cyan-500 dark:to-rose-600 p-1 mb-2 rounded-md">${escapeHTML(text)}</p>
                 ${imageDataUrl ? `<img src="${imageDataUrl}" alt="Uploaded Image" class="rounded-md my-auto" />` : ''}
             </div>
