@@ -87,6 +87,7 @@ function initChat(client) {
     `;
 
     let conversationHistory = [{ role: "system", content: customInstructions }];
+    let VisionHistory = [{ role: "system", content:"You are an helpful assistant"}];
 
     // Initialize highlight.js
     hljs.configure({ ignoreUnescapedHTML: true });
@@ -121,8 +122,10 @@ function initChat(client) {
 
         return `
         <div class="relative my-auto p-2 border border-gray-300 dark:border-gray-900 bg-white dark:bg-gray-800 rounded-md max-w-full">
-        <button id="${copyButtonId}"
-        class="copy-button absolute rounded-md px-2 py-2 right-2 top-2 bg-gradient-to-r from-sky-800 to-purple-600 hover:bg-blue-400 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50 dark:bg-gray-800">
+        <p class="code-language absolute rounded-md left-2 top-0 dark:text-gray-700 dark:text-white rounded-lg font-normal text-sm cursor-pointer opacity-80 hover:opacity-50">
+        ${validLanguage}
+        </p>
+        <button id="${copyButtonId}" class="copy-button absolute rounded-md px-2 py-2 right-2 top-2 bg-gradient-to-r from-sky-800 to-purple-600 hover:bg-blue-400 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50 dark:bg-gray-800">
         Copy
         </button>
         <pre class="rounded-md dark:bg-gray-700">
@@ -163,6 +166,8 @@ function initChat(client) {
         document.querySelectorAll('.copy-button').forEach(button => {
             button.addEventListener('click', async function() {
                 const codeBlock = this.nextElementSibling.querySelector('code');
+                console.log(this)
+                console.log(codeBlock)
                 const textToCopy = codeBlock.innerText;
                 try {
                     await navigator.clipboard.writeText(textToCopy);
@@ -213,142 +218,266 @@ function initChat(client) {
     async function classifyText(text) {
         const isImageRequest = text.startsWith("/image");
         const escapedText = escapeHTML(text);
+        const mode = modeSelect.value;
 
         // Display user message
         const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
         const userMessage = document.createElement("div");
-        userMessage.innerHTML = `
-        <div data-id="${userMessageId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
-        <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapedText}</p>
-        <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-80 hover:opacity-50">
-        Copy
-        </button>
-        </div>
-        `;
-        userMessage.classList.add("flex", "justify-end", "mb-4", "overflow-wrap");
-        chatArea.appendChild(userMessage);
-        implementUserCopy();
-        chatArea.scrollTop = chatArea.scrollHeight;
-        if (!isImageRequest) {
-            conversationHistory.push({ role: "user", content: text });
-        }
+        if (mode === "Vision"){
+            VisionChat("", text)
 
-        if (isImageRequest) {
-            const imageData = { inputs: text.replace("/image", "").trim() };
-            const imageId = `image_${Math.random().toString(36).substring(2, 7)}`;
-            const loadingMessage = document.createElement("div");
-            loadingMessage.innerHTML = `
-            <div id="${imageId}" class="w-fit bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 max-w-3xl mb-[7%] lg:mb-[5%]">
-            <div class="space-x-2 flex">
-            <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 xl:w-3 xl:h-3 rounded-full animate-bounce"></div>
-            <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  xl:w-3 xl:h-3 rounded-full animate-bounce-200"></div>
-            <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  xl:w-3 xl:h-3 rounded-full animate-bounce-400"></div>
-            <span class="text-sm text-gray-700 dark:text-gray-200">0s</span>
-            </div>
+        } else {
+            userMessage.innerHTML = `
+            <div data-id="${userMessageId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
+                <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapedText}</p>
+                <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-80 hover:opacity-50">
+            Copy
+            </button>
             </div>
             `;
-            chatArea.appendChild(loadingMessage);
+
+            userMessage.classList.add("flex", "justify-end", "mb-4", "overflow-wrap");
+            chatArea.appendChild(userMessage);
+            implementUserCopy();
             chatArea.scrollTop = chatArea.scrollHeight;
-            let secondsElapsed = 0;
-            const timerInterval = setInterval(() => {
-                secondsElapsed++;
-                loadingMessage.querySelector('span').textContent = `${secondsElapsed}s`;
-            }, 1000);
+            if (!isImageRequest) {
+                conversationHistory.push({ role: "user", content: text });
+            }
 
-            const useFlux = document.getElementById('CModel').checked;
-            const imageUrl = await generateImage(imageData, useFlux);
-            clearInterval(timerInterval);
-
-            if (imageUrl) {
-                const imageContainer = document.createElement("div");
-                imageContainer.classList.add("relative", "mb-[5%]")
-                const imageElement = document.createElement("img");
-                imageElement.src = imageUrl;
-                imageElement.classList.add("rounded-lg", "shadow-lg", "mt-4", "max-w-xs", "cursor-pointer");
-                imageElement.addEventListener("click", () => {
-                    if (imageElement.requestFullscreen) {
-                        imageElement.requestFullscreen();
-                    } else if (imageElement.webkitRequestFullscreen) {
-                        imageElement.webkitRequestFullscreen();
-                    } else if (imageElement.msRequestFullscreen) {
-                        imageElement.msRequestFullscreen();
-                    }
-                });
-
-                const downloadButtonContainer = document.createElement("button");
-                downloadButtonContainer.classList.add("absolute", "flex", "items-center", "text-white", "rounded-bl-md", "bg-gradient-to-r", "from-blue-500", "to-purple-500", "hover:from-blue-600", "hover:to-purple-600", "font-semibold", "py-2", "px-4", "focus:outline-none", "shadow-md", "w-fit", "h-fit", "bottom-0", "left-0", "opacity-60", "hover:opacity-100");
-
-                const downloadButton = document.createElement("a");
-                downloadButton.classList.add("flex", "items-center", "text-white", "no-underline");
-                downloadButton.href = imageUrl;
-                downloadButton.download = "generated_image.png";
-                downloadButton.innerHTML = `
-                <div class="flex items-center">
-                <span>Download</span>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ml-2">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z" fill="currentColor"></path>
-                </svg>
-                </div>
-                `;
-
-                downloadButtonContainer.appendChild(downloadButton);
-                document.body.appendChild(downloadButtonContainer);
-
-                downloadButtonContainer.appendChild(downloadButton);
-                imageContainer.appendChild(imageElement);
-                imageContainer.appendChild(downloadButtonContainer);
-
-                loadingMessage.innerHTML = '';
-                loadingMessage.appendChild(imageContainer);
-            } else {
+            if (isImageRequest) {
+                const imageData = { inputs: text.replace("/image", "").trim() };
+                const imageId = `image_${Math.random().toString(36).substring(2, 7)}`;
+                const loadingMessage = document.createElement("div");
                 loadingMessage.innerHTML = `
-                <div id="${imageId}" class="w-fit bg-red-400 text-gray-950 dark:bg-rose-500 rounded-lg p-2 font-normal shadow-lg dark:shadow-red-500 max-w-3xl mb-[5%]">
-                <span class="text-sm text-gray-950 dark:text-black">Could not Process request!⚠️</span>
+                <div id="${imageId}" class="w-fit bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-gray-100 rounded-lg p-2 font-normal shadow-lg dark:shadow-blue-500 max-w-3xl mb-[7%] lg:mb-[5%]">
+                <div class="space-x-2 flex">
+                <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 xl:w-3 xl:h-3 rounded-full animate-bounce"></div>
+                <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2  xl:w-3 xl:h-3 rounded-full animate-bounce-200"></div>
+                <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2  xl:w-3 xl:h-3 rounded-full animate-bounce-400"></div>
+                <span class="text-sm text-gray-700 dark:text-gray-200">0s</span>
+                </div>
                 </div>
                 `;
+                chatArea.appendChild(loadingMessage);
+                chatArea.scrollTop = chatArea.scrollHeight;
+                let secondsElapsed = 0;
+                const timerInterval = setInterval(() => {
+                    secondsElapsed++;
+                    loadingMessage.querySelector('span').textContent = `${secondsElapsed}s`;
+                }, 1000);
+
+                const useFlux = document.getElementById('CModel').checked;
+                const imageUrl = await generateImage(imageData, useFlux);
+                clearInterval(timerInterval);
+
+                if (imageUrl) {
+                    const imageContainer = document.createElement("div");
+                    imageContainer.classList.add("relative", "mb-[5%]")
+                    const imageElement = document.createElement("img");
+                    imageElement.src = imageUrl;
+                    imageElement.classList.add("rounded-lg", "shadow-lg", "mt-4", "max-w-xs", "cursor-pointer");
+                    imageElement.addEventListener("click", () => {
+                        if (imageElement.requestFullscreen) {
+                            imageElement.requestFullscreen();
+                        } else if (imageElement.webkitRequestFullscreen) {
+                            imageElement.webkitRequestFullscreen();
+                        } else if (imageElement.msRequestFullscreen) {
+                            imageElement.msRequestFullscreen();
+                        }
+                    });
+
+                    const downloadButtonContainer = document.createElement("button");
+                    downloadButtonContainer.classList.add("absolute", "flex", "items-center", "text-white", "rounded-bl-md", "bg-gradient-to-r", "from-blue-500", "to-purple-500", "hover:from-blue-600", "hover:to-purple-600", "font-semibold", "py-2", "px-4", "focus:outline-none", "shadow-md", "w-fit", "h-fit", "bottom-0", "left-0", "opacity-60", "hover:opacity-100");
+
+                    const downloadButton = document.createElement("a");
+                    downloadButton.classList.add("flex", "items-center", "text-white", "no-underline");
+                    downloadButton.href = imageUrl;
+                    downloadButton.download = "generated_image.png";
+                    downloadButton.innerHTML = `
+                    <div class="flex items-center">
+                    <span>Download</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ml-2">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z" fill="currentColor"></path>
+                    </svg>
+                    </div>
+                    `;
+
+                    downloadButtonContainer.appendChild(downloadButton);
+                    document.body.appendChild(downloadButtonContainer);
+
+                    downloadButtonContainer.appendChild(downloadButton);
+                    imageContainer.appendChild(imageElement);
+                    imageContainer.appendChild(downloadButtonContainer);
+
+                    loadingMessage.innerHTML = '';
+                    loadingMessage.appendChild(imageContainer);
+                } else {
+                    loadingMessage.innerHTML = `
+                    <div id="${imageId}" class="w-fit bg-red-400 text-gray-950 dark:bg-rose-500 rounded-lg p-2 font-normal shadow-lg dark:shadow-red-500 max-w-3xl mb-[5%]">
+                    <span class="text-sm text-gray-950 dark:text-black">Could not Process request!⚠️</span>
+                    </div>
+                    `;
+                }
+            } else {
+                let model = "Qwen/Qwen2.5-72B-Instruct";
+                if (mode === 'Coding mode') {
+                    model = "Qwen/Qwen2.5-Coder-32B-Instruct";
+                }
+
+                const aiMessage = document.createElement("div");
+                aiMessage.innerHTML = `
+                <div id="loader-parent" class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-blue-500 p-3 max-w-3xl">
+                <div class="loader space-x-2 flex">
+                <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
+                <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
+                <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-400"></div>
+                </div>
+                </div>`;
+
+                const aiMessageUId = `msg_${Math.random().toString(30).substring(3,9)}`;
+                aiMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
+                chatArea.appendChild(aiMessage);
+                chatArea.scrollTop = chatArea.scrollHeight;
+
+                try {
+                    const stream = client.chatCompletionStream({
+                        model: model,
+                        messages: conversationHistory,
+                        max_tokens:5000
+                    });
+
+                    let output = "";
+                    for await (const chunk of stream) {
+                        /*
+                        if (chunk?.choices?.length > 0) {
+                            output += chunk.choices[0].delta.content;*/
+                        const choice = chunk?.choices?.[0];
+                        if (choice?.delta?.content) {
+                            output += choice.delta.content;
+                            // Update innerHTML with marked output
+                            aiMessage.innerHTML = `
+                            <section class="relative w-fit max-w-full lg:max-w-6xl">
+                                <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full md:max lg:max-w-6xl">${marked(output)}
+                                </div>
+                                <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
+                                    <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
+                                        <svg class="fill-rose-700 dark:fill-gray-700 text-gray-600 bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
+                                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageUId}');">
+                                        <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15    19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
+                                        </svg>
+                                    </div>
+                                </section>
+
+                                <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+
+                                    <ul class="list-none p-0">
+                                        <li class="mb-2">
+                                        <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">1. Export to PDF</svg></a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">2. Export to JPG</a>
+                                        </li>
+                                        <li>
+                                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">3. Export to DOCX</a>
+                                        </li>
+                                        <li>
+                                            <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageUId}')">4. Word Export Advance</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </section>
+                            `;
+
+                            addCopyListeners(); // Assuming this function adds copy functionality to code blocks
+                            // Debounce MathJax rendering to avoid freezing
+                            debounceRenderMathJax(aiMessageUId);
+                        }
+
+                    }
+
+                    if (check === false) {
+                        addUtilityScript();
+                        check = true;
+                    }
+
+                    // Store conversation history
+                    conversationHistory.push({ role: "assistant", content: output });
+
+                } catch (error) {
+                    console.log(error);
+                    handleRequestError(error, userMessage, aiMessage, conversationHistory);
+
+                }
             }
-        } else {
-            const mode = modeSelect.value;
-            let model = "Qwen/Qwen2.5-72B-Instruct";
-            if (mode === 'Coding mode') {
-                model = "Qwen/Qwen2.5-Coder-32B-Instruct";
-            }
+        }
 
-            const aiMessage = document.createElement("div");
-            aiMessage.innerHTML = `
-            <div class="bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-teal-700 dark:to-cyan-700 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-blue-500 p-3 max-w-3xl">
-            <div class="loader space-x-2 flex">
-            <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
-            <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
-            <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-400"></div>
-            </div>
-            </div>`;
+    }
 
-            const aiMessageUId = `msg_${Math.random().toString(30).substring(3,9)}`;
-            aiMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
-            chatArea.appendChild(aiMessage);
-            chatArea.scrollTop = chatArea.scrollHeight;
+    // Listen for the imageLoaded event
+    document.addEventListener('imageLoaded', function(event) {
+        const imageDataUrl = event.detail.imageDataUrl;
+        const text = event.detail.text;
+        VisionChat(imageDataUrl, text);
+    });
 
-            try {
-                const stream = client.chatCompletionStream({
-                    model: model,
-                    messages: conversationHistory,
-                    max_tokens:10000
-                });
 
-                let output = "";
-                for await (const chunk of stream) {
-                    /*
-                    if (chunk?.choices?.length > 0) {
-                        output += chunk.choices[0].delta.content;*/
-                    const choice = chunk?.choices?.[0];
-                    if (choice?.delta?.content) {
-                        output += choice.delta.content;
-                        // Update innerHTML with marked output
-                        aiMessage.innerHTML = `
+    async function VisionChat(imageDataUrl, text) {
+
+        // Add user message to chat
+        const userMessage = addUserMessage(text, imageDataUrl);
+        VisionHistory.push({
+            role: "user",
+            content: [
+                {
+                    type: "text",
+                    text: text,
+                },
+                {
+                    type: "image_url",
+                    image_url: {
+                        url: imageDataUrl,
+                    },
+                },
+            ],
+        });
+        console.log(VisionHistory);
+        const VisionMessage = document.createElement("div");
+        const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
+        VisionMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
+        chatArea.appendChild(VisionMessage);
+        //chatArea.scrollTop = chatArea.scrollHeight;
+
+        // Add loading animation
+        VisionMessage.innerHTML = `
+        <div id="loader-parent" class="bg-gray-200 dark:bg-slate-800 text-gray-800  dark:text-black rounded-lg p-2 shadow-lg dark:shadow-md dark:shadow-blue-500 p-3 max-w-3xl">
+        <div class="loader space-x-2 flex">
+        <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
+        <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
+        <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-400"></div>
+        </div>
+        </div>`
+
+        try {
+            const visionstream = client.chatCompletionStream({
+                model: "meta-llama/Llama-3.2-11B-Vision-Instruct",
+                messages: VisionHistory,
+                max_tokens: 2000,
+            });
+
+            let visionMs = "";
+
+            for await (const chunk of visionstream) {
+                const choice = chunk?.choices?.[0]
+                if (choice?.delta?.content) {
+                    visionMs += choice.delta.content;
+                    VisionMessage.innerHTML = `
                         <section class="relative w-fit max-w-full lg:max-w-6xl">
-                            <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full md:max lg:max-w-6xl">${marked(output)}
+                            <div class="${VisionMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full md:max lg:max-w-6xl">${marked(visionMs)}
                             </div>
                             <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
                                 <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
@@ -356,9 +485,9 @@ function initChat(client) {
                                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                                     </svg>
                                 </div>
-                                <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageUId}');">
+                                <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${VisionMessageUId}');">
                                     <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15    19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
+                                        <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
                                     </svg>
                                 </div>
                             </section>
@@ -367,44 +496,54 @@ function initChat(client) {
 
                                 <ul class="list-none p-0">
                                     <li class="mb-2">
-                                    <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">1. Export to PDF</svg></a>
+                                        <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${VisionMessageUId}')">1. Export to PDF</a>
                                     </li>
                                     <li class="mb-2">
-                                        <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">2. Export to JPG</a>
+                                        <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${VisionMessageUId}')">2. Export to JPG</a>
                                     </li>
                                     <li>
-                                        <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">3. Export to DOCX</a>
+                                        <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${VisionMessageUId}')">3. Export to DOCX</a>
                                     </li>
                                     <li>
-                                        <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageUId}')">4. Word Export Advance</a>
+                                        <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${VisionMessageUId}')">4. Word Export Advance</a>
                                     </li>
                                 </ul>
                             </div>
                         </section>
                         `;
-
-                        addCopyListeners(); // Assuming this function adds copy functionality to code blocks
-                        // Debounce MathJax rendering to avoid freezing
-                        debounceRenderMathJax(aiMessageUId);
-                    }
-
                 }
-
-                if (check === false) {
-                    addUtilityScript();
-                    check = true;
+                //Add utility script
+                addUtilityScript();
+                VisionHistory.push({role: "assistant", content: visionMs});
                 }
+        } catch (error) {
+            console.log(error);
+            handleRequestError(error, userMessage, VisionMessage, VisionHistory, true);
 
-                // Store conversation history
-                conversationHistory.push({ role: "assistant", content: output });
-
-            } catch (error) {
-                console.log(error);
-                handleRequestError(error, userMessage, aiMessage, conversationHistory);
-
-            }
         }
 
+}
+
+    function addUserMessage(text, imageDataUrl) {
+        const VisionUserMessageUId = `msg_${Math.random().toString(35).substring(2, 8)}`;
+        const VisioncopyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
+        const userMessage = document.createElement("div");
+        userMessage.classList.add("flex", "justify-end", "mb-4");
+        userMessage.innerHTML = `
+        <div data-id="${VisionUserMessageUId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
+            <button id="${VisioncopyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-80 hover:opacity-50">
+                Copy
+            </button>
+
+            <div class="bg-blue-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow-md px-4 py-2 w-fit max-w-full">
+                <p class="${VisionUserMessageUId} whitespace-pre-wrap break-words w-fit max-full md:max-w-full bg-blue-400 dark:bg-gradient-to-tr dark:from-pink-700 dark:via-cyan-500 dark:to-rose-600 p-1 mb-2 rounded-md">${escapeHTML(text)}</p>
+                ${imageDataUrl ? `<img src="${imageDataUrl}" alt="Uploaded Image" class="rounded-md my-auto" />` : ''}
+            </div>
+        </div>
+        `;
+        chatArea.appendChild(userMessage);
+        chatArea.scrollTop = chatArea.scrollHeight;
+        return userMessage
     }
 
     function addUtilityScript() {
@@ -435,13 +574,18 @@ function initChat(client) {
     }
 
 
-    function handleRequestError(error, userMessage, aiMessage, conversationHistory) {
+    function handleRequestError(error, userMessage, aiMessage, conversationHistory, vision=false) {
         try {
             if (!error.message === "Failed to fetch" && !error.message === "network error") {
                 console.log("Unknown error ->", error);
                 console.log("History length:", conversationHistory.length);
+                console.log('Error:', JSON.stringify(error, null, 2));
+                console.log(error.details);
                 console.log("History size:", conversationHistory.length * 1.024, "KB");
             } else {
+                if (error.message === "[object Object]"){
+                    removeFirstConversationPairs();
+                }
                 console.log(`Intercepted '${error}'`);
                 console.log("Unknown error ->", error);
                 console.log("History length:", conversationHistory.length);
@@ -458,16 +602,40 @@ function initChat(client) {
                     if (userMessage) userMessage.remove();
 
                     // Retry action
-                    classifyText(lastMessage);
+                    if (vision === true){
+                        console.log(lastMessage);
+                        //VisionChat()
+                    } else {
+                        classifyText(lastMessage);
+                    }
                     //console.log('Retry action triggered with:', lastMessage);
                     errorContainer.classList.add('hidden');
                 };
-
+                //window.retryHandler=retryHandler;
                 retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
                 const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
                 newRetry.addEventListener('click', retryHandler);
 
-                closeModal.addEventListener('click', () => errorContainer.classList.add('hidden'));
+                closeModal.addEventListener('click', () => {
+                    errorContainer.classList.add('hidden')
+                    if (aiMessage){
+                        //console.log(aiMessage.secondChild.classList[0])
+                        console.log(aiMessage.firstChild)
+                        console.log(aiMessage.target)
+                        console.log(aiMessage.attributes)
+                        if (aiMessage.querySelector("loader")){
+                            console.log("Loader present")
+                            aiMessage.remove();
+                            userMessage.remove();
+                            errorContainer.classList.add('hidden');
+                        }
+                    } else {
+                        console.log("showing",aiMessage)
+                        aiMessage.remove();
+                        userMessage.remove();
+                        console.log(userMessage)
+                    }
+                });
 
                 // Function to show the modal with an error message
                 function showError() {
@@ -511,9 +679,10 @@ function initChat(client) {
     }
 
     // Copy function for the whole text block/aiMessage
-    function CopyAll(UId) {
-
+    function CopyAll(UId, bt = false) {
+        console.log(UId)
         const textBlock = document.querySelector(UId);
+        console.log(textBlock)
         //console.log(textBlock);
         if (!textBlock) {
             console.error('Element not found: ', UId);
@@ -521,11 +690,17 @@ function initChat(client) {
         }
 
         const textToCopy = textBlock.innerText;
+        console.log(textToCopy)
 
-        if (textToCopy.length >= 50) {
+        if (textToCopy.length >= 1) {
             try {
-                navigator.clipboard.writeText(textToCopy);
-
+                 navigator.clipboard.writeText(textToCopy);
+                 if (bt === true){
+                   bt.textContent = 'Copied!';
+                setTimeout(() => {
+                    bt.textContent = 'Copy';
+                }, 3000)
+                 }
             } catch (err) {
                 console.error('Failed to copy: ', err);
             }
@@ -572,3 +747,4 @@ function initChat(client) {
     window.CopyAll = CopyAll;
 
 }
+

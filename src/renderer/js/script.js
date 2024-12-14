@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const moreButton = document.getElementById("more");
     const fileInput = document.getElementById('fileInput');
     const dropZone = document.getElementById('dropZone');
+    const dropZoneModal = document.getElementById('dropZoneModal');
     const dropZoneText = document.getElementById('dropZoneText');
     const uploadedFilesContainer = document.getElementById('uploadedFiles');
 
@@ -113,11 +114,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function OpenFileModal(){
-        dropZone.classList.remove('hidden')
+        dropZoneModal.classList.remove('hidden')
     }
 
-    function CloseFileModal(){
-        dropZone.classList.add('hidden')
+    function CloseFileModal() {
+        dropZoneModal.classList.add('hidden');
+        // Clear file input and prompt
+        fileInput.value = "";
+        document.getElementById("imagePrompt").value = "";
+        uploadedFilesContainer.innerHTML = "";
+        dropZoneText.textContent = "Drag and drop files here or click to select";
     }
 
      // Handle file selection
@@ -132,7 +138,9 @@ document.addEventListener('DOMContentLoaded', function() {
          // Prevent the default click behavior
          event.stopPropagation();
          event.preventDefault();
-        fileInput.click();
+         if (event.target.id === "dropZone") {
+            fileInput.click();
+         }
      });
 
      function handleFileSelect(event) {
@@ -154,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
      }
 
      function handleFiles(files) {
-         console.log("Handling files")
+         console.log("Handling files");
 
          for (let i = 0; i < files.length; i++) {
              const file = files[i];
@@ -165,32 +173,40 @@ document.addEventListener('DOMContentLoaded', function() {
              fileElement.classList.add('flex', 'items-center', 'mb-2', 'text-gray-700');
              fileElement.innerHTML = `
              <span class="mr-2">${file.name}</span>
-             <span class="text-sm text-gray-500">(${file.size} bytes)</span>
+             <span class="text-sm text-gray-500">(${(file.size / 1024).toFixed(2)} kb)</span>
              `;
-             uploadedFilesContainer.appendChild(fileElement);
+             document.getElementById("uploadedFiles").appendChild(fileElement);
+
+             // Convert the file to a data URL
+             const reader = new FileReader();
+             reader.onload = (e) => {
+                 const imageDataUrl = e.target.result;
+                 // Store the image data URL in the global window object
+                 window.imageDataUrl = imageDataUrl;
+             };
+             reader.readAsDataURL(file);
          }
 
          // Update the drop zone text if files are uploaded
          if (files.length > 0) {
-             dropZoneText.textContent = 'Files uploaded successfully';
+             document.getElementById("dropZoneText").textContent = 'Files uploaded successfully';
          }
      }
 
-     /* Fix The heading verriding by <p> tag wrap
-     // Find all p elements in the document
-     const paragraphs = document.querySelectorAll('p');
-
-     paragraphs.forEach(p => {
-         // Check if the p element contains a heading (h1 to h6)
-         const heading = p.querySelector('h1, h2, h3, h4, h5, h6');
-         if (heading) {
-             // Move the heading out of the p element
-             p.parentNode.insertBefore(heading, p);
-
-             // Remove the p element if it is now empty
-             if (p.innerHTML.trim() === '') {
-                 p.remove();
-             }
+     function submitImageAndText() {
+         const imageDataUrl = window.imageDataUrl;
+         const text = document.getElementById("imagePrompt").value;
+         if (imageDataUrl && text) {
+             // Dispatch an event with the image data URL and text
+             const event = new CustomEvent('imageLoaded', { detail: { imageDataUrl: imageDataUrl, text: text } });
+             document.dispatchEvent(event);
+             CloseFileModal();
+             document.getElementById('suggestions').classList.add('hidden')
+         } else {
+             alert("Please upload an image and enter a prompt.");
          }
-     });*/
+     }
+     window.submitImageAndText = submitImageAndText;
+     window.CloseFileModal = CloseFileModal;
+
 });

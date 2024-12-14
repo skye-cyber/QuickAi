@@ -12,7 +12,7 @@ module.exports = {
   },
   plugins: [
     new webpack.ProvidePlugin({
-      process: 'process/browser', // Provide process polyfill
+      process: 'process', // Provide process polyfill
       Buffer: ['buffer', 'Buffer'], // Provide Buffer
       }),
 
@@ -42,6 +42,17 @@ module.exports = {
       process: require.resolve('process'),
       child_process:false //'child-process-promise'
     }
+  },
+  module: {
+    rules: [
+      {
+        //test: /\.js$/,
+        //exclude: /node_modules/,
+        //use: {
+          //loader: 'babel-loader',
+        },
+      },
+    ],
   },
   devtool: 'source-map', // Consider using source maps for better debugging
   mode: 'production',

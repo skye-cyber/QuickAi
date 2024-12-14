@@ -25,7 +25,7 @@ window.MathJax = {
 <body class="bg-gradient-to-b from-indigo-200 via-purple-300 to-blue-200 dark:from-slate-700 dark:to-slate-700 min-h-screen font-sans flex flex-col items-center overflow-hidden">
 
     <!-- Main Container -->
-    <div id="mainclass="h-[100vh] w-[100vw] max-h-[100vh]  max-w-[100vw] p-6 mt-0 bg-white bg-opacity-90 rounded-b-none shadow-lg dark:bg-slate-800 rounded-t-none overflow-y-hidden">
+    <div id="main" class="h-[100vh] w-[100vw] max-h-[100vh]  max-w-[100vw] p-6 mt-0 bg-white bg-opacity-90 rounded-b-none shadow-lg dark:bg-slate-800 rounded-t-none overflow-y-hidden">
         <!-- Header -->
         <header class="mb-4">
             <article class="flex flex-rows-1 justify-between">
@@ -34,6 +34,7 @@ window.MathJax = {
                     <select id="mode" class="rounded-lg p-2 font-semibold text-sky-900 dark:text-gray-50 rounded-md bg-gradient-to-tr from-purple-300 to-violet-300 dark:from-gray-700 dark:to-gray-900 hover:from-cyan-400 hover:to-violet-400 dark:hover:from-gray-600 dark:hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-gray-400">
                         <option default class="bg-gray-100 dark:bg-gray-600">General mode</option>
                         <option class="bg-gray-100 dark:bg-gray-600">Coding mode</option>
+                        <option class="bg-gray-100 dark:bg-gray-600" title="supports image upload and donwload">Vision</option>
                     </select>
                 </span>
                 <label class="relative inline-flex items-center cursor-pointer my-2 lg:ml-[24vw]" title="Change image generation model to FLUX">
@@ -130,16 +131,22 @@ window.MathJax = {
     <!--Attachment modal and file input -->
     <section class="">
         <!--Attachment modal -->
-        <div class="fixed flex inset-4 z-50 items-center justify-center bg-black bg-opacity-50 dark:bg-slate-950 dark:bg-opacity-50 hidden" id="dropZone" title="Attach files">
+        <div class="fixed flex inset-4 z-50 items-center justify-center bg-black bg-opacity-40 dark:bg-black dark:bg-opacity-30  hidden" id="dropZoneModal" title="Attach files" onclick="CloseFileModal();">
             <!-- Modal Content -->
-            <div class="relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg md:w-full md:h-full md:mx-auto max-w-[90vw] max-h-[90vh] md:max-h-[80vh] md:max-w-md 2xl:max-w-lg">
+            <div id="dropZone" class="relative bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg md:w-full md:h-full md:mx-auto max-w-[90vw] max-h-[90vh] md:max-h-[80vh] md:max-w-md 2xl:max-w-lg">
                 <button id="closeFileEModal" title="Close" class="absolute top-1 right-1 text-gray-400 dark:text-gray-500 hover:text-blue-300 dark:hover:text-gray-300" aria-label="Close">
                     <svg class="fill-current h-6 w-6" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.65-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"></path>
                     </svg>
                 </button>
-                <p class="text-gray-600" id="dropZoneText">Drag and drop files here or click to select</p>
-                <div id="uploadedFiles" class="mt-4 text-slate-900 bg-blue-400 dark:bg-blue-100 dark:bg-gradient-to-r dark:from-cyan-900 dark:via-pink-800 dark:to-amber-700 bg-clip-text"></div>
+                <p class="text-gray-400 dark:text-gray-100" id="dropZoneText">Drag and drop files here or click to select</p>
+                <div class="bg-blue-300">
+                <div id="uploadedFiles" class="mt-4 text-slate-900 bg-blue-400 dark:bg-gradient-to-r dark:from-green-600 dark:via-pink-300 dark:to-amber-500 bg-clip-text"></div>
+                </div>
+                <input type="text" aria-label="prompt input field" title="prompt field" id="imagePrompt" class="mt-4 p-2 border border-gray-300 rounded w-full" placeholder="Enter your prompt here" />
+                <div class="fixed justify-right items-right">
+                    <button id="submitImage" aria-label="submit button" title="submit" class="mt-4 p-2 bg-blue-500 text-white rounded" onclick="submitImageAndText()">Submit</button>
+                </div>
             </div>
         </div>
         <!-- File Input -->
@@ -163,8 +170,8 @@ window.MathJax = {
         </div>
     </div>
 
-        <!-- Modal Background -->
-    <div id="settingsModal" class="hidden fixed inset-2 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-50">
+        <!-- Settings Modal Background -->
+    <div id="settingsModal" class="hidden fixed inset-2 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-50" onclick="if (event.target.id === 'settingsModal') {                       this.classList.add('hidden');}">
         <!-- Modal Content -->
         <div class="relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full mx-2 md:mx-auto max-w-md">
             <!-- Close Button -->

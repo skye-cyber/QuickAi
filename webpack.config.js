@@ -43,6 +43,17 @@ module.exports = {
       child_process:false //'child-process-promise'
     }
   },
+  module: {
+    rules: [
+      {
+        //test: /\.js$/,
+        //exclude: /node_modules/,
+        //use: {
+          //loader: 'babel-loader',
+        //},
+      },
+    ],
+  },
   devtool: 'source-map', // Consider using source maps for better debugging
   mode: 'production',
 };
