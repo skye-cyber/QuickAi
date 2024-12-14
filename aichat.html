@@ -51,7 +51,7 @@ window.MathJax = {
         </header>
 
         <!-- Chat Area -->
-        <section id="chatArea" class="bg-gray-100 dark:bg-slate-900 h-[75vh] p-2 md:p-4 rounded-lg shadow-inner  dark:shadow-gray-950 overflow-y-auto overflow-x-hidden space-y-4">
+        <section id="chatArea" class="bg-gray-100 dark:bg-slate-900 h-[75vh] p-2 md:p-4 rounded-lg shadow-inner  dark:shadow-gray-950 overflow-y-auto overflow-x-hidden space-y-4" oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';">
             <!-- Quick query options -->
             <section id='suggestions' class="mx-auto">
                 <div class="justify-center mt-[var(--screen-optical-compact-offset-amount)] flex h-full flex-shrink flex-col items-center overflow-hidden text-token-text-primary" style="opacity: 1; will-change: auto;">
@@ -184,14 +184,25 @@ window.MathJax = {
             <!-- Modal Title -->
             <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Settings</h2>
 
-            <!-- Theme Switching Option -->
-            <div class="flex items-center mb-4">
-            <label for="themeSwitch" class="mr-3 text-gray-700 dark:text-gray-300">Dark Mode</label>
-            <label class="relative inline-flex items-center cursor-pointer">
-                <input id="themeSwitch" type="checkbox" class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-            </label>
-            </div>
+            <section class="block md:flex" arial-label="switch theme" title="switch theme">
+                <!-- Theme Switching Option -->
+                <div class="flex items-center mb-4">
+                <label for="themeSwitch" class="mr-3 text-gray-700 dark:text-gray-300">Dark Mode</label>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input id="themeSwitch" type="checkbox" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                </label>
+                </div>
+
+                <!-- AutoScroll option -->
+                <div class="flex items-center mb-4" title="scroll on content" aial-label="scroll on content">
+                <label for="AutoScroll" class="md:ml-4 mr-3 text-gray-700 dark:text-gray-300">Auto scroll</label>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input id="AutoScroll" checked type="checkbox" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                </label>
+                </div>
+            </section>
 
             <!-- Additional Settings Options -->
             <div class="mb-4">
@@ -211,5 +222,5 @@ window.MathJax = {
     </div>
 </body>
 <script src="src/renderer/js/script.js"></script>
-<script src="src/renderer/js/_aichat.js"></script>
+<!--<script src="src/renderer/js/_aichat.js"></script>-->
 </html>

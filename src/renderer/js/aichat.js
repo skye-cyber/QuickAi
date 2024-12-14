@@ -28,6 +28,7 @@ function initChat(client) {
     const userInput = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
     const modeSelect = document.getElementById('mode');
+    const AutoScroll = document.getElementById("AutoScroll");
     let check = false;
 
     // Custom instructions
@@ -122,7 +123,7 @@ function initChat(client) {
 
         return `
         <div class="relative my-auto p-2 border border-gray-300 dark:border-gray-900 bg-white dark:bg-gray-800 rounded-md max-w-full">
-        <p class="code-language absolute rounded-md left-2 top-0 dark:text-gray-700 dark:text-white rounded-lg font-normal text-sm cursor-pointer opacity-80 hover:opacity-50">
+        <p class="code-language absolute rounded-md left-2 top-0.5 dark:text-gray-700 dark:text-white rounded-lg font-normal text-sm cursor-pointer opacity-80 hover:opacity-50">
         ${validLanguage}
         </p>
         <button id="${copyButtonId}" class="copy-button absolute rounded-md px-2 py-2 right-2 top-2 bg-gradient-to-r from-sky-800 to-purple-600 hover:bg-blue-400 text-white border border-2 cursor-pointer opacity-80 hover:opacity-50 dark:bg-gray-800">
@@ -335,7 +336,7 @@ function initChat(client) {
                 const aiMessageUId = `msg_${Math.random().toString(30).substring(3,9)}`;
                 aiMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
                 chatArea.appendChild(aiMessage);
-                chatArea.scrollTop = chatArea.scrollHeight;
+                AutoScroll.checked ? scrollToBottom(chatArea) : null;
 
                 try {
                     const stream = client.chatCompletionStream({
@@ -389,7 +390,7 @@ function initChat(client) {
                                 </div>
                             </section>
                             `;
-
+                            AutoScroll.checked ? scrollToBottom(chatArea) : null;
                             addCopyListeners(); // Assuming this function adds copy functionality to code blocks
                             // Debounce MathJax rendering to avoid freezing
                             debounceRenderMathJax(aiMessageUId);
@@ -423,223 +424,224 @@ function initChat(client) {
         VisionChat(text, fileType, fileDataUrl);
     });
 
-//initialize system Instructions
-let VisionHistory = [];
-VisionSystem = `
-    Your name is QuickAi. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Electron, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).
+    //initialize system Instructions
+    let VisionHistory = [];
+    const VisionSystem = `
+        Your name is QuickAi. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Electron, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).
 
-    Your primary goal is to assist the user in all their needs. You should be brief and direct to the point based on the user's needs. You are required to use TailwindCSS for styling unless the user requests otherwise.
-    When interacting with the user:
-    - You are allowed but not required to begin by introducing yourself and optionally mentioning your deployer/creator, goal unless you've done so previously. However, if the user starts the interaction by directly diving into the problem/question at hand, you can skip the introduction.
-    - Further information about yourself or your creator (Wambua) should only be revealed when explicitly requested for.
-`;
-VisionHistory.push({
-    role: "system",
-    content: [
-        {
-            type: "text",
-            text: "You are an helpful assistant",
-        },
-    ],
-});
-
-async function VisionChat(text, fileType, fileDataUrl = null) {
-    console.log(fileDataUrl)
-    //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
-    //switch to vission model
-    modeSelect.value = "Vision"
-    // Determine the content based on fileDataUrl
-    let userContent;
-    if (fileDataUrl) {
-        console.log("Image url present", fileDataUrl);
-        if (fileType == "image") {
-            userContent = [
-                {
-                    type: "text",
-                    text: text,
-                },
-                {
-                    type: "image_url",
-                    image_url: {
-                        url: fileDataUrl,
-                    },
-                },
-            ];
-        }
-        else if (fileType == "document") {
-            userContent = [
-                {
-                    type: "text",
-                    text: text,
-                },
-                {
-                    type: "file_url",
-                    file_url: {
-                        url: fileDataUrl,
-                    },
-                },
-            ];
-        }
-    } else {
-        console.log("Url not found");
-        userContent = [
+        Your primary goal is to assist the user in all their needs. You should be brief and direct to the point based on the user's needs. You are required to use TailwindCSS for styling unless the user requests otherwise.
+        When interacting with the user:
+        - You are allowed but not required to begin by introducing yourself and optionally mentioning your deployer/creator, goal unless you've done so previously. However, if the user starts the interaction by directly diving into the problem/question at hand, you can skip the introduction.
+        - Further information about yourself or your creator (Wambua) should only be revealed when explicitly requested for.
+    `;
+    VisionHistory.push({
+        role: "system",
+        content: [
             {
                 type: "text",
-                text: text,
+                text: VisionSystem,
             },
-        ];
-    }
-
-    // Add user message to VisionHistory
-    VisionHistory.push({
-        role: "user",
-        content: userContent,
+        ],
     });
 
-    //console.log("Updated VisionHistory:", JSON.stringify(VisionHistory, null, 2));
+    async function VisionChat(text, fileType, fileDataUrl = null) {
+        console.log(fileDataUrl)
+        //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
+        //switch to vission model
+        modeSelect.value = "Vision"
+        // Determine the content based on fileDataUrl
+        let userContent;
+        if (fileDataUrl) {
+            console.log("Image url present", fileDataUrl);
+            if (fileType == "image") {
+                userContent = [
+                    {
+                        type: "text",
+                        text: text,
+                    },
+                    {
+                        type: "image_url",
+                        image_url: {
+                            url: fileDataUrl,
+                        },
+                    },
+                ];
+            }
+            else if (fileType == "document") {
+                userContent = [
+                    {
+                        type: "text",
+                        text: text,
+                    },
+                    {
+                        type: "file_url",
+                        file_url: {
+                            url: fileDataUrl,
+                        },
+                    },
+                ];
+            }
+        } else {
+            console.log("Url not found");
+            userContent = [
+                {
+                    type: "text",
+                    text: text,
+                },
+            ];
+        }
 
-    console.log(userContent)
-    // Store the last message for retry purposes
-    const lastMessage = userContent;
-
-    // Add user message to chat
-    const userMessage = addUserMessage(text, fileType, fileDataUrl);
-    const VisionMessage = document.createElement("div");
-    const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
-    VisionMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
-    chatArea.appendChild(VisionMessage);
-
-    // Add loading animation
-    VisionMessage.innerHTML = `
-    <div id="loader-parent" class="bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-md dark:shadow-blue-500 p-3 max-w-3xl">
-    <div class="loader space-x-2 flex">
-    <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
-    <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
-    <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-400"></div>
-    </div>
-    </div>
-    `;
-
-    try {
-        const visionstream = client.chatCompletionStream({
-            model: "meta-llama/Llama-3.2-11B-Vision-Instruct",
-            messages: VisionHistory,
-            max_tokens: 2000,
+        // Add user message to VisionHistory
+        VisionHistory.push({
+            role: "user",
+            content: userContent,
         });
 
-        let visionMs = "";
-        for await (const chunk of visionstream) {
-            const choice = chunk?.choices?.[0];
-            if (choice?.delta?.content) {
-                visionMs += choice.delta.content;
-                VisionMessage.innerHTML = `
-                <section class="relative w-fit max-w-full lg:max-w-6xl">
-                    <div class="${VisionMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full md:max lg:max-w-6xl">${marked(visionMs)}
-                    </div>
-                    <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
-                        <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
-                            <svg class="fill-rose-700 dark:fill-gray-700 text-gray-600 bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
-                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                            </svg>
+        //console.log("Updated VisionHistory:", JSON.stringify(VisionHistory, null, 2));
+
+        console.log(userContent)
+        // Store the last message for retry purposes
+        const lastMessage = userContent;
+
+        // Add user message to chat
+        const userMessage = addUserMessage(text, fileType, fileDataUrl);
+        const VisionMessage = document.createElement("div");
+        const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
+        VisionMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
+        chatArea.appendChild(VisionMessage);
+
+        // Add loading animation
+        VisionMessage.innerHTML = `
+        <div id="loader-parent" class="bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-md dark:shadow-blue-500 p-3 max-w-3xl">
+        <div class="loader space-x-2 flex">
+        <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
+        <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
+        <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-400"></div>
+        </div>
+        </div>
+        `;
+
+        try {
+            const visionstream = client.chatCompletionStream({
+                model: "meta-llama/Llama-3.2-11B-Vision-Instruct",
+                messages: VisionHistory,
+                max_tokens: 2000,
+            });
+
+            let visionMs = "";
+            for await (const chunk of visionstream) {
+                const choice = chunk?.choices?.[0];
+                if (choice?.delta?.content) {
+                    visionMs += choice.delta.content;
+                    VisionMessage.innerHTML = `
+                    <section class="relative w-fit max-w-full lg:max-w-6xl">
+                        <div class="${VisionMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full md:max lg:max-w-6xl">${marked(visionMs)}
                         </div>
-                        <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${VisionMessageUId}');">
-                            <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
-                            </svg>
+                        <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
+                            <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
+                                <svg class="fill-rose-700 dark:fill-gray-700 text-gray-600 bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
+                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                </svg>
+                            </div>
+                            <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${VisionMessageUId}');">
+                                <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
+                                </svg>
+                            </div>
+                        </section>
+
+                        <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+
+                            <ul class="list-none p-0">
+                                <li class="mb-2">
+                                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${VisionMessageUId}')">1. Export to PDF</a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${VisionMessageUId}')">2. Export to JPG</a>
+                                </li>
+                                <li>
+                                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${VisionMessageUId}')">3. Export to DOCX</a>
+                                </li>
+                                <li>
+                                    <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${VisionMessageUId}')">4. Word Export Advance</a>
+                                </li>
+                            </ul>
                         </div>
                     </section>
+                    `;
 
-                    <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
-
-                        <ul class="list-none p-0">
-                            <li class="mb-2">
-                                <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${VisionMessageUId}')">1. Export to PDF</a>
-                            </li>
-                            <li class="mb-2">
-                                <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${VisionMessageUId}')">2. Export to JPG</a>
-                            </li>
-                            <li>
-                                <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${VisionMessageUId}')">3. Export to DOCX</a>
-                            </li>
-                            <li>
-                                <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${VisionMessageUId}')">4. Word Export Advance</a>
-                            </li>
-                        </ul>
-                    </div>
-                </section>
-                `;
-
-                addCopyListeners();
-                // Debounce MathJax rendering to avoid freezing
-                debounceRenderMathJax(aiMessageUId);
-            }
-        }
-
-        VisionHistory.push({ role: "assistant", content: [{ type: "text", text: visionMs }] });
-        //console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
-
-    } catch (error) {
-        console.log("Error caught:", error);
-        // Get elements for error modal
-        console.log(lastMessage)
-        const errorContainer = document.getElementById('errorContainer');
-        const errorArea = document.getElementById('errorArea');
-        const closeModal = document.getElementById('closeEModal');
-        const retry = document.getElementById('retry');
-
-        // Function to show the modal with an error message
-        function showError() {
-            errorContainer.classList.remove('hidden');
-            errorArea.textContent = "An error occurred during response. Retry?";
-            VisionHistory.pop(); // Remove the last conversation entry
-        }
-
-        // Remove existing event listeners before adding a new one
-        retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
-        const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
-
-        // Retry action
-        const retryHandler = () => {
-            // Retry action with previous data
-            if (lastMessage) {
-                const textItem = lastMessage.find(item => item.type === "text");
-                const text = textItem?.text;
-                if (fileType == "image"){
-                    const imageItem = lastMessage.find(item => item.type === "image_url");
-                    var fileDataUrl = imageItem?.image_url?.url;
-                    var fileType ="image"
-                } else {
-                    const imageItem = lastMessage.find(item => item.type === "file_url");
-                    fileDataUrl = imageItem?.file_url?.url;
-                    fileType ="document"
-                }
-
-                if (VisionMessage) VisionMessage.remove();
-                if (userMessage) userMessage.remove();
-                VisionChat(text, fileType, fileDataUrl);
-            }
-
-            errorContainer.classList.add('hidden');
-        };
-
-        newRetry.addEventListener('click', retryHandler);
-
-        closeModal.addEventListener('click', () => {
-            errorContainer.classList.add('hidden');
-            if (VisionMessage) {
-                if (VisionMessage.firstElementChild.id === "loader-parent") {
-                    console.log("Loader present");
-                    VisionMessage.remove();
-                    userMessage.remove();
-                    errorContainer.classList.add('hidden');
+                    AutoScroll.checked ? scrollToBottom(chatArea) : null;
+                    addCopyListeners();
+                    // Debounce MathJax rendering to avoid freezing
+                    debounceRenderMathJax(aiMessageUId);
                 }
             }
-        });
 
-        // Show error modal
-        showError();
+            VisionHistory.push({ role: "assistant", content: [{ type: "text", text: visionMs }] });
+            //console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
+
+        } catch (error) {
+            console.log("Error caught:", error);
+            // Get elements for error modal
+            console.log(lastMessage)
+            const errorContainer = document.getElementById('errorContainer');
+            const errorArea = document.getElementById('errorArea');
+            const closeModal = document.getElementById('closeEModal');
+            const retry = document.getElementById('retry');
+
+            // Function to show the modal with an error message
+            function showError() {
+                errorContainer.classList.remove('hidden');
+                errorArea.textContent = "An error occurred during response. Retry?";
+                VisionHistory.pop(); // Remove the last conversation entry
+            }
+
+            // Remove existing event listeners before adding a new one
+            retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
+            const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
+
+            // Retry action
+            const retryHandler = () => {
+                // Retry action with previous data
+                if (lastMessage) {
+                    const textItem = lastMessage.find(item => item.type === "text");
+                    const text = textItem?.text;
+                    if (fileType == "image"){
+                        const imageItem = lastMessage.find(item => item.type === "image_url");
+                        var fileDataUrl = imageItem?.image_url?.url;
+                        var fileType ="image"
+                    } else {
+                        const imageItem = lastMessage.find(item => item.type === "file_url");
+                        fileDataUrl = imageItem?.file_url?.url;
+                        fileType ="document"
+                    }
+
+                    if (VisionMessage) VisionMessage.remove();
+                    if (userMessage) userMessage.remove();
+                    VisionChat(text, fileType, fileDataUrl);
+                }
+
+                errorContainer.classList.add('hidden');
+            };
+
+            newRetry.addEventListener('click', retryHandler);
+
+            closeModal.addEventListener('click', () => {
+                errorContainer.classList.add('hidden');
+                if (VisionMessage) {
+                    if (VisionMessage.firstElementChild.id === "loader-parent") {
+                        console.log("Loader present");
+                        VisionMessage.remove();
+                        userMessage.remove();
+                        errorContainer.classList.add('hidden');
+                    }
+                }
+            });
+
+            // Show error modal
+            showError();
+        }
     }
-}
 
     function addUserMessage(text, fileType, fileDataUrl) {
         const VisionUserMessageUId = `msg_${Math.random().toString(35).substring(2, 8)}`;
@@ -661,7 +663,7 @@ async function VisionChat(text, fileType, fileDataUrl = null) {
         </div>
         `;
         chatArea.appendChild(userMessage);
-        chatArea.scrollTop = chatArea.scrollHeight;
+        AutoScroll.checked ? scrollToBottom(chatArea) : null;
         copyBMan();
         return userMessage
     }
@@ -835,6 +837,7 @@ async function VisionChat(text, fileType, fileDataUrl = null) {
             document.getElementById('suggestions').classList.add('hidden')
         }
     });
+
 
     userInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && !e.shiftKey) {

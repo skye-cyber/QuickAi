@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    addUtilityScript();
     const modal = document.getElementById("settingsModal");
     const themeSwitch = document.getElementById("themeSwitch");
     const rootElement = document.documentElement;
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropZoneModal = document.getElementById('dropZoneModal');
     const dropZoneText = document.getElementById('dropZoneText');
     const uploadedFilesContainer = document.getElementById('uploadedFiles');
+    const userInput = document.getElementById("userInput");
 
     // Query map for button actions
     const queryMap = {
@@ -26,6 +28,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to hide the modal
     function hideModal() {
         modal.classList.add('hidden');
+    }
+
+    function addUtilityScript() {
+        console.log("Added _aichat script");
+        const script = document.createElement('script');
+        script.src = 'src/renderer/js/_aichat.js';
+        script.async = true; // Optional: load the script asynchronously
+        document.body.appendChild(script);
     }
 
     // Show settings modal when settings button is clicked
@@ -215,6 +225,32 @@ document.addEventListener('DOMContentLoaded', function() {
              alert("Please upload an image and enter a prompt.");
          }
      }
+
+     function scrollToBottom(element) {
+         // Use setTimeout to ensure the scroll happens after the DOM has updated
+         setTimeout(() => {
+             element.scrollTop = element.scrollHeight;
+         }, 0);
+     }
+
+     // Ensure the textarea is empty initially
+     userInput.value = userInput.value.trim();
+     // Trigger input event to adjust height
+     userInput.dispatchEvent(new Event('input'));
+
+     document.addEventListener('keydown', (event) => {
+         if (event.ctrlKey && event.key === 'S' || event.ctrlKey && event.key === 's') {
+             event.preventDefault(); // Prevent the default Save action in browsers
+             modal.classList.toggle('hidden');
+         } else if (event.key === 'Escape') {
+             event.preventDefault();
+            modal.classList.add('hidden');
+         }/* else if (event.ctrlKey && event.shiftKey && event.key === 'M') {
+             event.preventDefault(); // Prevent any default action
+             document.getElementById("mode").display=block;
+         }*/
+     });
+     window.scrollToBottom = scrollToBottom;
      window.submitImageAndText = submitImageAndText;
      window.CloseFileModal = CloseFileModal;
 
