@@ -87,7 +87,6 @@ function initChat(client) {
     `;
 
     let conversationHistory = [{ role: "system", content: customInstructions }];
-    let VisionHistory = [{ role: "system", content:"You are an helpful assistant"}];
 
     // Initialize highlight.js
     hljs.configure({ ignoreUnescapedHTML: true });
@@ -225,7 +224,7 @@ function initChat(client) {
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
         const userMessage = document.createElement("div");
         if (mode === "Vision"){
-            VisionChat("", text)
+            VisionChat(text=text)
 
         } else {
             userMessage.innerHTML = `
@@ -422,106 +421,186 @@ function initChat(client) {
     document.addEventListener('imageLoaded', function(event) {
         const imageDataUrl = event.detail.imageDataUrl;
         const text = event.detail.text;
-        VisionChat(imageDataUrl, text);
+        VisionChat(text, imageDataUrl);
     });
 
+//initialize system Instructions
+let VisionHistory = [];
+VisionHistory.push({
+    role: "system",
+    content: [
+        {
+            type: "text",
+            text: "You are an helpful assistant",
+        },
+    ],
+});
 
-    async function VisionChat(imageDataUrl, text) {
+async function VisionChat(text, imageDataUrl = null) {
+    //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
 
-        // Add user message to chat
-        const userMessage = addUserMessage(text, imageDataUrl);
-        VisionHistory.push({
-            role: "user",
-            content: [
-                {
-                    type: "text",
-                    text: text,
+    // Determine the content based on imageDataUrl
+    let userContent;
+    if (imageDataUrl !== null) {
+        console.log("Image url present", imageDataUrl);
+        userContent = [
+            {
+                type: "text",
+                text: text,
+            },
+            {
+                type: "image_url",
+                image_url: {
+                    url: imageDataUrl,
                 },
-                {
-                    type: "image_url",
-                    image_url: {
-                        url: imageDataUrl,
-                    },
-                },
-            ],
+            },
+        ];
+    } else {
+        console.log("Url not found");
+        userContent = [
+            {
+                type: "text",
+                text: text,
+            },
+        ];
+    }
+
+    // Add user message to VisionHistory
+    VisionHistory.push({
+        role: "user",
+        content: userContent,
+    });
+
+    //console.log("Updated VisionHistory:", JSON.stringify(VisionHistory, null, 2));
+
+    // Store the last message for retry purposes
+    const lastMessage = userContent;
+
+    // Add user message to chat
+    const userMessage = addUserMessage(text, imageDataUrl);
+    const VisionMessage = document.createElement("div");
+    const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
+    VisionMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
+    chatArea.appendChild(VisionMessage);
+
+    // Add loading animation
+    VisionMessage.innerHTML = `
+    <div id="loader-parent" class="bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-md dark:shadow-blue-500 p-3 max-w-3xl">
+    <div class="loader space-x-2 flex">
+    <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
+    <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
+    <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-400"></div>
+    </div>
+    </div>
+    `;
+
+    try {
+        const visionstream = client.chatCompletionStream({
+            model: "meta-llama/Llama-3.2-11B-Vision-Instruct",
+            messages: VisionHistory,
+            max_tokens: 2000,
         });
-        console.log(VisionHistory);
-        const VisionMessage = document.createElement("div");
-        const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
-        VisionMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
-        chatArea.appendChild(VisionMessage);
-        //chatArea.scrollTop = chatArea.scrollHeight;
 
-        // Add loading animation
-        VisionMessage.innerHTML = `
-        <div id="loader-parent" class="bg-gray-200 dark:bg-slate-800 text-gray-800  dark:text-black rounded-lg p-2 shadow-lg dark:shadow-md dark:shadow-blue-500 p-3 max-w-3xl">
-        <div class="loader space-x-2 flex">
-        <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
-        <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
-        <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-400"></div>
-        </div>
-        </div>`
+        let visionMs = "";
+        for await (const chunk of visionstream) {
+            const choice = chunk?.choices?.[0];
+            if (choice?.delta?.content) {
+                visionMs += choice.delta.content;
+                VisionMessage.innerHTML = `
+                <section class="relative w-fit max-w-full lg:max-w-6xl">
+                    <div class="${VisionMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full md:max lg:max-w-6xl">${marked(visionMs)}
+                    </div>
+                    <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
+                        <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
+                            <svg class="fill-rose-700 dark:fill-gray-700 text-gray-600 bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                        </div>
+                        <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${VisionMessageUId}');">
+                            <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
+                            </svg>
+                        </div>
+                    </section>
 
-        try {
-            const visionstream = client.chatCompletionStream({
-                model: "meta-llama/Llama-3.2-11B-Vision-Instruct",
-                messages: VisionHistory,
-                max_tokens: 2000,
-            });
+                    <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
 
-            let visionMs = "";
-
-            for await (const chunk of visionstream) {
-                const choice = chunk?.choices?.[0]
-                if (choice?.delta?.content) {
-                    visionMs += choice.delta.content;
-                    VisionMessage.innerHTML = `
-                        <section class="relative w-fit max-w-full lg:max-w-6xl">
-                            <div class="${VisionMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full md:max lg:max-w-6xl">${marked(visionMs)}
-                            </div>
-                            <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
-                                <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
-                                    <svg class="fill-rose-700 dark:fill-gray-700 text-gray-600 bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
-                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                                    </svg>
-                                </div>
-                                <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${VisionMessageUId}');">
-                                    <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
-                                    </svg>
-                                </div>
-                            </section>
-
-                            <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
-
-                                <ul class="list-none p-0">
-                                    <li class="mb-2">
-                                        <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${VisionMessageUId}')">1. Export to PDF</a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${VisionMessageUId}')">2. Export to JPG</a>
-                                    </li>
-                                    <li>
-                                        <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${VisionMessageUId}')">3. Export to DOCX</a>
-                                    </li>
-                                    <li>
-                                        <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${VisionMessageUId}')">4. Word Export Advance</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </section>
-                        `;
-                }
-                //Add utility script
-                addUtilityScript();
-                VisionHistory.push({role: "assistant", content: visionMs});
-                }
-        } catch (error) {
-            console.log(error);
-            handleRequestError(error, userMessage, VisionMessage, VisionHistory, true);
-
+                        <ul class="list-none p-0">
+                            <li class="mb-2">
+                                <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${VisionMessageUId}')">1. Export to PDF</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${VisionMessageUId}')">2. Export to JPG</a>
+                            </li>
+                            <li>
+                                <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${VisionMessageUId}')">3. Export to DOCX</a>
+                            </li>
+                            <li>
+                                <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${VisionMessageUId}')">4. Word Export Advance</a>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+                `;
+            }
         }
 
+        VisionHistory.push({ role: "assistant", content: [{ type: "text", text: visionMs }] });
+        //console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
+
+    } catch (error) {
+        console.log("Error caught:", error);
+        // Get elements for error modal
+        const errorContainer = document.getElementById('errorContainer');
+        const errorArea = document.getElementById('errorArea');
+        const closeModal = document.getElementById('closeEModal');
+        const retry = document.getElementById('retry');
+
+        // Function to show the modal with an error message
+        function showError() {
+            errorContainer.classList.remove('hidden');
+            errorArea.textContent = "An error occurred during response. Retry?";
+            VisionHistory.pop(); // Remove the last conversation entry
+        }
+
+        // Remove existing event listeners before adding a new one
+        retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
+        const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
+
+        // Retry action
+        const retryHandler = () => {
+            // Retry action with previous data
+            if (lastMessage) {
+                const textItem = lastMessage.find(item => item.type === "text");
+                const text = textItem?.text;
+                const imageItem = lastMessage.find(item => item.type === "image_url");
+                const imageDataUrl = imageItem?.image_url?.url;
+
+                if (VisionMessage) VisionMessage.remove();
+                if (userMessage) userMessage.remove();
+                VisionChat(text, imageDataUrl);
+            }
+
+            errorContainer.classList.add('hidden');
+        };
+
+        newRetry.addEventListener('click', retryHandler);
+
+        closeModal.addEventListener('click', () => {
+            errorContainer.classList.add('hidden');
+            if (VisionMessage) {
+                if (VisionMessage.firstElementChild.id === "loader-parent") {
+                    console.log("Loader present");
+                    VisionMessage.remove();
+                    userMessage.remove();
+                    errorContainer.classList.add('hidden');
+                }
+            }
+        });
+
+        // Show error modal
+        showError();
+    }
 }
 
     function addUserMessage(text, imageDataUrl) {
@@ -574,10 +653,9 @@ function initChat(client) {
     }
 
 
-    function handleRequestError(error, userMessage, aiMessage, conversationHistory, vision=false) {
+    function handleRequestError(error, userMessage, aiMessage, conversationHistory) {
         try {
             if (!error.message === "Failed to fetch" && !error.message === "network error") {
-                console.log("Unknown error ->", error);
                 console.log("History length:", conversationHistory.length);
                 console.log('Error:', JSON.stringify(error, null, 2));
                 console.log(error.details);
@@ -588,7 +666,6 @@ function initChat(client) {
                 }
                 console.log(`Intercepted '${error}'`);
                 console.log("Unknown error ->", error);
-                console.log("History length:", conversationHistory.length);
                 console.log("History size:", conversationHistory.length * 1.024, "KB");
                 const errorContainer = document.getElementById('errorContainer');
                 const errorArea = document.getElementById('errorArea');
@@ -598,18 +675,13 @@ function initChat(client) {
 
                 // Remove existing event listeners before adding a new one
                 const retryHandler = () => {
-                    if (aiMessage) aiMessage.remove();
-                    if (userMessage) userMessage.remove();
-
                     // Retry action
-                    if (vision === true){
-                        console.log(lastMessage);
-                        //VisionChat()
-                    } else {
-                        classifyText(lastMessage);
-                    }
+                    classifyText(lastMessage);
+
                     //console.log('Retry action triggered with:', lastMessage);
                     errorContainer.classList.add('hidden');
+                    if (aiMessage) aiMessage.remove();
+                    if (userMessage) userMessage.remove();
                 };
                 //window.retryHandler=retryHandler;
                 retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
@@ -619,21 +691,12 @@ function initChat(client) {
                 closeModal.addEventListener('click', () => {
                     errorContainer.classList.add('hidden')
                     if (aiMessage){
-                        //console.log(aiMessage.secondChild.classList[0])
-                        console.log(aiMessage.firstChild)
-                        console.log(aiMessage.target)
-                        console.log(aiMessage.attributes)
-                        if (aiMessage.querySelector("loader")){
+                        if (aiMessage.firstElementChild.id === "loader-parent"){
                             console.log("Loader present")
                             aiMessage.remove();
                             userMessage.remove();
                             errorContainer.classList.add('hidden');
                         }
-                    } else {
-                        console.log("showing",aiMessage)
-                        aiMessage.remove();
-                        userMessage.remove();
-                        console.log(userMessage)
                     }
                 });
 

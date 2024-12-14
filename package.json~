@@ -37,6 +37,7 @@
     "file-saver": "^2.0.5",
     "fs": "^0.0.1-security",
     "highlight": "^0.2.4",
+    "html-docx-js": "^0.3.1",
     "html-to-docx": "^1.8.0",
     "html-to-image": "^1.11.11",
     "html-to-pdf": "^0.1.11",
@@ -44,12 +45,15 @@
     "https-browserify": "^1.0.0",
     "husky": "^9.1.7",
     "jspdf": "^2.5.2",
+    "level": "^9.0.0",
+    "levelup": "^5.1.1",
     "marked": "^15.0.3",
     "mathjax": "^3.2.2",
     "mathjax-electron": "^3.0.0",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
+    "read-file-relative": "^1.2.0",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "url": "^0.11.4",
@@ -59,6 +63,7 @@
   "dependencies": {
     "@tailwindcss/typography": "^0.5.15",
     "dotenv": "^16.4.5",
+    "katex": "^0.16.11"
   },
   "files": [
     "aichat.html",

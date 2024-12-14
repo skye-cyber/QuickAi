@@ -1,6 +1,6 @@
 {
   "name": "QuickAi",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "An application to interact with AI assistants for free.",
   "main": "src/main/index.js",
   "homepage": "home.html",
@@ -45,6 +45,8 @@
     "https-browserify": "^1.0.0",
     "husky": "^9.1.7",
     "jspdf": "^2.5.2",
+    "level": "^9.0.0",
+    "levelup": "^5.1.1",
     "marked": "^15.0.3",
     "mathjax": "^3.2.2",
     "mathjax-electron": "^3.0.0",
