@@ -84,6 +84,7 @@ function initChat(client) {
     11. All the text styling inside html elements should be CSS. For example instead of **Text** you would use html bold attribute.
     12. Bullet points should be indented inwards and have different color from their parent.
     13. Major headings/titles should have a different color other than black.
+    14. If users need to share or chat by providing images/visual data, they can do so by selecting vision model at the top left menu, then they can upload files.
     `;
 
     let conversationHistory = [{ role: "system", content: customInstructions }];
@@ -160,13 +161,10 @@ function initChat(client) {
     });
 
 
-
     function addCopyListeners() {
         document.querySelectorAll('.copy-button').forEach(button => {
             button.addEventListener('click', async function() {
                 const codeBlock = this.nextElementSibling.querySelector('code');
-                console.log(this)
-                console.log(codeBlock)
                 const textToCopy = codeBlock.innerText;
                 try {
                     await navigator.clipboard.writeText(textToCopy);
@@ -230,7 +228,7 @@ function initChat(client) {
             userMessage.innerHTML = `
             <div data-id="${userMessageId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
                 <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapedText}</p>
-                <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-80 hover:opacity-50">
+                <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80">
             Copy
             </button>
             </div>
@@ -357,7 +355,7 @@ function initChat(client) {
                             // Update innerHTML with marked output
                             aiMessage.innerHTML = `
                             <section class="relative w-fit max-w-full lg:max-w-6xl">
-                                <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full md:max lg:max-w-6xl">${marked(output)}
+                                <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(output)}
                                 </div>
                                 <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
                                     <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
@@ -419,13 +417,22 @@ function initChat(client) {
 
     // Listen for the imageLoaded event
     document.addEventListener('imageLoaded', function(event) {
-        const imageDataUrl = event.detail.imageDataUrl;
+        const fileDataUrl = event.detail.fileDataUrl;
         const text = event.detail.text;
-        VisionChat(text, imageDataUrl);
+        const fileType = event.detail.fileType
+        VisionChat(text, fileType, fileDataUrl);
     });
 
 //initialize system Instructions
 let VisionHistory = [];
+VisionSystem = `
+    Your name is QuickAi. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Electron, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).
+
+    Your primary goal is to assist the user in all their needs. You should be brief and direct to the point based on the user's needs. You are required to use TailwindCSS for styling unless the user requests otherwise.
+    When interacting with the user:
+    - You are allowed but not required to begin by introducing yourself and optionally mentioning your deployer/creator, goal unless you've done so previously. However, if the user starts the interaction by directly diving into the problem/question at hand, you can skip the introduction.
+    - Further information about yourself or your creator (Wambua) should only be revealed when explicitly requested for.
+`;
 VisionHistory.push({
     role: "system",
     content: [
@@ -436,26 +443,43 @@ VisionHistory.push({
     ],
 });
 
-async function VisionChat(text, imageDataUrl = null) {
+async function VisionChat(text, fileType, fileDataUrl = null) {
+    console.log(fileDataUrl)
     //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
     //switch to vission model
     modeSelect.value = "Vision"
-    // Determine the content based on imageDataUrl
+    // Determine the content based on fileDataUrl
     let userContent;
-    if (imageDataUrl !== null) {
-        console.log("Image url present", imageDataUrl);
-        userContent = [
-            {
-                type: "text",
-                text: text,
-            },
-            {
-                type: "image_url",
-                image_url: {
-                    url: imageDataUrl,
+    if (fileDataUrl) {
+        console.log("Image url present", fileDataUrl);
+        if (fileType == "image") {
+            userContent = [
+                {
+                    type: "text",
+                    text: text,
                 },
-            },
-        ];
+                {
+                    type: "image_url",
+                    image_url: {
+                        url: fileDataUrl,
+                    },
+                },
+            ];
+        }
+        else if (fileType == "document") {
+            userContent = [
+                {
+                    type: "text",
+                    text: text,
+                },
+                {
+                    type: "file_url",
+                    file_url: {
+                        url: fileDataUrl,
+                    },
+                },
+            ];
+        }
     } else {
         console.log("Url not found");
         userContent = [
@@ -474,11 +498,12 @@ async function VisionChat(text, imageDataUrl = null) {
 
     //console.log("Updated VisionHistory:", JSON.stringify(VisionHistory, null, 2));
 
+    console.log(userContent)
     // Store the last message for retry purposes
     const lastMessage = userContent;
 
     // Add user message to chat
-    const userMessage = addUserMessage(text, imageDataUrl);
+    const userMessage = addUserMessage(text, fileType, fileDataUrl);
     const VisionMessage = document.createElement("div");
     const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
     VisionMessage.classList.add("flex", "justify-start", "mb-[6%]", "overflow-wrap");
@@ -543,6 +568,10 @@ async function VisionChat(text, imageDataUrl = null) {
                     </div>
                 </section>
                 `;
+
+                addCopyListeners();
+                // Debounce MathJax rendering to avoid freezing
+                debounceRenderMathJax(aiMessageUId);
             }
         }
 
@@ -552,6 +581,7 @@ async function VisionChat(text, imageDataUrl = null) {
     } catch (error) {
         console.log("Error caught:", error);
         // Get elements for error modal
+        console.log(lastMessage)
         const errorContainer = document.getElementById('errorContainer');
         const errorArea = document.getElementById('errorArea');
         const closeModal = document.getElementById('closeEModal');
@@ -574,12 +604,19 @@ async function VisionChat(text, imageDataUrl = null) {
             if (lastMessage) {
                 const textItem = lastMessage.find(item => item.type === "text");
                 const text = textItem?.text;
-                const imageItem = lastMessage.find(item => item.type === "image_url");
-                const imageDataUrl = imageItem?.image_url?.url;
+                if (fileType == "image"){
+                    const imageItem = lastMessage.find(item => item.type === "image_url");
+                    var fileDataUrl = imageItem?.image_url?.url;
+                    var fileType ="image"
+                } else {
+                    const imageItem = lastMessage.find(item => item.type === "file_url");
+                    fileDataUrl = imageItem?.file_url?.url;
+                    fileType ="document"
+                }
 
                 if (VisionMessage) VisionMessage.remove();
                 if (userMessage) userMessage.remove();
-                VisionChat(text, imageDataUrl);
+                VisionChat(text, fileType, fileDataUrl);
             }
 
             errorContainer.classList.add('hidden');
@@ -604,25 +641,28 @@ async function VisionChat(text, imageDataUrl = null) {
     }
 }
 
-    function addUserMessage(text, imageDataUrl) {
+    function addUserMessage(text, fileType, fileDataUrl) {
         const VisionUserMessageUId = `msg_${Math.random().toString(35).substring(2, 8)}`;
         const VisioncopyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
         const userMessage = document.createElement("div");
         userMessage.classList.add("flex", "justify-end", "mb-4");
         userMessage.innerHTML = `
         <div data-id="${VisionUserMessageUId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 font-normal dark:shadow-cyan-500/50  md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
-            <button id="${VisioncopyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-80 hover:opacity-50">
+            <button id="${VisioncopyButtonId}" class="Vision-user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg p-2 font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${VisionUserMessageUId}', this)">
                 Copy
             </button>
 
-            <div class="bg-blue-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow-md px-4 py-2 w-fit max-w-full h-fit md:max-h-md lg:max-h-lg">
-                <p class="${VisionUserMessageUId} whitespace-pre-wrap break-words w-fit max-full md:max-w-full bg-blue-400 dark:bg-gradient-to-tr dark:from-pink-700 dark:via-cyan-500 dark:to-rose-600 p-1 mb-2 rounded-md">${escapeHTML(text)}</p>
-                ${imageDataUrl ? `<img src="${imageDataUrl}" alt="Uploaded Image" class="rounded-md my-auto" />` : ''}
+            <div class="bg-blue-200 dark:bg-rose-400 text-gray-800 dark:text-white rounded-lg shadow-md px-4 py-2 w-fit max-w-full h-fit md:max-h-md lg:max-h-lg">
+                <p class="${VisionUserMessageUId} whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl bg-blue-400 dark:bg-gradient-to-tr dark:from-pink-700 dark:via-cyan-800 dark:to-rose-600 p-1 mb-2 rounded-md">${escapeHTML(text)}</p>
+                ${fileDataUrl && fileType === "image" ? `<img src="${fileDataUrl}" alt="Uploaded Image" class="rounded-md my-auto" />` : fileType === "document" ? `<svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16V4a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2zm1-1h4v10h-4V4z"/>
+                </svg>` : ""}
             </div>
         </div>
         `;
         chatArea.appendChild(userMessage);
         chatArea.scrollTop = chatArea.scrollHeight;
+        copyBMan();
         return userMessage
     }
 
@@ -638,7 +678,7 @@ async function VisionChat(text, imageDataUrl = null) {
     // Function to ensure MathJax renders dynamically injected content
     let renderTimeout;
 
-    function debounceRenderMathJax(_currentclass, delay = 300) {
+    function debounceRenderMathJax(_currentclass, delay = 900) {
         //const targetElement = document.querySelector(_currentclass);
         if (renderTimeout) clearTimeout(renderTimeout);
         renderTimeout = setTimeout(() => {
@@ -693,7 +733,7 @@ async function VisionChat(text, imageDataUrl = null) {
                     errorContainer.classList.add('hidden')
                     if (aiMessage){
                         if (aiMessage.firstElementChild.id === "loader-parent"){
-                            console.log("Loader present")
+                            console.log("Removing loader")
                             aiMessage.remove();
                             userMessage.remove();
                             errorContainer.classList.add('hidden');
@@ -743,23 +783,22 @@ async function VisionChat(text, imageDataUrl = null) {
     }
 
     // Copy function for the whole text block/aiMessage
-    function CopyAll(UId, bt = false) {
-        console.log(UId)
+    function CopyAll(UId, bt = null) {
+        //console.log(UId)
         const textBlock = document.querySelector(UId);
-        console.log(textBlock)
-        //console.log(textBlock);
+        //console.log(textBlock)
         if (!textBlock) {
             console.error('Element not found: ', UId);
             return;
         }
 
         const textToCopy = textBlock.innerText;
-        console.log(textToCopy)
+        //console.log(textToCopy)
 
-        if (textToCopy.length >= 1) {
+        if (textToCopy.length >= 50) {
             try {
                  navigator.clipboard.writeText(textToCopy);
-                 if (bt === true){
+                 if (bt){
                    bt.textContent = 'Copied!';
                 setTimeout(() => {
                     bt.textContent = 'Copy';
@@ -806,7 +845,26 @@ async function VisionChat(text, imageDataUrl = null) {
                 document.getElementById('suggestions').classList.add('hidden')
             }
         }
-    });
+        });
+    function copyBMan(){
+        document.querySelectorAll(".Vision-user-copy-button").forEach(button => {
+            console.log("Adding copy control")
+            // Get the next sibling of the current element
+            const nextSibling = button.nextElementSibling;
+
+            // Check if the next sibling exists
+            if (nextSibling) {
+                // Get the first child of the next sibling
+                const userTextChild = nextSibling.firstElementChild;
+
+            if (userTextChild.innerHTML.length < 50) {
+                button.classList.toggle('hidden');
+            } else {
+                console.log("userTextChild not found")
+            }
+            }
+        });
+    }
 
     window.CopyAll = CopyAll;
 

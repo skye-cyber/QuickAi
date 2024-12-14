@@ -168,23 +168,31 @@ document.addEventListener('DOMContentLoaded', function() {
              const file = files[i];
              console.log('File uploaded:', file.name, file.type, file.size);
 
+             // Determine if the file is an image or a document
+             const isImage = file.type.startsWith('image/');
+             const fileType = isImage ? 'image' : 'document';
+             window.fileType = fileType;
              // Create a list item for the file
              const fileElement = document.createElement('div');
              fileElement.classList.add('flex', 'items-center', 'mb-2', 'text-gray-700');
              fileElement.innerHTML = `
              <span class="mr-2">${file.name}</span>
-             <span class="text-sm text-gray-500">(${(file.size / 1024).toFixed(2)} kb)</span>
+             <span class="text-sm text-gray-500">(${(file.size / 1024).toFixed(2)} kb) - ${fileType}</span>
              `;
              document.getElementById("uploadedFiles").appendChild(fileElement);
 
-             // Convert the file to a data URL
-             const reader = new FileReader();
-             reader.onload = (e) => {
-                 const imageDataUrl = e.target.result;
-                 // Store the image data URL in the global window object
-                 window.imageDataUrl = imageDataUrl;
-             };
-             reader.readAsDataURL(file);
+             // Convert the file to a data URL if it's an image
+             if (isImage) {
+               const reader = new FileReader();
+               reader.onload = (e) => {
+                   const imageDataUrl = e.target.result;
+                    // Store the image data URL in the global window object
+                    window.fileDataUrl = imageDataUrl;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert("Sorry, Cannot process this file type quiet yet")
+            }
          }
 
          // Update the drop zone text if files are uploaded
@@ -194,14 +202,15 @@ document.addEventListener('DOMContentLoaded', function() {
      }
 
      function submitImageAndText() {
-         const imageDataUrl = window.imageDataUrl;
+         const imageDataUrl = window.fileDataUrl;
+         const fileType = window.fileType;
          const text = document.getElementById("imagePrompt").value;
          if (imageDataUrl && text) {
              // Dispatch an event with the image data URL and text
-             const event = new CustomEvent('imageLoaded', { detail: { imageDataUrl: imageDataUrl, text: text } });
+             const event = new CustomEvent('imageLoaded', { detail: { fileDataUrl: fileDataUrl, text: text, fileType:fileType } });
              document.dispatchEvent(event);
              CloseFileModal();
-             document.getElementById('suggestions').classList.add('hidden')
+             document.getElementById('suggestions').classList.add('hidden');
          } else {
              alert("Please upload an image and enter a prompt.");
          }
