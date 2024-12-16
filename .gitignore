@@ -2,3 +2,4 @@ dist/
 electron/
 bin/
 reload.html
+*~
