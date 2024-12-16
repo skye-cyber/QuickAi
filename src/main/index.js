@@ -3,6 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { Buffer } = require('buffer');
 const dotenv = require('dotenv')
+//const fs = require('fs').promises;
 
 app.disableHardwareAcceleration()
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -20,6 +21,7 @@ ipcMain.handle('get-buffer-from-iv', (event, iv) => {
     const ivBuffer = Buffer.from(iv.split(',').map(Number)); // Split string, convert to numbers, and make a buffer
     return ivBuffer;
 });
+
 
 function createWindow() {
     // Create the loading window
@@ -44,8 +46,8 @@ function createWindow() {
         icon: path.join(process.resourcesPath, 'assets/QuickAi.png'), // Path to your icon file
         show: false,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js'), // Use the preload script
-        nodeIntegration: true, // Enable Node.js integration in the renderer process
+        preload: path.join(__dirname, 'preload.js'), // Use the preload script
+        nodeIntegration: false, // Enable Node.js integration in the renderer process
         contextIsolation: true
         }
     });
@@ -69,6 +71,8 @@ app.setAppUserModelId('com.quickai.app'); // Set the app user model ID
 app.on('ready', () => {
     // Create the main window
     const mainWindow = createWindow();
+    const storagePath = path.join(app.getPath('home'), '.quickai.store');
+    mainWindow.webContents.send('storagePath', storagePath);
 
     // Create the tray icon
     const tray = new Tray(path.join(process.resourcesPath, 'assets/QuickAi.png')); // Path to your tray icon

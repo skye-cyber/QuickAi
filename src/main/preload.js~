@@ -3,7 +3,8 @@ const crypto = require('crypto');
 const { Buffer } = require('buffer');
 const fs = require('fs');
 const path = require('path');
-const readFileSync = require('read-file-relative');
+const os = require('os')
+//const readFileSync = require('read-file-relative');
 
 
 contextBridge.exposeInMainWorld('electron', {
@@ -12,24 +13,59 @@ contextBridge.exposeInMainWorld('electron', {
     scryptSync: (password, salt, keylen) => crypto.scryptSync(password, salt, keylen),
     Buffer,
     getDownloadsPath: () => {
-        const homedir = require('os').homedir();
+        const homedir = os.homedir();
         const downloadsPath = path.join(homedir, 'Downloads');
         return downloadsPath;
     },
-    /*asBlob: (html, options = {}) => {
-        return new Promise((resolve, reject) => {
-            try {
-                // Simulate the original behavior using readFileSync
-                //const content = readFileSync(path.join(__dirname, 'output-template.docx'));
-                // Pass the content to the original asBlob function
-                SuperhtmlDocx.asBlob(html, options)
-                .then((docx) => resolve(docx))
-                .catch((err) => reject(err));
-            } catch (err) {
-                reject(err);
+    home_dir: () => {
+        return os.homedir()
+    },
+
+    mkdir: async (dir) => {
+        try{
+            if (!fs.existsSync(dir)){
+                fs.mkdirSync(dir)
             }
-        });
-    },*/
+            return true
+        } catch (err){
+            console.log(err)
+            return false
+        }
+    },
+
+    write: async (path, data) =>{
+        try{
+            fs.writeFileSync(path, data, (err) => {
+                if (err) throw err;
+                console.log('The file has been saved!');
+            });
+            return true
+        } catch (err){
+            console.log(err)
+            return false
+        }
+    },
+
+    read: async (path) =>{
+        try{
+            if (fs.statSync){
+                return JSON.parse(fs.readFile(path, 'utf-8'));
+            }
+        } catch (err){
+            console.log(err)
+            return false
+        }
+    },
+
+    readDir: async (dir) =>{
+        try{
+            files = fs.readdirSync(dir)
+            return files
+        } catch (err){
+            console.log(err)
+            return false
+        }
+    },
 
     saveAndOpenImage: (downloadsPath, dataUrl) => {
         fetch(dataUrl)

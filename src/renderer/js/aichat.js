@@ -98,7 +98,7 @@ function initChat(client) {
     renderer.code = function (code, language) {
         // Handle case where `code` is an object
         const validLanguage = code.lang || 'plaintext';
-        console.log(`Language: ${validLanguage}`);
+        //console.log(`Language: ${validLanguage}`);
         if (typeof code === "object" && code.text !== undefined) {
             code = code.text; // Extract the actual code
         }
@@ -161,6 +161,8 @@ function initChat(client) {
         breaks: true,
     });
 
+    //avail markde to the other scripts
+    window.marked = marked;
 
     function addCopyListeners() {
         document.querySelectorAll('.copy-button').forEach(button => {
@@ -425,8 +427,6 @@ function initChat(client) {
         VisionChat(text, fileType, fileDataUrl);
     });
 
-    //initialize system Instructions
-    let VisionHistory = [];
     const VisionSystem = `
         Your name is QuickAi. You are deployed in a cross-platform application built on Electron by Wambua, also known as Skye. He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Electron, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).
 
@@ -435,7 +435,7 @@ function initChat(client) {
         - You are allowed but not required to begin by introducing yourself and optionally mentioning your deployer/creator, goal unless you've done so previously. However, if the user starts the interaction by directly diving into the problem/question at hand, you can skip the introduction.
         - Further information about yourself or your creator (Wambua) should only be revealed when explicitly requested for.
     `;
-    VisionHistory.push({
+    const system = {
         role: "system",
         content: [
             {
@@ -443,7 +443,10 @@ function initChat(client) {
                 text: VisionSystem,
             },
         ],
-    });
+    };
+
+    //initialize system Instructions
+    let VisionHistory = [system];
 
     async function VisionChat(text, fileType, fileDataUrl = null) {
         //console.log(fileType)
@@ -680,8 +683,7 @@ function initChat(client) {
 
     // Function to ensure MathJax renders dynamically injected content
     let renderTimeout;
-
-    function debounceRenderMathJax(_currentclass, delay = 900) {
+    function debounceRenderMathJax(_currentclass, delay = 1000) {
         //const targetElement = document.querySelector(_currentclass);
         if (renderTimeout) clearTimeout(renderTimeout);
         renderTimeout = setTimeout(() => {
@@ -696,21 +698,18 @@ function initChat(client) {
         }, delay);
     }
 
-
     function handleRequestError(error, userMessage, aiMessage, conversationHistory) {
         try {
             if (!error.message === "Failed to fetch" && !error.message === "network error") {
                 console.log("History length:", conversationHistory.length);
                 console.log('Error:', JSON.stringify(error, null, 2));
                 console.log(error.details);
-                console.log("History size:", conversationHistory.length * 1.024, "KB");
             } else {
                 if (error.message === "[object Object]"){
                     removeFirstConversationPairs();
                 }
                 console.log(`Intercepted '${error}'`);
-                console.log("Unknown error ->", error);
-                console.log("History size:", conversationHistory.length * 1.024, "KB");
+                console.log("History length:", conversationHistory.length);
                 const errorContainer = document.getElementById('errorContainer');
                 const errorArea = document.getElementById('errorArea');
                 const closeModal = document.getElementById('closeEModal');
@@ -852,7 +851,7 @@ function initChat(client) {
         });
     function copyBMan(){
         document.querySelectorAll(".Vision-user-copy-button").forEach(button => {
-            console.log("Adding copy control")
+            //console.log("Adding copy control")
             // Get the next sibling of the current element
             const nextSibling = button.nextElementSibling;
 
@@ -870,7 +869,8 @@ function initChat(client) {
         });
     }
 
+    window.conversationHistory = conversationHistory;
+    window.VisionHistory = VisionHistory
     window.CopyAll = CopyAll;
 
 }
-

@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-    addUtilityScript();
+    //for (const item of ['_chatStore']) {
+        addScripts('_chatStore');
+    //}
     const modal = document.getElementById("settingsModal");
     const themeSwitch = document.getElementById("themeSwitch");
     const rootElement = document.documentElement;
@@ -30,12 +32,12 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.classList.add('hidden');
     }
 
-    function addUtilityScript() {
-        console.log("Added _aichat script");
+    function addScripts(_script) {
         const script = document.createElement('script');
-        script.src = 'src/renderer/js/_aichat.js';
+        script.src = `src/renderer/js/${_script}.js`;
         script.async = true; // Optional: load the script asynchronously
         document.body.appendChild(script);
+        console.log(`Added ${_script} script`);
     }
 
     // Show settings modal when settings button is clicked
@@ -245,10 +247,10 @@ document.addEventListener('DOMContentLoaded', function() {
          } else if (event.key === 'Escape') {
              event.preventDefault();
             modal.classList.add('hidden');
-         }/* else if (event.ctrlKey && event.shiftKey && event.key === 'M') {
+         } else if (event.ctrlKey && event.key === 'P' || event.ctrlKey && event.key === 'p') {
              event.preventDefault(); // Prevent any default action
-             document.getElementById("mode").display=block;
-         }*/
+             document.getElementById("togglePane").click()
+         }
      });
      window.scrollToBottom = scrollToBottom;
      window.submitImageAndText = submitImageAndText;
