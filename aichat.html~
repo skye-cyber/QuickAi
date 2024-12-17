@@ -29,7 +29,7 @@ window.MathJax = {
         <!-- Header -->
         <header class="mb-4">
             <article class="flex flex-rows-1 justify-between ml-8">
-                <span>
+                <span title="Switch models">
                     <select id="mode" class="rounded-lg p-2 font-semibold text-sky-900 dark:text-gray-50 rounded-md bg-gradient-to-tr from-purple-300 to-violet-300 dark:from-gray-700 dark:to-gray-900 hover:from-cyan-400 hover:to-violet-400 dark:hover:from-gray-600 dark:hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-gray-400">
                         <option class="bg-gray-100 dark:bg-gray-600">Basic mode</option>
                         <option class="bg-gray-100 dark:bg-gray-600">Coding mode</option>
@@ -239,4 +239,5 @@ window.MathJax = {
 </body>
 <script src="src/renderer/js/script.js"></script>
 <script src="src/renderer/js/_aichat.js"></script>
+<<script src="src/renderer/js/_utility.js"></script>-->
 </html>

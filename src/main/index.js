@@ -3,7 +3,28 @@ const path = require('path');
 const crypto = require('crypto');
 const { Buffer } = require('buffer');
 const dotenv = require('dotenv')
-//const fs = require('fs').promises;
+
+
+// Handle IPC messages from renderer
+ipcMain.on('toMain', (event, data) => {
+    console.log('Received data from renderer:', data);
+    // Optionally send a response back
+    event.reply('fromMain', data);
+});
+
+// Handle IPC messages from renderer
+ipcMain.on('fromVision-ToMain', (event, data) => {
+    console.log('Received data from renderer:', data);
+    // Optionally send a response back
+    event.reply('fromMain-ToVision', data);
+});
+
+// Handle IPC messages from renderer
+ipcMain.on('fromChat-ToMain', (event, data) => {
+    console.log('Received data from renderer:', data);
+    // Optionally send a response back
+    event.reply('fromMain-ToChat', data);
+});
 
 app.disableHardwareAcceleration()
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -15,6 +36,55 @@ ipcMain.handle('get-env', () => {
         API_OBJ: process.env.API_OBJ,
         SKEY: process.env.SKEY,
     };
+});
+
+ipcMain.handle('getKey', async (event, encryptedObject, password) => {
+    const { iv, encryptedData } = encryptedObject;
+
+    if (!iv) {
+        throw new Error("IV is missing or undefined");
+    }
+
+    try {
+        // Convert IV from a comma-separated string to a buffer
+        const ivBuffer = Buffer.from(iv.split(',').map(Number));
+
+        // Derive the key from the password using scrypt
+        const key = crypto.scryptSync(password, 'PhantomJoker15', 32);
+
+        // Create decipher
+        const decipher = crypto.createDecipheriv('aes-256-cbc', key, ivBuffer);
+
+        // Decrypt the data
+        let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+
+        return decrypted;
+    } catch (error) {
+        console.error("Error in decrypting data:", error);
+        throw error;
+    }
+});
+
+ipcMain.handle('createKey', async (apiKey, password) => {
+        // Derive a 32-byte key from the password
+        const key = crypto.scryptSync(password, 'PhantomJoker15', 32);
+
+        // Generate a random IV (16 bytes for AES)
+        const iv = crypto.randomFillSync(new Uint8Array(16));
+
+        // Create the cipher
+        const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+
+        // Encrypt the API key
+        let encrypted = cipher.update(apiKey, 'utf8', 'hex');
+        encrypted += cipher.final('hex');
+
+        // Return the IV and encrypted data as a single object
+        return {
+            iv: iv.toString('hex'),
+                encryptedData: encrypted
+        };
 });
 
 ipcMain.handle('get-buffer-from-iv', (event, iv) => {
@@ -30,9 +100,9 @@ function createWindow() {
         height: 600,
         show: false,
         webPreferences: {
-            nodeIntegration: true,
+            nodeIntegration: false,
             contextIsolation: true,
-            enableRemoteModule: false, // Disable remote module if not needed
+            //enableRemoteModule: false, // Disable remote module if not needed
         }
     });
 
@@ -48,7 +118,10 @@ function createWindow() {
         webPreferences: {
         preload: path.join(__dirname, 'preload.js'), // Use the preload script
         nodeIntegration: false, // Enable Node.js integration in the renderer process
-        contextIsolation: true
+        contextIsolation: true,
+        sandbox: false, // Disable sandboxing
+        // Don't enable remote module, that could open up security risks
+        //webSecurity: true,
         }
     });
 
@@ -111,5 +184,4 @@ app.on('activate', () => {
         createWindow(); // Recreate a window if none are open on macOS
     }
 });
-
 

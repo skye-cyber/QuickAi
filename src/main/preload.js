@@ -1,92 +1,149 @@
 const { contextBridge, ipcRenderer, shell } = require('electron');
-const crypto = require('crypto');
-const { Buffer } = require('buffer');
 const fs = require('fs');
 const path = require('path');
-const os = require('os')
-//const readFileSync = require('read-file-relative');
-
+const os = require('os');
+let ChatconversationHistory = []; // Define your array here
+let VconversationHistory = [];
+let CurrentId = "";
+window.global = window;
+contextBridge.exposeInMainWorld('global', window);
 
 contextBridge.exposeInMainWorld('electron', {
     getEnv: () => ipcRenderer.invoke('get-env'),
     getBufferFromIV: (iv) => ipcRenderer.invoke('get-buffer-from-iv', iv),
-    scryptSync: (password, salt, keylen) => crypto.scryptSync(password, salt, keylen),
-    Buffer,
+    get_key: (encryptedObject, password) => ipcRenderer.invoke('getKey', encryptedObject, password),
     getDownloadsPath: () => {
         const homedir = os.homedir();
         const downloadsPath = path.join(homedir, 'Downloads');
         return downloadsPath;
     },
+
     home_dir: () => {
-        return os.homedir()
+        return os.homedir();
     },
-
     mkdir: async (dir) => {
-        try{
-            if (!fs.existsSync(dir)){
-                fs.mkdirSync(dir)
+        try {
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir);
             }
-            return true
-        } catch (err){
-            console.log(err)
-            return false
+            return true;
+        } catch (err) {
+            console.log(err);
+            return false;
         }
     },
-
-    write: async (path, data) =>{
-        try{
-            fs.writeFileSync(path, data, (err) => {
-                if (err) throw err;
-                console.log('The file has been saved!');
-            });
-            return true
-        } catch (err){
-            console.log(err)
-            return false
+    write: async (path, data) => {
+        try {
+            fs.writeFileSync(path, data);
+            return true;
+        } catch (err) {
+            console.log(err);
+            return false;
         }
     },
-
-    read: async (path) =>{
-        try{
-            if (fs.statSync){
-                return JSON.parse(fs.readFile(path, 'utf-8'));
+    read: async (path) => {
+        try {
+            if (fs.statSync) {
+                return JSON.parse(fs.readFileSync(path, 'utf-8'));
             }
-        } catch (err){
-            console.log(err)
-            return false
+        } catch (err) {
+            console.log(err);
+            return false;
         }
     },
-
-    readDir: async (dir) =>{
-        try{
-            return  files =fs.readdirSync(dir)
-        } catch (err){
-            console.log(err)
-            return false
+    readDir: async (dir) => {
+        try {
+            return fs.readdirSync(dir);
+        } catch (err) {
+            console.log(err);
+            return false;
         }
+    },
+    stat: (obj) => {
+        return fs.statSync(obj);
+    },
+    getExt: (file) => {
+        return path.extname(file);
+    },
+    getBasename: (_path, ext) => {
+        return path.basename(_path, ext);
+    },
+    joinPath: (node, child) => {
+        return path.join(node, child);
+    },
+    conversationHistory: (system) => {
+         let conversationHistory = [system];
+         return conversationHistory
+    },
+    //Text Chat Handling
+    getChat: () => ChatconversationHistory,
+    addToChat: (item) => {
+        ChatconversationHistory.push(item); // Modify the array
+        ipcRenderer.send('fromChat-ToMain', ChatconversationHistory); // Notify other processes
+    },
+    //Vison History handling
+    popFromChat: () => {
+        ChatconversationHistory.pop();
+    },
+    getVisionChat: () => VconversationHistory,
+    addToVisionChat: (item) => {
+        VconversationHistory.push(item); // Modify the array
+        ipcRenderer.send('fromVision-ToMain', VconversationHistory); // Notify other processes
+    },
+    popFromVisionChat: () => {
+        ChatconversationHistory.pop();
+    },
+    getSuperCId: () => {
+        return CurrentId;
+    },
+    setSuperCId: (id) => {
+        CurrentId = id;
+    },
+    send: (channel, data) => {
+        // List of valid channels
+        console.log(channel, data)
+        const validChannels = ['toMain'];
+        if (validChannels.includes(channel)) {
+            ipcRenderer.send(channel, data);
+        }
+    },
+    receive: (channel, func) => {
+        const validChannels = ['fromMain', 'fromMain-ToVision', 'fromMain-ToChat'];
+        if (validChannels.includes(channel)) {
+            // Strip event as it includes `sender` and other properties
+            ipcRenderer.on(channel, (event, ...args) => func(...args));
+        }
+    },
+    addUtilityScript: () => {
+        //console.log("Executing")
+        const script = document.createElement('script');
+        script.src = 'src/renderer/js/_utility.js';
+        script.async = true; // Optional: load the script asynchronously
+        document.body.appendChild(script);
+        console.log("Added Utility script", script);
     },
 
     saveAndOpenImage: (downloadsPath, dataUrl) => {
         fetch(dataUrl)
-        .then(res => res.blob())
-        .then(blob => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const buffer = Buffer.from(reader.result);
-                const outputPath = path.join(downloadsPath, 'output.jpg');
+            .then(res => res.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const buffer = Buffer.from(reader.result);
+                    const outputPath = path.join(downloadsPath, 'output.jpg');
 
-                fs.writeFile(outputPath, buffer, (err) => {
-                    if (err) {
-                        console.error('Error saving image:', err);
-                    } else {
-                        shell.openPath(outputPath);
-                    }
-                });
-            };
-            reader.readAsArrayBuffer(blob);
-        })
-        .catch((error) => {
-            console.error('Error creating blob:', error);
-        });
+                    fs.writeFile(outputPath, buffer, (err) => {
+                        if (err) {
+                            console.error('Error saving image:', err);
+                        } else {
+                            shell.openPath(outputPath);
+                        }
+                    });
+                };
+                reader.readAsArrayBuffer(blob);
+            })
+            .catch((error) => {
+                console.error('Error creating blob:', error);
+            });
     },
 });

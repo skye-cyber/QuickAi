@@ -1,5 +1,4 @@
-const crypto = require('crypto');
-
+const crypto = window.electron.crypto
 
 function hide_key(apiKey, password) {
     // Derive a 32-byte key from the password
@@ -38,7 +37,7 @@ export function get_key(encryptedObject, password) {
         const key = window.electron.scryptSync(password, 'PhantomJoker15', 32);
 
         // Create the decipher
-        const decipher = crypto.createDecipheriv('aes-256-cbc', key, ivBuffer);
+        const decipher = window.electron.createDecipheriv('aes-256-cbc', key, ivBuffer);
 
         // Decrypt the data
         let decrypted = decipher.update(encryptedData, 'hex', 'utf8');

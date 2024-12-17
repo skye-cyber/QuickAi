@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+//const RemoveWithPlugin = require('./RemoveWithPlugin')
 
 module.exports = {
   entry: {
@@ -12,16 +13,20 @@ module.exports = {
     path: path.resolve(__dirname, './src/renderer/js'),
   },
   plugins: [
+    //new RemoveWithPlugin(),
     new webpack.ProvidePlugin({
       process: 'process', // Provide process polyfill
       Buffer: ['buffer', 'Buffer'], // Provide Buffer
+      crypto: ['crypto-browserify'],
       }),
-
   ],
 
   optimization: {
     usedExports: true,
     minimize: true,
+    //splitChunks: {
+      //chunks: 'all',
+    //},
   },
 
   resolve: {
@@ -47,14 +52,17 @@ module.exports = {
   module: {
     rules: [
       {
-        //test: /\.js$/,
-        //exclude: /node_modules/,
-        //use: {
-          //loader: 'babel-loader',
-        //},
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          /*options: {
+            presets: ['@babel/preset-env', { targets: { browsers: ['last 2 versions'] }}]
+            }*/
+          }
       },
     ],
   },
   devtool: 'source-map', // Consider using source maps for better debugging
-  mode: 'production',
+  mode: 'development',
 };

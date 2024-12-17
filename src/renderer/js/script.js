@@ -256,4 +256,18 @@ document.addEventListener('DOMContentLoaded', function() {
      window.submitImageAndText = submitImageAndText;
      window.CloseFileModal = CloseFileModal;
 
+     // Set up the event listener
+     window.electron.receive('fromMain', (data) => {
+         //console.log(data)
+         if (data.message === "set-Utitility-Script"){
+            console.log('Message received:', data.message);
+            try {
+                window.electron.addUtilityScript();
+                console.log("Utility script added successfully");
+            } catch (err) {
+                console.error("Error adding utility script:", err);
+            }
+         }
+     });
+
 });

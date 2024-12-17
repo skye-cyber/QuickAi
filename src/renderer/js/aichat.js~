@@ -1,7 +1,7 @@
 import { HfInference } from "@huggingface/inference";
 import { marked } from "marked";
 import hljs from 'highlight.js';
-import { get_key } from './Pcrypto.js';
+//import { get_key } from './Pcrypto.js';
 
 let h_faceKey = null; // Define h_faceKey globally
 
@@ -12,7 +12,7 @@ window.electron.getEnv().then(env => {
     };
 
     const SKEY = env.SKEY;
-    const keyObject = get_key(encryptedOBJ, SKEY);
+    const keyObject = window.electron.get_key(encryptedOBJ, SKEY);
 
     keyObject.then(result => {
         h_faceKey = result;
@@ -88,7 +88,7 @@ function initChat(client) {
     14. If users need to share or chat by providing images/visual data, they can do so by selecting vision model at the top left menu, then they can upload files.
     `;
 
-    let conversationHistory = [{ role: "system", content: customInstructions }];
+    window.electron.addToChat({ role: "system", content: customInstructions });
 
     // Initialize highlight.js
     hljs.configure({ ignoreUnescapedHTML: true });
@@ -242,7 +242,7 @@ function initChat(client) {
             implementUserCopy();
             chatArea.scrollTop = chatArea.scrollHeight;
             if (!isImageRequest) {
-                conversationHistory.push({ role: "user", content: text });
+                window.electron.addToChat({ role: "user", content: text });
             }
 
             if (isImageRequest) {
@@ -344,7 +344,7 @@ function initChat(client) {
                 try {
                     const stream = client.chatCompletionStream({
                         model: model,
-                        messages: conversationHistory,
+                        messages: window.electron.getChat(),
                         max_tokens:5000
                     });
 
@@ -361,13 +361,13 @@ function initChat(client) {
                             <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
                                 <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(output)}
                                 </div>
-                                <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
+                                <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-not-allowed cursor-pointer">
                                     <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
                                         <svg class="fill-rose-700 dark:fill-gray-700 text-gray-600 bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
                                             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                                         </svg>
                                     </div>
-                                    <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageUId}');">
+                                    <div class="rounded-lg p-1 opacity-70 cursor-not-allowed cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageUId}');">
                                         <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15    19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
                                         </svg>
@@ -400,18 +400,19 @@ function initChat(client) {
                         }
 
                     }
-
                     if (check === false) {
-                        addUtilityScript();
+                        // Sending a message to the main process
+                        window.electron.send('toMain', { message: 'set-Utitility-Script' });
+                        console.log("∇send↗toMain")
                         check = true;
                     }
 
                     // Store conversation history
-                    conversationHistory.push({ role: "assistant", content: output });
+                    window.electron.addToChat({ role: "assistant", content: output });
 
                 } catch (error) {
                     console.log(error);
-                    handleRequestError(error, userMessage, aiMessage, conversationHistory);
+                    handleRequestError(error, userMessage, aiMessage);
 
                 }
             }
@@ -446,7 +447,7 @@ function initChat(client) {
     };
 
     //initialize system Instructions
-    let VisionHistory = [system];
+    window.electron.addToVisionChat(system);
 
     async function VisionChat(text, fileType, fileDataUrl = null) {
         //console.log(fileType)
@@ -496,7 +497,7 @@ function initChat(client) {
         }
 
         // Add user message to VisionHistory
-        VisionHistory.push({
+        window.electron.addToVisionChat({
             role: "user",
             content: userContent,
         });
@@ -528,8 +529,8 @@ function initChat(client) {
         try {
             const visionstream = client.chatCompletionStream({
                 model: "meta-llama/Llama-3.2-11B-Vision-Instruct",
-                messages: VisionHistory,
-                max_tokens: 2000,
+                messages: window.electron.getVisionChat(),
+                max_tokens: 3000,
             });
 
             let visionMs = "";
@@ -580,8 +581,12 @@ function initChat(client) {
                     debounceRenderMathJax(VisionMessageUId);
                 }
             }
+            if (check === false) {
+                window.electron.send('ready_4_utility');
+                check = true;
+            }
 
-            VisionHistory.push({ role: "assistant", content: [{ type: "text", text: visionMs }] });
+            window.electron.addToVisionChat({ role: "assistant", content: [{ type: "text", text: visionMs }] });
             //console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
 
         } catch (error) {
@@ -597,7 +602,7 @@ function initChat(client) {
             function showError() {
                 errorContainer.classList.remove('hidden');
                 errorArea.textContent = "An error occurred during response. Retry?";
-                VisionHistory.pop(); // Remove the last conversation entry
+                window.electron.popFromVisionChat(); // Remove the last conversation entry
             }
 
             // Remove existing event listeners before adding a new one
@@ -618,8 +623,7 @@ function initChat(client) {
                         const imageItem = lastMessage.find(item => item.type === "file_url");
                         fileDataUrl = imageItem?.file_url?.url;
                     }
-                    //console.log(fileType)
-                    //console.log(fileDataUrl)
+
                     if (VisionMessage) VisionMessage.remove();
                     if (userMessage) userMessage.remove();
                     VisionChat(text, fileType, fileDataUrl);
@@ -672,18 +676,10 @@ function initChat(client) {
         return userMessage
     }
 
-    function addUtilityScript() {
-        console.log("Added Utility script");
-        const script = document.createElement('script');
-        script.src = 'src/renderer/js/_utility.js';
-        script.async = true; // Optional: load the script asynchronously
-        document.body.appendChild(script);
-    }
-
 
     // Function to ensure MathJax renders dynamically injected content
     let renderTimeout;
-    function debounceRenderMathJax(_currentclass, delay = 1000) {
+    function debounceRenderMathJax(_currentclass, delay = 500) {
         //const targetElement = document.querySelector(_currentclass);
         if (renderTimeout) clearTimeout(renderTimeout);
         renderTimeout = setTimeout(() => {
@@ -698,7 +694,7 @@ function initChat(client) {
         }, delay);
     }
 
-    function handleRequestError(error, userMessage, aiMessage, conversationHistory) {
+    function handleRequestError(error, userMessage, aiMessage) {
         try {
             if (!error.message === "Failed to fetch" && !error.message === "network error") {
                 console.log("History length:", conversationHistory.length);
@@ -709,12 +705,12 @@ function initChat(client) {
                     removeFirstConversationPairs();
                 }
                 console.log(`Intercepted '${error}'`);
-                console.log("History lenth:", conversationHistory.length);
+                console.log("History length:", conversationHistory.length);
                 const errorContainer = document.getElementById('errorContainer');
                 const errorArea = document.getElementById('errorArea');
                 const closeModal = document.getElementById('closeEModal');
                 const retry = document.getElementById('retry');
-                const lastMessage = conversationHistory.slice(-1)[0]?.content; // Safely access the last message
+                const lastMessage = window.electron.getChat().slice(-1)[0]?.content; // Safely access the last message
 
                 // Remove existing event listeners before adding a new one
                 const retryHandler = () => {
@@ -747,7 +743,7 @@ function initChat(client) {
                 function showError() {
                     errorContainer.classList.remove('hidden');
                     errorArea.textContent = "An error occurred during response. Retry?";
-                    conversationHistory.pop(); // Remove the last conversation entry
+                    window.electron.popFromChat(); // Remove the last conversation entry
                 }
 
                 showError();
@@ -868,9 +864,6 @@ function initChat(client) {
             }
         });
     }
-
-    window.conversationHistory = conversationHistory;
-    window.VisionHistory = VisionHistory
     window.CopyAll = CopyAll;
 
 }
