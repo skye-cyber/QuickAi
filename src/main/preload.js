@@ -76,7 +76,9 @@ contextBridge.exposeInMainWorld('electron', {
          return conversationHistory
     },
     //Text Chat Handling
-    getChat: () => ChatconversationHistory,
+    getChat: () => {
+        return ChatconversationHistory
+    },
     addToChat: (item) => {
         ChatconversationHistory.push(item); // Modify the array
         ipcRenderer.send('fromChat-ToMain', ChatconversationHistory); // Notify other processes
@@ -85,7 +87,9 @@ contextBridge.exposeInMainWorld('electron', {
     popFromChat: () => {
         ChatconversationHistory.pop();
     },
-    getVisionChat: () => VconversationHistory,
+    getVisionChat: () => {
+        return VconversationHistory
+    },
     addToVisionChat: (item) => {
         VconversationHistory.push(item); // Modify the array
         ipcRenderer.send('fromVision-ToMain', VconversationHistory); // Notify other processes
@@ -101,7 +105,7 @@ contextBridge.exposeInMainWorld('electron', {
     },
     send: (channel, data) => {
         // List of valid channels
-        console.log(channel, data)
+        //console.log(channel, data)
         const validChannels = ['toMain'];
         if (validChannels.includes(channel)) {
             ipcRenderer.send(channel, data);
@@ -122,7 +126,12 @@ contextBridge.exposeInMainWorld('electron', {
         document.body.appendChild(script);
         console.log("Added Utility script", script);
     },
-
+    getNewChatUUId: () => {
+        return `C-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    },
+    getNewVisionUUId: () => {
+        return `V-${Date.now()}-${Math.random().toString(34).substring(2, 12)}`;
+    },
     saveAndOpenImage: (downloadsPath, dataUrl) => {
         fetch(dataUrl)
             .then(res => res.blob())

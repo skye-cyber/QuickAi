@@ -3,7 +3,7 @@ const webpack = require('webpack');
 //const RemoveWithPlugin = require('./RemoveWithPlugin')
 
 module.exports = {
-  target:'electron-renderer',
+  //target:'electron-renderer',
   entry: {
     aichat: './src/renderer/js/aichat.js',
     utility: './src/renderer/js/exportUtilities.js',

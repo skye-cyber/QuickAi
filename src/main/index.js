@@ -7,21 +7,21 @@ const dotenv = require('dotenv')
 
 // Handle IPC messages from renderer
 ipcMain.on('toMain', (event, data) => {
-    console.log('Received data from renderer:', data);
+    //console.log('Received data from renderer:', data);
     // Optionally send a response back
     event.reply('fromMain', data);
 });
 
 // Handle IPC messages from renderer
 ipcMain.on('fromVision-ToMain', (event, data) => {
-    console.log('Received data from renderer:', data);
+    //console.log('Received data from renderer:', data);
     // Optionally send a response back
     event.reply('fromMain-ToVision', data);
 });
 
 // Handle IPC messages from renderer
 ipcMain.on('fromChat-ToMain', (event, data) => {
-    console.log('Received data from renderer:', data);
+    //console.log('Received data from renderer:', data);
     // Optionally send a response back
     event.reply('fromMain-ToChat', data);
 });
