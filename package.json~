@@ -19,6 +19,8 @@
   },
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
     "assert": "^2.1.0",
     "babel-loader": "^9.2.1",
     "browser": "^0.2.6",
@@ -28,8 +30,6 @@
     "canvg": "^4.0.2",
     "child-process-promise": "^2.2.1",
     "compression-webpack-plugin": "^11.1.0",
-    "copy-webpack-plugin": "^12.0.2",
-    "crypto": "^1.0.1",
     "crypto-browserify": "^3.12.1",
     "dotenv": "^16.4.7",
     "dotenv-expand": "^12.0.1",
@@ -60,16 +60,13 @@
     "stream-http": "^3.2.0",
     "url": "^0.11.4",
     "util": "^0.12.5",
-    "vm-browserify": "^1.1.2",
-    "webpack-cli": "^5.1.4",
-    "webpack-node-externals": "^3.0.0"
+    "vm-browserify": "^1.1.2"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.15",
     "base": "^3.0.0",
     "bl": "^6.0.16",
     "braces": "^3.0.3",
-    "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
     "engine-base": "^1.0.0",
     "gulp-util": "^3.0.8",
@@ -82,13 +79,9 @@
     "minimatch": "^10.0.1",
     "set-value": "^4.1.0",
     "shelljs": "^0.8.5",
-    "update": "^0.7.4"
-  },
-  "browser": {
-    "crypto": "crypto-browserify",
-    "buffer": "buffer",
-    "path": "path-browserify",
-    "os": "os-browserify/browser"
+    "update": "^0.7.4",
+    "uuid": "^11.0.3",
+    "webpack": "^5.97.1"
   },
   "files": [
     "aichat.html",

@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropZoneText = document.getElementById('dropZoneText');
     const uploadedFilesContainer = document.getElementById('uploadedFiles');
     const userInput = document.getElementById("userInput");
+    const mode = document.getElementById('mode');
+    let preValue = mode.value;
+    const modelChange = new CustomEvent('ModelChange');
 
     // Query map for button actions
     const queryMap = {
@@ -76,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to update scroll button visibility
     function updateScrollButtonVisibility() {
+        //console.log("Scrollable")
         const isScrollable = chatArea.scrollHeight > chatArea.clientHeight;
         const isAtBottom = chatArea.scrollTop + chatArea.clientHeight >= chatArea.scrollHeight;
 
@@ -250,6 +254,12 @@ document.addEventListener('DOMContentLoaded', function() {
          } else if (event.ctrlKey && event.key === 'P' || event.ctrlKey && event.key === 'p') {
              event.preventDefault(); // Prevent any default action
              document.getElementById("togglePane").click()
+         } else if (event.ctrlKey && event.key === 'N' || event.ctrlKey && event.key === 'n') {
+             event.stopPropagation();
+             event.preventDefault(); // Prevent any default action
+             const ConversationEvent = new CustomEvent('NewConversationOpened');
+            ClearChatArea()
+            document.dispatchEvent(ConversationEvent)
          }
      });
      window.scrollToBottom = scrollToBottom;
@@ -268,6 +278,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error("Error adding utility script:", err);
             }
          }
+     });
+
+
+     function ClearChatArea(){
+         Array.from(chatArea.children).forEach((child) => {
+             if (child.id !== 'suggestions') {
+                 child.remove();
+             }
+             //console.log('opened new conversation')
+             document.getElementById('suggestions') ? document.getElementById('suggestions').classList.remove('hidden') : "";
+        });
+     }
+
+
+     mode.addEventListener('change', function() {
+         const arr = [preValue, mode.value];
+         const validPairs = [['Basic mode', 'Coding mode'], ['Coding mode', 'Basic mode']];
+
+         // Check if arr is one of the valid pairs
+         const isValid = validPairs.some(pair =>
+         arr[0] === pair[0] && arr[1] === pair[1]
+         );
+
+         if (!isValid) {
+             console.log(preValue, mode.value);
+             document.dispatchEvent(modelChange);
+             ClearChatArea();
+         }
+
+         currentValue = mode.value;
      });
 
 });

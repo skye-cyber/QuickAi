@@ -14,14 +14,14 @@ ipcMain.on('toMain', (event, data) => {
 
 // Handle IPC messages from renderer
 ipcMain.on('fromVision-ToMain', (event, data) => {
-    //console.log('Received data from renderer:', data);
+    console.log('Received data from VChat:', data);
     // Optionally send a response back
     event.reply('fromMain-ToVision', data);
 });
 
 // Handle IPC messages from renderer
 ipcMain.on('fromChat-ToMain', (event, data) => {
-    //console.log('Received data from renderer:', data);
+    console.log('Received data from Chat:', data);
     // Optionally send a response back
     event.reply('fromMain-ToChat', data);
 });
