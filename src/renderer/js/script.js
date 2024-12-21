@@ -255,13 +255,24 @@ document.addEventListener('DOMContentLoaded', function() {
              event.preventDefault(); // Prevent any default action
              document.getElementById("togglePane").click()
          } else if (event.ctrlKey && event.key === 'N' || event.ctrlKey && event.key === 'n') {
-             event.stopPropagation();
-             event.preventDefault(); // Prevent any default action
-             const ConversationEvent = new CustomEvent('NewConversationOpened');
-            ClearChatArea()
-            document.dispatchEvent(ConversationEvent)
+            NewConversation(event);
          }
      });
+
+     // handle new conversation logic
+     function NewConversation(event){
+        event.stopPropagation();
+        event.preventDefault(); // Prevent any default action
+        const ConversationEvent = new CustomEvent('NewConversationOpened');
+        ClearChatArea()
+        document.dispatchEvent(ConversationEvent)
+     }
+
+    // Handle new conversation button click
+    document.getElementById('new-chat').addEventListener('click', function (event) {
+        NewConversation(event);
+    })
+
      window.scrollToBottom = scrollToBottom;
      window.submitImageAndText = submitImageAndText;
      window.CloseFileModal = CloseFileModal;
@@ -306,8 +317,17 @@ document.addEventListener('DOMContentLoaded', function() {
              document.dispatchEvent(modelChange);
              ClearChatArea();
          }
-
-         currentValue = mode.value;
+         SetTitle(mode.value);
+         //currentValue = mode.value;
      });
+
+    function SetTitle(value){
+        if (value.toLowerCase() == "vision"){
+            document.title = "QuickAi - Vision"
+        }
+        else if (value.toLowerCase() == "coding mode"){
+            document.title = "QuickAi - Coder"
+        }
+    }
 
 });
