@@ -14,14 +14,14 @@ ipcMain.on('toMain', (event, data) => {
 
 // Handle IPC messages from renderer
 ipcMain.on('fromVision-ToMain', (event, data) => {
-    console.log('Received data from VChat:', data);
+    //console.log('Received data from VChat:', data);
     // Optionally send a response back
     event.reply('fromMain-ToVision', data);
 });
 
 // Handle IPC messages from renderer
 ipcMain.on('fromChat-ToMain', (event, data) => {
-    console.log('Received data from Chat:', data);
+    //console.log('Received data from Chat:', data);
     // Optionally send a response back
     event.reply('fromMain-ToChat', data);
 });
@@ -208,8 +208,8 @@ app.on('ready', () => {
   Menu.setApplicationMenu(menu);
   // Create the main window
   const mainWindow = createWindow();
-  const storagePath = path.join(app.getPath('home'), '.quickai.store');
-  mainWindow.webContents.send('storagePath', storagePath);
+  //const storagePath = path.join(app.getPath('home'), '.quickai.store');
+  //mainWindow.webContents.send('storagePath', storagePath);
 
   // Create the tray icon
   const tray = new Tray(path.join(process.resourcesPath, 'assets/QuickAi.png')); // Path to your tray icon
