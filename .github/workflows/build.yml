@@ -37,7 +37,7 @@ jobs:
         sudo apt-get install -y build-essential
         
     - name: Install dependencies
-      run: npm install --no-cache --verbose
+      run: npm install --no-cache --verbose --force
 
     - name: List node_modules contents
       run: ls -la node_modules/http-proxy-agent
