@@ -117,7 +117,7 @@ function initChat(client) {
                     setTimeout(() => {
                         this.textContent = 'Copy';
                     }, 2000);
-                    showCopyModal()
+                    showCopyModal();
                 } catch (err) {
                     console.error('Failed to copy: ', err);
                 }
@@ -611,7 +611,7 @@ function initChat(client) {
     // Function to ensure MathJax renders dynamically injected content
     let renderTimeout;
 
-    function debounceRenderMathJax(_currentclass, delay = 500, noDelay = false) {
+    function debounceRenderMathJax(_currentclass, delay = 600, noDelay = false) {
         if (renderTimeout) clearTimeout(renderTimeout);
 
         if (noDelay) {
@@ -754,9 +754,23 @@ function initChat(client) {
     }
 
     // Function to show the modal
-    function showCopyModal() {
+    function showCopyModal(_color=null, text="Text copied") {
         const modal = document.getElementById('copyModal');
-
+        const txtSpace = document.getElementById("text-space")
+        txtSpace.textContent = text;
+        addRmColor();
+        function addRmColor(task="add"){
+            if (_color){
+                if (task==="add"){
+                    txtSpace.classList.add(_color);
+                    console.log("Added", _color)
+                    }
+                else {
+                    txtSpace.classList.remove(_`color);
+                    console.log("Removed", _color)
+                }
+            }
+        }
         // Slide modal to 20% height and make it visible after 1 second
         setTimeout(() => {
             modal.classList.add('top-1/5', 'opacity-100', 'pointer-events-auto');
@@ -774,6 +788,7 @@ function initChat(client) {
             modal.classList.remove('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
             modal.classList.add('top-0', 'left-1/2', '-translate-x-1/2', 'pointer-events-none');
         }, 1000); // 0.5s for fade out
+        addRmColor("rm")
     }
 
 
@@ -835,6 +850,7 @@ function initChat(client) {
     window.CopyAll = CopyAll;
     window.copyBMan =copyBMan;
     window.implementUserCopy = implementUserCopy;
-    window.addCopyListeners = addCopyListeners();
+    window.addCopyListeners = addCopyListeners;
+    window.showDeletionStatus = showCopyModal;
 
 }

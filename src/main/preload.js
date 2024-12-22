@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer, shell } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+//import trash from 'trash';
 let CurrentId = "";
 window.global = window;
 contextBridge.exposeInMainWorld('global', window);
@@ -72,6 +73,7 @@ Color choices:
 12. Bullet points should be indented inwards and have different color from their parent.
 13. Major headings/titles should have a different color other than black.
 14. If users need to share or chat by providing images/visual data, they can do so by selecting vision model at the top left menu, then they can upload files.
+15. Be very careful with css like positioning and size, not to mess other elements.
 `;
 
 let ChatconversationHistory = [{ role: "system", content: CSystem_init }]; // Define your array here
@@ -147,6 +149,22 @@ contextBridge.exposeInMainWorld('electron', {
         }catch (err){
             console.log(err)
             return false
+        }
+    },
+    deleteChat: (base_dir, id) => {
+        try{
+            const file = path.join(base_dir, `${id}.json`)
+            if (fs.statSync(file)){
+                fs.rmSync(file)
+                // Move the item to the trash
+                //trash([file])
+                return true
+            }else{
+                console.log('Item not found')
+                return false
+            }
+        }catch (err){
+            console.log(err);
         }
     },
     /*conversationHistory: (system) => {

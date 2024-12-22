@@ -4,66 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QuickAI - Loading...</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #0000ff;
-      font-family: Arial, sans-serif;
-    }
-    .loading-container {
-      text-align: center;
-      position: relative;
-    }
-    .loader {
-      border: 16px solid #f3f3f3; /* Light grey */
-      border-top: 16px solid #3498db; /* Blue */
-      border-radius: 50%;
-      width: 120px;
-      height: 120px;
-      animation: spin 2s linear infinite;
-      position: relative;
-    }
-    .loader img {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 60px; /* Adjust the size as needed */
-      height: 60px; /* Adjust the size as needed */
-      z-index: 1; /* Ensure the icon is above the border */
-    }
-    .title {
-      font-size: 24px;
-      margin-top: 20px;
-      color: #3498db;
-    }
-    .message {
-      font-size: 16px;
-      color: #666;
-      margin-top: 10px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+  <link href="./src/renderer/css/loader.css" rel="stylesheet" >
 </head>
-<body>
-  <div class="loading-container">
-    <div class="loader">
-      <img src="src/assets/QuickAi.png" alt="">
+<body class="flex items-center justify-center min-h-screen bg-blue-500 text-white font-sans">
+  <div class="relative w-64 h-64 p-4 rounded-full bg-white shadow-md flex items-center justify-center">
+    <div class="relative w-32 h-32 bg-white rounded-full">
+      <div class="relative w-32 h-32 border-4 border-transparent border-t-blue-500 rounded-full animate-spin">
+
+      </div>
+      <section class="absolute top-[7%] left-[7%] transform -translate-x-1/2 -translate-y-1/2 animate-spin-200 w-28 h-28 rounded-full" style="background: conic-gradient(from 180deg, #2ed573, #ffdd59)">
+
+      </section>
+      <img src="src/assets/QuickAi.png" alt="" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 z-10">
     </div>
-    <div class="title">QuickAI</div>
-    <div class="message">Loading...</div>
+    <div class="absolute bottom-8 text-xl text-blue-500">QuickAI </div>
+    <div class="absolute bottom-2 mt-2 text-sm text-gray-600">Loading... </div>
   </div>
-  <script>
-  alert("Loading")
-  console.log("loading")
-  </script>
 </body>
 </html>

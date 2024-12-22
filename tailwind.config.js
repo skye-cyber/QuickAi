@@ -2,6 +2,7 @@
 module.exports = {
   darkMode: 'class', /*'[data-mode="dark"]'],*/
   content: ['*.html', '*.js', './src/renderer/js/*.js'],
+  //content: ['loading.html'],
   theme: {
     screens: {
       sm: '640px',
@@ -33,7 +34,7 @@ module.exports = {
         'h5': '300',  // Adjust as needed
         'h6': '200',  // Adjust as needed
       },
-      },
+    },
 
       animation: {
         'bounce': 'bounce 0.5s infinite',
@@ -43,7 +44,9 @@ module.exports = {
         'bounce-400': 'bounce 0.5s 400ms infinite',
         'bounce-500': 'bounce 0.5s 500ms infinite',
         'bounce-600': 'bounce 0.5s 600ms infinite',
-
+        'heartpulse': 'heartpulse 1s infinite',
+        'spin': 'spin 2s linear infinite',
+        'spin-200': 'spin 0.5s linear infinite',
       },
 
       keyframes: {
@@ -52,7 +55,20 @@ module.exports = {
           '50%': { opacity: 0.5 },
           '100%': { opacity: 1 },
         },
+        heartpulse: {
+          '0%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.2)' },
+          '100%': { transform: 'scale(1)' },
+        },
+        spin: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
       },
+      /*gradientColorStops: {
+        'gradient-primary': '#00b4d8',
+        'gradient-secondary': '#00ffcc',
+      },*/
     },
   plugins: [],
 };

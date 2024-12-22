@@ -47,11 +47,32 @@
         font-weight: 200;   /* extra light */
     }
 }
+.pulse {
+    display: inline-block;
+    transition: transform 0.3s ease-in-out;
+}
 
-.scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    &::-webkit-scrollbar {
-        display: none;  /* Chrome, Safari, and Opera */
+.pulse:hover {
+    transform: scale(1.1);
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.5);
+    }
+    100% {
+        transform: scale(1);
     }
 }
+
+.pulse-hover {
+    display: inline-block;
+}
+
+.pulse-hover:hover {
+    animation: pulse 1s infinite;
+}
+
