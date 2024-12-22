@@ -28,13 +28,13 @@ jobs:
       run: npm install
 
     - name: Build for ${{ matrix.platform }}
-      run: npm run build -- --linux --win --mac
+      run: npm run dist -- --linux --win --mac
       if: matrix.platform == 'all'
       env:
         CI: true
 
     - name: Build for ${{ matrix.platform }}
-      run: npm run build -- --${{ matrix.platform }}
+      run: npm run dist -- --${{ matrix.platform }}
       env:
         CI: true
 
@@ -43,4 +43,4 @@ jobs:
       with:
         name: electron-app-${{ matrix.platform }}
         path: dist
-}
+
