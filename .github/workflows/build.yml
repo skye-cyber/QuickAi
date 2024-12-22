@@ -23,7 +23,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20.18.1'
-        npm-version: '10-9-2'
+        npm-version: '10.9.2'
 
     - name: Cache node modules
       uses: actions/cache@v4
@@ -37,9 +37,15 @@ jobs:
         sudo apt-get install -y build-essential
         
     - name: Install dependencies
-      run: npm install --no-cache
+      run: npm install --no-cache --verbose
 
     - name: List node_modules contents
+      run: ls -la node_modules/http-proxy-agent
+
+    - name: Install http-proxy-agent again
+      run: npm install http-proxy-agent@latest
+
+    - name: List node_modules contents again
       run: ls -la node_modules/http-proxy-agent
       
     - name: Print Node.js version
