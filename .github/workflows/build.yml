@@ -42,8 +42,8 @@ jobs:
     - name: List node_modules contents
       run: ls -la node_modules/http-proxy-agent
 
-    - name: Install http-proxy-agent again
-      run: npm install http-proxy-agent@latest
+    - name: Install http-proxy-agent and agent-base again
+      run: npm install http-proxy-agent@latest agent-base@latest
 
     - name: List node_modules contents again
       run: ls -la node_modules/http-proxy-agent
