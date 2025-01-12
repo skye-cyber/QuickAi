@@ -79,6 +79,25 @@ Color choices:
 let ChatconversationHistory = [{ role: "system", content: CSystem_init }]; // Define your array here
 let VconversationHistory = [{role: "system", content:[ { type: "text", text: VSystem_init } ]}];
 
+let model_temp = null;
+let model_top_p = null;
+
+document.addEventListener('DOMContentLoaded', () =>{
+    const temp_element = document.getElementById('model_temperature')
+    const top_p_element = document.getElementById('model_top_p')
+    model_temp = temp_element.options[temp_element.selectedIndex].value; // or use temp_element.options[temp_element.selectedIndex].value
+    model_top_p =  top_p_element.value;
+
+    temp_element.addEventListener('change', function() {
+        model_temp = temp_element.value
+
+    })
+
+    top_p_element.addEventListener('change', function() {
+        model_top_p = top_p_element.value
+    })
+})
+
 contextBridge.exposeInMainWorld('electron', {
     getEnv: () => ipcRenderer.invoke('get-env'),
     getBufferFromIV: (iv) => ipcRenderer.invoke('get-buffer-from-iv', iv),
@@ -257,6 +276,14 @@ contextBridge.exposeInMainWorld('electron', {
                 console.error('Error creating blob:', error);
             });
     },
+
+    temperature: () => {
+        return model_temp;
+    },
+    top_p: () => {
+        return model_top_p;
+    },
+
 });
 
 document.addEventListener('DOMContentLoaded', function() {

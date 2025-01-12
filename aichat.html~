@@ -83,7 +83,7 @@
                 <svg class="w-6 h-6 text-green-500 dark:text-green-400 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
-                <p id="text"class="text-lg">Text copied</p>
+                <p id="text-space" class="text-lg">Text copied</p>
             </div>
         </div>
 
@@ -302,13 +302,50 @@
 
             <!-- Additional Settings Options -->
             <div class="mb-4">
-            <label class="block text-gray-700 dark:text-gray-300 mb-2">Language</label>
+            <label class="block text-gray-700 dark:text-gray-300 mb-2">Language:</label>
             <select class="form-select w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500">
                 <option value="en">English</option>
                 <option value="fr">French</option>
                 <option value="es">Spanish</option>
             </select>
             </div>
+
+            <!-- Model configurations -->
+            <section class="grid grid-cols-1 md:grid-cols-2 space-x-2">
+                <!-- Model Temperature -->
+                <div class="mb-4" id="tmp" title="model temperature">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">Temperature:</label>
+                    <select id="model_temperature" class="form-select w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500">
+                        <option value="0.1">0.1</option>
+                        <option value="0.2">0.2</option>
+                        <option value="0.3">0.3</option>
+                        <option value="0.4">0.4</option>
+                        <option value="0.5">0.5</option>
+                        <option value="0.6">0.6</option>
+                        <option value="0.7" selected>0.7</option>
+                        <option value="0.8">0.8</option>
+                        <option value="0.9">0.9</option>
+                        <option value="1">1</option>
+                    </select>
+                </div>
+
+                <!-- Model Top_p -->
+                <div class="mb-4" title="model result probability, 0.9 = 90%">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">Top_p:</label>
+                    <select id="model_top_p" class="form-select w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500">
+                        <option value="0.1">0.1</option>
+                        <option value="0.2">0.2</option>
+                        <option value="0.3">0.3</option>
+                        <option value="0.4">0.4</option>
+                        <option value="0.5">0.5</option>
+                        <option value="0.6">0.6</option>
+                        <option value="0.7">0.7</option>
+                        <option value="0.8">0.8</option>
+                        <option value="0.9" selected>0.9</option>
+                        <option value="1">1</option>
+                    </select>
+                </div>
+            </section>
 
             <!-- Save Settings Button -->
             <button id="saveSettings" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
