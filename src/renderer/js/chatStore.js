@@ -6,7 +6,6 @@ const storagePath = window.electron.joinPath(window.electron.home_dir(), '.quick
 const chatArea = document.getElementById('chatArea');
 const conversationsPanel = document.getElementById('conversations');
 escapeHTML = window.escapeHTML;
-//const items = document.querySelectorAll('.item');
 const modal = document.getElementById('renameModal');
 const modalTitle = document.getElementById('modalTitle');
 const newNameInput = document.getElementById('newName');
@@ -162,9 +161,10 @@ class ConversationManager {
     userMessage.classList.add('flex', 'justify-end', 'mb-4');
 
     if (model.toLocaleLowerCase() === 'vision'){
-      userText = content[0].text
+      // Exclude timestamp when rendering user messages
+      userText = content[0].text.slice(-1)===']' ? content[0].text.substring(0, content[0].text.length - 22) : content[0].text
     } else{
-      userText = content
+      userText = content.slice(-1) === ']' ? content.substring(0, content.length - 22) : content
     }
     const messageHtml = (fileDataUrl) // Check whether both file and file url exist
       ? `

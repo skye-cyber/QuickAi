@@ -180,6 +180,9 @@ function initChat(client) {
             </div>
             `;
 
+            // Add Timestamp
+            text = `${text} [${window.electron.getDateTime()} UTC]`
+
             userMessage.classList.add("flex", "justify-end", "mb-4", "overflow-wrap");
             chatArea.appendChild(userMessage);
             implementUserCopy();
@@ -289,9 +292,9 @@ function initChat(client) {
                         model: model,
                         messages: window.electron.getChat(), //Add conversation in json format to avoid size limitation
                         max_tokens:2000,
-                        frequency_penalty: 0.5, // Reduces the likelihood of repeating tokens. A higher value discourages repetition.
+                        /*frequency_penalty: 0.5, // Reduces the likelihood of repeating tokens. A higher value discourages repetition.
                         temperature: window.electron.temperature(),
-                        top_p: window.electron.top_p(), //Limits the model to consider only the top p probability mass for sampling. For example, a value of 0.9 means the model will consider only the tokens that make up 90% of the probability distribution.
+                        top_p: window.electron.top_p(), //Limits the model to consider only the top p probability mass for sampling. For example, a value of 0.9 means the model will consider only the tokens that make up 90% of the probability distribution.*/
 
                     });
                     let output = "";
@@ -344,8 +347,8 @@ function initChat(client) {
                             // Debounce MathJax rendering to avoid freezing
                             debounceRenderMathJax(aiMessageUId);
                         }
-
                     }
+
                     if (check === false) {
                         // Sending a message to the main process
                         window.electron.send('toMain', { message: 'set-Utitility-Script' });
@@ -380,6 +383,13 @@ function initChat(client) {
         //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
         //switch to vission model
         modeSelect.value = "Vision"
+
+        // Add user message to chat
+        const userMessage = addUserMessage(text, fileType, fileDataUrl);
+
+        //Add Timestamp
+        text = `${text} [${window.electron.getDateTime()} UTC]`
+        console.log(text)
         // Determine the content based on fileDataUrl
         let userContent;
         if (fileDataUrl) {
@@ -428,15 +438,9 @@ function initChat(client) {
             content: userContent,
         });
 
-        //console.log("Updated VisionHistory:", JSON.stringify(VisionHistory, null, 2));
-
-        //console.log(userContent)
         // Store the last message for retry purposes
         const lastMessage = userContent;
 
-
-        // Add user message to chat
-        const userMessage = addUserMessage(text, fileType, fileDataUrl);
         const VisionMessage = document.createElement("div");
         const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
         VisionMessage.classList.add("flex", "justify-start", "mb-12", "overflow-wrap");
@@ -509,6 +513,7 @@ function initChat(client) {
                     debounceRenderMathJax(VisionMessageUId);
                 }
             }
+
             if (check === false) {
                 window.electron.send('ready_4_utility');
                 check = true;

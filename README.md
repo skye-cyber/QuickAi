@@ -69,6 +69,7 @@ This project is licensed under the GNU GPL Version 3. See the LICENSE file for m
 ## Contact
 If you have any questions or need further assistance, please contact us at:
 
-Email: swskye17@gmail.com
-GitHub: https://github.com/skye-cyber
+- **Email:** [swskye17@gmail.com](mailto:swskye17@gmail.com)
+- **GitHub:** [skye-cyber](https://github.com/skye-cyber)
+
 Thank you for using QuickAi!
