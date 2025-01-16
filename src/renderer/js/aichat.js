@@ -291,7 +291,7 @@ function initChat(client) {
                     const stream = client.chatCompletionStream({
                         model: model,
                         messages: window.electron.getChat(), //Add conversation in json format to avoid size limitation
-                        max_tokens:2000,
+                        max_tokens:3000,
                         /*frequency_penalty: 0.5, // Reduces the likelihood of repeating tokens. A higher value discourages repetition.
                         temperature: window.electron.temperature(),
                         top_p: window.electron.top_p(), //Limits the model to consider only the top p probability mass for sampling. For example, a value of 0.9 means the model will consider only the tokens that make up 90% of the probability distribution.*/

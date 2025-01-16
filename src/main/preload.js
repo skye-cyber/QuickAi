@@ -84,29 +84,12 @@ let VconversationHistory = [{role: "system", content:[ { type: "text", text: VSy
 let model_temp = null;
 let model_top_p = null;
 
-document.addEventListener('DOMContentLoaded', () =>{
-    const temp_element = document.getElementById('model_temperature')
-    const top_p_element = document.getElementById('model_top_p')
-    model_temp = temp_element.options[temp_element.selectedIndex].value; // or use temp_element.options[temp_element.selectedIndex].value
-    model_top_p =  top_p_element.value;
-
-    temp_element.addEventListener('change', function() {
-        model_temp = temp_element.value
-
-    })
-
-    top_p_element.addEventListener('change', function() {
-        model_top_p = top_p_element.value
-    })
-})
-
 contextBridge.exposeInMainWorld('electron', {
     getEnv: () => ipcRenderer.invoke('get-env'),
     getBufferFromIV: (iv) => ipcRenderer.invoke('get-buffer-from-iv', iv),
     get_key: (encryptedObject, password) => ipcRenderer.invoke('getKey', encryptedObject, password),
     getDownloadsPath: () => {
-        const homedir = os.homedir();
-        const downloadsPath = path.join(homedir, 'Downloads');
+        const downloadsPath = path.join(os.homedir(), 'Downloads');
         return downloadsPath;
     },
 
@@ -188,11 +171,45 @@ contextBridge.exposeInMainWorld('electron', {
             console.log(err);
         }
     },
-    /*conversationHistory: (system) => {
-         let conversationHistory = [system];
-         return conversationHistory
-    },*/
-    //Text Chat Handling
+    savePreference: async (data) =>{
+        try{
+            const prefFile = ".pref.config"
+            const prefPath = path.join(os.homedir(), '.quickai/.quickai.config');
+            try{
+                if (!fs.mkdirSync(prefPath)){
+                    fs.mkdirSync(prefPath);
+                }
+            }catch(error){
+                //
+            }
+            const prefFpath = path.join(prefPath, prefFile);
+            fs.writeFileSync(prefFpath, data);
+            return true
+        } catch(err){
+            //console.log(err);
+            return false
+        }
+    },
+    deletePreference: async (data) =>{
+        try{
+            const prefPath = path.join(os.homedir(), '.quickai/.quickai.config/.pref.config');
+            fs.rmSync(prefPath, data);
+            return true
+        } catch(err){
+            console.log(err);
+            return false
+        }
+    },
+    getPreferences: async () => {
+        try{ const _fpath = path.join(os.homedir(), '.quickai/.quickai.config/.pref.config')
+            if (fs.statfsSync(_fpath)){
+                const prefData = fs.readFileSync(_fpath, 'utf-8')
+                return prefData
+            }
+        }catch(err){
+            //console.log(err)
+        }
+    },
     getChat: () => {
         return ChatconversationHistory
     },
@@ -279,6 +296,26 @@ contextBridge.exposeInMainWorld('electron', {
             });
     },
 
+    cleanFile: async (file) => {
+        fs.readFileSync(file, (err, data) => {
+            if (err) throw err;
+            data = JSON.parse(data);
+            //for (let [i, res] of data.e)
+            data.forEach(res => {
+                // console.log(data)
+                if (res.role === "user"){
+
+                    if (data[data.indexOf(res)+1].role !== "assistant"){
+                        console.log("Pair: !index", data.indexOf(res)+1)
+                        data.slice(data.indexOf(res), data.indexOf(res)+1).values()
+                    }else if (data[data.indexOf(res)+1].role === "assistant"){
+                        console.log("Pair: OK", data.indexOf(res))
+                    }
+                }
+            })
+            return true
+        });
+    },
     temperature: () => {
         return model_temp;
     },
