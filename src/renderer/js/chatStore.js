@@ -168,24 +168,27 @@ class ConversationManager {
     }
     const messageHtml = (fileDataUrl) // Check whether both file and file url exist
       ? `
-        <div data-id="${userMessageId}" class="relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
-          <button id="${copyButtonId}" class="absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
+        <div data-id="${userMessageId}" class="relative rounded-lg p-2 font-normal md:p-3 w-fit max-w-full lg:max-w-5xl">
+            <div class="flex justify-end">
+                <article class="bg-cyan-100 w-fit p-2 rounded-lg">
+                    ${fileDataUrl && fileType === "image" ? `<img src="${fileDataUrl}" alt="Uploaded Image" class="rounded-md w-32 h-32 my-auto" />` : fileType === "document" ? `<svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16V4a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2zm1-1h4v10h-4V4z"/>
+                    </svg>` : ""}
+                </article>
+            </div>
+
+            <div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-cyan-200 text-gray-900 rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
+                <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapeHTML(userText)}</p>
+                <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
+                    Copy
+                </button>
+            </div>
+        </div>` :
+        `<div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-cyan-200 text-gray-900 rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
+            <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapeHTML(userText)}</p>
+            <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
             Copy
-          </button>
-          <div class="bg-blue-200 dark:bg-rose-400 text-gray-800 dark:text-white rounded-lg shadow-md px-4 py-2 w-fit max-w-full h-fit md:max-h-md lg:max-h-lg">
-          <p class="${userMessageId} whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl bg-blue-400 dark:bg-gradient-to-tr dark:from-pink-700 dark:via-cyan-800 dark:to-rose-600 p-1 mb-2 rounded-md">${escapeHTML(userText)}</p>
-          ${ fileType === "image" ? `<img src="${fileDataUrl}" alt="Uploaded Image" class="rounded-md my-auto" />` : fileType === "document" ? `<svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16V4a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2zm1-1h4v10h-4V4z"/>
-          </svg>` : ""}
-          </div>
-        </div>
-      `
-      : `
-        <div data-id="${userMessageId}" class="${userMessageId} relative bg-gradient-to-tl from-sky-600 to-fuchsia-800 dark:from-purple-700 dark:to-pink-700 text-white dark:text-gray-100 rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
-          <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapeHTML(userText)}</p>
-          <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
-            Copy
-          </button>
+            </button>
         </div>
       `;
 
@@ -303,8 +306,8 @@ class ConversationManager {
         }
 }
 const conversationManager = new ConversationManager(storagePath);
-let conversationHistory = window.electron.getChat();
-let VconversationHistory = window.electron.getVisionChat();
+//let conversationHistory = window.electron.getChat();
+//let VconversationHistory = window.electron.getVisionChat();
 
 // Function to fetch conversation files and display their IDs
 async function fetchConversations() {

@@ -178,12 +178,22 @@ document.addEventListener('DOMContentLoaded', function() {
      }
 
      function handleFiles(files) {
-         console.log("Handling files");
-
+        const previewContainer = document.getElementById('uploadedFiles');
          for (let i = 0; i < files.length; i++) {
              const file = files[i];
              console.log('File uploaded:', file.name, file.type, file.size);
-
+             const previewItem = document.createElement('div');
+                previewItem.className = 'flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg';
+                previewItem.innerHTML = `
+                    <div class="flex items-center">
+                        <svg class="fill-current h-6 w-6 text-gray-500 mr-2" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h2v4a2 2 0 002 2h2a2 2 0 002-2v-4h2a2 2 0 002-2V4a2 2 0 00-2-2H9z"></path>
+                        </svg>
+                        <p class="text-gray-800 dark:text-gray-200 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">${file.name}</p>
+                    </div>
+                    <span class="text-gray-500 dark:text-gray-300">${((file.size / (1024 * 1024)).toFixed(2))} MB</span>
+                `;
+                previewContainer.appendChild(previewItem);
              // Determine if the file is an image or a document
              const isImage = file.type.startsWith('image/');
              const fileType = isImage ? 'image' : 'document';
@@ -195,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
              <span class="mr-2">${file.name}</span>
              <span class="text-sm text-gray-500">(${(file.size / 1024).toFixed(2)} kb) - ${fileType}</span>
              `;
-             document.getElementById("uploadedFiles").appendChild(fileElement);
+             //document.getElementById("uploadedFiles").appendChild(fileElement);
 
              // Convert the file to a data URL if it's an image
              if (isImage) {
@@ -330,4 +340,115 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+
+// ------Implement user preference handling ------
+const prefContent= document.getElementById('pref-content');
+const prefInput =document.getElementById('pref-input');
+const prefPrevSection = document.getElementById('pref-section');
+const prefEdit = document.getElementById('pref-edit');
+const prefDelete = document.getElementById('pref-delete');
+const prefSubmit = document.getElementById('pref-submit');
+const prefInputSection = document.getElementById('pref-inputSection');
+
+// Always hide input section when prefContent has value
+if (prefContent.innerText){
+    prefInputSection.classList.add('hidden');
+} else if (!prefContent.innerText){
+    prefPrevSection.classList.add('hidden');
+}
+//Add event listener for Pref submission
+//-------------Button---------------
+prefSubmit.addEventListener("click", () => {
+    const inputText = prefInput.value.trim();
+    if (inputText && inputText.length > 10) {
+        prefInput.value = "";
+        // Dispatch Save event
+        window.electron.savePreference(inputText)
+        prefInputSection.classList.add('hidden'); //hide input section
+        prefContent.innerText = inputText; //Update preference content
+        prefPrevSection.classList.remove('hidden');
+    }
 });
+
+//-------------Enter key---------------
+prefInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        const inputText = prefInput.value.trim();
+        if (inputText && inputText.length > 10) {
+            prefInput.value = "";
+            // Dispatch Save event
+            window.electron.savePreference(inputText)
+            prefInputSection.classList.add('hidden'); //hide input section
+            prefContent.innerText = inputText; //Update preference content
+            prefPrevSection.classList.remove('hidden');
+        }
+    }
+});
+
+//Add event listener for edit
+prefEdit.addEventListener('click', function() {
+    prefInputSection.classList.remove('hidden'); //Show input section
+    prefInput.value = prefContent.innerText;
+    prefEdit.focus() //Focus text area for editing
+    prefPrevSection.classList.add('hidden'); //Hide preference display block
+})
+
+//Add event listener for Delete
+prefDelete.addEventListener('click', function() {
+    prefEdit.focus() //Focus text area for editing
+    DeletePref();
+})
+
+async function DeletePref(){
+    if (await window.electron.deletePreference()){
+        prefPrevSection.classList.add('hidden'); //Hide preference display block
+        prefInputSection.classList.remove('hidden'); //Show input section
+        prefInput.value = "";
+    }else{
+        const errorContainer = document.getElementById('errorContainer');
+        const errorArea = document.getElementById('errorArea');
+        errorArea.textContent = "Failed to delete preferences!"
+        errorContainer.classList.remove('hidden');
+        setTimeout(() => {
+            errorContainer.classList.add('hidden');
+        }, 3000)
+    }
+}
+// Retrieve preferences
+async function displayPref(){
+    const pref = await window.electron.getPreferences()
+
+    if (pref){
+        prefContent.innerText = pref;
+        prefPrevSection.classList.remove('hidden'); //Hide preference display block
+        prefInputSection.classList.add('hidden'); //Show input section
+    }
+}
+//Load preferences
+displayPref();
+//Notify();
+});
+
+// Function to show the modal
+function Notify(_color=null, text="Text copied") {
+    const modal = document.getElementById('quickaiNotify');
+
+    // Slide modal to 20% height and make it visible after 1 second
+    setTimeout(() => {
+        modal.classList.add('top-1/5', 'opacity-100', 'pointer-events-auto');
+    }, 300); // 1 second delay
+
+    // Slide modal to the left and fade out after 5 seconds
+    setTimeout(() => {
+        modal.classList.remove('top-1/5', 'left-1/2', '-translate-x-1/2');
+        modal.classList.add('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
+
+    }, 4000); // 4 seconds for staying in the middle
+
+    // Reset transform after fully fading out and moving off-screen
+    setTimeout(() => {
+        modal.classList.remove('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
+        modal.classList.add('top-0', 'left-1/2', '-translate-x-1/2', 'pointer-events-none');
+    }, 1000); // 0.5s for fade out
+    addRmColor("rm")
+}

@@ -197,7 +197,7 @@ contextBridge.exposeInMainWorld('electron', {
         return ChatconversationHistory
     },
     addToChat: (item) => {
-        ChatconversationHistory.push(item); // Modify the array
+        ChatconversationHistory.push(JSON.stringify(item)); // Modify the array
         ipcRenderer.send('fromChat-ToMain', ChatconversationHistory); // Notify other processes
     },
     //Vison History handling
@@ -208,7 +208,7 @@ contextBridge.exposeInMainWorld('electron', {
         return VconversationHistory
     },
     addToVisionChat: (item) => {
-        VconversationHistory.push(item); // Modify the array
+        VconversationHistory.push(JSON.stringify(item)); // Modify the array
         ipcRenderer.send('fromVision-ToMain', VconversationHistory); // Notify other processes
     },
     popFromVisionChat: () => {
