@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mode = document.getElementById('mode');
     let preValue = mode.value;
     const modelChange = new CustomEvent('ModelChange');
+    const attachFiles = document.getElementById("AttachFiles");
 
     // Query map for button actions
     const queryMap = {
@@ -59,6 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Set the initial theme
     setTheme(currentTheme);
+    //Set code these styleSheet
+    window.electron.addCodeThemeSheet(currentTheme);
 
     // Function to set the theme
     function setTheme(theme) {
@@ -75,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
     themeSwitch.addEventListener("click", () => {
         const newTheme = rootElement.classList.contains("dark") ? "light" : "dark";
         setTheme(newTheme);
+        window.electron.addCodeThemeSheet(newTheme);
     });
 
     // Function to update scroll button visibility
@@ -121,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    document.getElementById("AttachFiles").addEventListener("click", OpenFileModal);
+    attachFiles.addEventListener("click", OpenFileModal);
 
     const FileModalClose = document.getElementById("closeFileEModal");
     FileModalClose.addEventListener("click", (e) => {
@@ -179,66 +183,75 @@ document.addEventListener('DOMContentLoaded', function() {
 
      function handleFiles(files) {
         const previewContainer = document.getElementById('uploadedFiles');
-         for (let i = 0; i < files.length; i++) {
-             const file = files[i];
-             console.log('File uploaded:', file.name, file.type, file.size);
-             const previewItem = document.createElement('div');
-                previewItem.className = 'flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg';
-                previewItem.innerHTML = `
-                    <div class="flex items-center">
-                        <svg class="fill-current h-6 w-6 text-gray-500 mr-2" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h2v4a2 2 0 002 2h2a2 2 0 002-2v-4h2a2 2 0 002-2V4a2 2 0 00-2-2H9z"></path>
-                        </svg>
-                        <p class="text-gray-800 dark:text-gray-200 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">${file.name}</p>
-                    </div>
-                    <span class="text-gray-500 dark:text-gray-300">${((file.size / (1024 * 1024)).toFixed(2))} MB</span>
-                `;
-                previewContainer.appendChild(previewItem);
-             // Determine if the file is an image or a document
-             const isImage = file.type.startsWith('image/');
-             const fileType = isImage ? 'image' : 'document';
-             window.fileType = fileType;
-             // Create a list item for the file
-             const fileElement = document.createElement('div');
-             fileElement.classList.add('flex', 'items-center', 'mb-2', 'text-gray-700');
-             fileElement.innerHTML = `
-             <span class="mr-2">${file.name}</span>
-             <span class="text-sm text-gray-500">(${(file.size / 1024).toFixed(2)} kb) - ${fileType}</span>
-             `;
-             //document.getElementById("uploadedFiles").appendChild(fileElement);
+        let Uploaded = 0
+        //Create a list to hold file urls
+        let fileUrls = []
+        for (let i = 0; i < files.length; i++) {
+           const file = files[i];
 
-             // Convert the file to a data URL if it's an image
-             if (isImage) {
-               const reader = new FileReader();
-               reader.onload = (e) => {
-                   const imageDataUrl = e.target.result;
-                    // Store the image data URL in the global window object
-                    window.fileDataUrl = imageDataUrl;
-                };
-                reader.readAsDataURL(file);
-            } else {
-                alert("Sorry, Cannot process this file type quiet yet")
-            }
+           // Determine if the file is an image or a document
+           const isImage = file.type.startsWith('image/');
+           const fileType = isImage ? 'image' : 'document';
+           window.fileType = fileType;
+
+           // Convert the file to a data URL if it's an image
+           if (isImage) {
+               Uploaded += 1;
+              // Create a list item for the file
+              console.log('File uploaded:', file.name, file.type, file.size);
+              // Hide svgbefore displaying files
+              document.getElementById('dropZoneSVG').classList.add('hidden')
+              const previewItem = document.createElement('div');
+                  previewItem.className = 'flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg';
+                  previewItem.innerHTML = `
+                      <div class="flex items-center overflow-auto scrollbar-hide">
+                          <svg class="fill-current h-6 w-6 text-gray-500 mr-1" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                              <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h2v4a2 2 0 002 2h2a2 2 0 002-2v-4h2a2 2 0 002-2V4a2 2 0 00-2-2H9z"></path>
+                          </svg>
+                          <p class="flex text-gray-800 dark:text-stone-300 w-full text-ellipsis whitespace-nowrap">${file.name}</p>
+                      </div>
+                      <span class="p-1 border-l border-bg-stone-400 rounded-md bg-blue-400 dark:bg-stone-300 text-gray-700 dark:text-zinc-950">${((file.size / (1024 * 1024)).toFixed(2))} MB</span>
+                  `;
+              previewContainer.appendChild(previewItem);
+              const reader = new FileReader();
+
+              const AllfileTypes = "image";
+              window.AllfileTypes = AllfileTypes
+              reader.onload = (e) => {
+                  const imageDataUrl = e.target.result;
+                  fileUrls.push(imageDataUrl);
+                  };
+                  reader.readAsDataURL(file);
+          } else {
+              Notify(null, "Unsupported files were ignored!")
+          }
          }
+         // Store the image data URL in the global window object
+         window.fileDataUrl = fileUrls;
 
          // Update the drop zone text if files are uploaded
-         if (files.length > 0) {
-             document.getElementById("dropZoneText").textContent = 'Files uploaded successfully';
+         if (Uploaded > 0) {
+             document.getElementById("dropZoneText").textContent = `${Uploaded} File(s) uploaded successfully`;
          }
      }
 
      function submitImageAndText() {
          const imageDataUrl = window.fileDataUrl;
-         const fileType = window.fileType;
+         const fileType = window.AllfileTypes;
          const text = document.getElementById("imagePrompt").value;
          if (imageDataUrl && text) {
              // Dispatch an event with the image data URL and text
              const event = new CustomEvent('imageLoaded', { detail: { fileDataUrl: fileDataUrl, text: text, fileType:fileType } });
              document.dispatchEvent(event);
+             document.getElementById('dropZoneSVG').classList.remove('hidden')
              CloseFileModal();
              document.getElementById('suggestions').classList.add('hidden');
          } else {
-             alert("Please upload an image and enter a prompt.");
+             if (!imageDataUrl){
+                 Notify(null, "Please select a file!")
+             }else if (!text){
+                 Notify(null, "Please Enter a prompt relating to the upload")
+             }
          }
      }
 
@@ -254,6 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
      // Trigger input event to adjust height
      userInput.dispatchEvent(new Event('input'));
 
+    // shortcut implementations
      document.addEventListener('keydown', (event) => {
          if (event.ctrlKey && event.key === 'S' || event.ctrlKey && event.key === 's') {
              event.preventDefault(); // Prevent the default Save action in browsers
@@ -266,6 +280,9 @@ document.addEventListener('DOMContentLoaded', function() {
              document.getElementById("togglePane").click()
          } else if (event.ctrlKey && event.key === 'N' || event.ctrlKey && event.key === 'n') {
             NewConversation(event);
+         } else if (event.ctrlKey && event.key === 'f' || event.ctrlKey && event.key === 'F') {
+             event.preventDefault(); // Prevent any default action
+             attachFiles.click();
          }
      });
 
@@ -283,9 +300,9 @@ document.addEventListener('DOMContentLoaded', function() {
         NewConversation(event);
     })
 
-     window.scrollToBottom = scrollToBottom;
-     window.submitImageAndText = submitImageAndText;
-     window.CloseFileModal = CloseFileModal;
+    window.scrollToBottom = scrollToBottom;
+    window.submitImageAndText = submitImageAndText;
+    window.CloseFileModal = CloseFileModal;
 
      // Set up the event listener
      window.electron.receive('fromMain', (data) => {
@@ -424,31 +441,84 @@ async function displayPref(){
         prefInputSection.classList.add('hidden'); //Show input section
     }
 }
+
+//Ensure that the imag prompt is initially empty
+document.getElementById('imagePrompt').value = "";
 //Load preferences
 displayPref();
 //Notify();
 });
 
 // Function to show the modal
-function Notify(_color=null, text="Text copied") {
+function Notify(_color=null, text="") {
     const modal = document.getElementById('quickaiNotify');
-
+    const message = document.getElementById('messageContent');
+    if (text){
+        message.innerText = text;
+    }
     // Slide modal to 20% height and make it visible after 1 second
     setTimeout(() => {
         modal.classList.add('top-1/5', 'opacity-100', 'pointer-events-auto');
-    }, 300); // 1 second delay
+    }, 200); // 1 second delay
 
     // Slide modal to the left and fade out after 5 seconds
     setTimeout(() => {
         modal.classList.remove('top-1/5', 'left-1/2', '-translate-x-1/2');
         modal.classList.add('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
 
-    }, 4000); // 4 seconds for staying in the middle
+    }, 5000); // 4 seconds for staying in the middle
 
     // Reset transform after fully fading out and moving off-screen
     setTimeout(() => {
         modal.classList.remove('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
         modal.classList.add('top-0', 'left-1/2', '-translate-x-1/2', 'pointer-events-none');
     }, 1000); // 0.5s for fade out
-    addRmColor("rm")
 }
+
+//Handle custom model selection
+document.addEventListener('DOMContentLoaded', function() {
+    const modeButton = document.getElementById('modeButton');
+    const modeDropdown = document.getElementById('modeDropdown');
+    const modeItems = document.querySelectorAll('[data-value]');
+    const selectedModeText = document.getElementById('selectedModeText');
+    const modeSelect = document.getElementById('mode');
+
+    // Function to toggle dropdown visibility
+    function toggleDropdown() {
+        modeDropdown.classList.toggle('hidden');
+    }
+
+    // Function to select a mode
+    function selectMode(value) {
+        modeItems.forEach(item => {
+            const isSelected = item.getAttribute('data-value') === value;
+            item.classList.toggle('dark:bg-stone-900', isSelected);
+            item.classList.toggle('bg-green-200', isSelected);
+        });
+
+        selectedModeText.innerText = modeSelect.options[modeSelect.selectedIndex].innerText;
+        modeDropdown.classList.add('hidden');
+    }
+
+    // Event listener for button click to toggle dropdown
+    modeButton.addEventListener('click', toggleDropdown);
+
+    // Event listener for clicking outside the dropdown to close it
+    document.addEventListener('click', function(event) {
+        if (!modeButton.contains(event.target) && !modeDropdown.contains(event.target)) {
+            modeDropdown.classList.add('hidden');
+        }
+    });
+
+    // Event listener for selecting a mode
+    modeItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            modeSelect.value = value;
+            selectMode(value);
+        });
+    });
+
+    // Initial selection based on the select element's default value
+    selectMode(modeSelect.value);
+});

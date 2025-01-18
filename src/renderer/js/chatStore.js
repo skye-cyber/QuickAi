@@ -1,6 +1,6 @@
 //const { electron } = require("process");
 
-const { random } = require("lodash");
+//const { random } = require("lodash");
 
 const storagePath = window.electron.joinPath(window.electron.home_dir(), '.quickai.store');
 const chatArea = document.getElementById('chatArea');
@@ -118,28 +118,43 @@ class ConversationManager {
 
   // Get file type from message content
   getFileType(content) {
-    //console.log(content)
-    try{
-        const file_Dict = {
-          "image_url": "image",
-          "file_url": "document"
-        }
-        const fileMessage = content.find(item => item.type === "image_url" || item.type === "file_url");
-        return fileMessage ? file_Dict(fileMessage.type) : null;
-    }catch (TypeError){
-      return null
-    }
-  }
+    try {
+      const fileDict = {
+        "image_url": "image",
+        "file_url": "document"
+      };
 
-  // Get file URL from message content
-  getFileUrl(content) {
-    try{
-      const fileMessage = content.find(item => item.type === "image_url" || item.type === "file_url");
-      return fileMessage ? fileMessage[fileMessage.type].url : null;
-    }catch (TypeError){
-      return null
+      // Find the item with type "image_url" or "file_url"
+      const fileTypeItem = content.find(item => item.type === "image_url" || item.type === "file_url");
+      console.log(content.find(item => item.type))
+      // Check if the found item exists and has a valid type
+      if (fileTypeItem && fileDict[fileTypeItem.type]) {
+        return fileDict[fileTypeItem.type];
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error determining file type:", error);
+      return null;
     }
   }
+getFileUrl(content) {
+  try {
+    // Find the item with type "image_url"
+    const fileMessage = content.find(item => item.type === "image_url");
+
+    // Check if the item exists and has an images array
+    if (fileMessage && fileMessage.images) {
+      // Extract all URLs from the images array
+      return fileMessage.images.map(image => image.url);
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Error extracting file URL:", error);
+    return [];
+  }
+}
 
   // Get message type (text or vision) from message content
   getMessageType(content) {
@@ -154,11 +169,12 @@ class ConversationManager {
     const fileType = this.getFileType(content);
     var fileDataUrl = null;
     var userText = null;
+    console.log(fileType)
     if (fileType){
       fileDataUrl = this.getFileUrl(content);
     }
     const userMessage = document.createElement("div");
-    userMessage.classList.add('flex', 'justify-end', 'mb-4');
+    userMessage.className = "flex justify-end mb-4";
 
     if (model.toLocaleLowerCase() === 'vision'){
       // Exclude timestamp when rendering user messages
@@ -166,32 +182,32 @@ class ConversationManager {
     } else{
       userText = content.slice(-1) === ']' ? content.substring(0, content.length - 22) : content
     }
-    const messageHtml = (fileDataUrl) // Check whether both file and file url exist
-      ? `
-        <div data-id="${userMessageId}" class="relative rounded-lg p-2 font-normal md:p-3 w-fit max-w-full lg:max-w-5xl">
-            <div class="flex justify-end">
-                <article class="bg-cyan-100 w-fit p-2 rounded-lg">
-                    ${fileDataUrl && fileType === "image" ? `<img src="${fileDataUrl}" alt="Uploaded Image" class="rounded-md w-32 h-32 my-auto" />` : fileType === "document" ? `<svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16V4a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2zm1-1h4v10h-4V4z"/>
-                    </svg>` : ""}
-                </article>
-            </div>
-
-            <div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-cyan-200 text-gray-900 rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
-                <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapeHTML(userText)}</p>
-                <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
-                    Copy
-                </button>
-            </div>
-        </div>` :
-        `<div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-cyan-200 text-gray-900 rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
+    const messageHtml =`
+        <div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
             <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapeHTML(userText)}</p>
             <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
             Copy
             </button>
         </div>
-      `;
+        `;
 
+    // Create files container if they exist
+    if (fileDataUrl){
+      const fileHtml = `
+      <div class="flex justify-end">
+        <article class="flex flex-rows-1 md:flex-rows-3 bg-cyan-100 w-fit p-1 rounded-lg">
+        ${fileDataUrl && fileType === "image" ? fileDataUrl.map(url => `<img src="${url}" alt="Uploaded Image" class="rounded-md w-14 h-14 my-auto mx-1" />`).join('') : fileType === "document" ? fileDataUrl.map(url => `<div class="inline-flex items-center"><svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16V4a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2zm1-1h4v10h-4V4z"/></svg><span>${url}</span></div>`).join('') : ""}
+        </article>
+      </div>
+      `;
+      const filesContainer = document.createElement("div");
+      filesContainer.className = "flex justify-end";
+      filesContainer.innerHTML = fileHtml;
+      chatArea.appendChild(filesContainer);
+    }
+
+    // Append the user text to the page
     userMessage.innerHTML = messageHtml;
     chatArea.appendChild(userMessage);
   }
@@ -205,7 +221,7 @@ class ConversationManager {
     //console.log(content)
     aiMessage.innerHTML = `
     <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-        <div class="${aiMessageId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${window.marked(content)}
+        <div class="${aiMessageId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${window.marked(content)}
         </div>
         <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
             <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
@@ -252,8 +268,7 @@ class ConversationManager {
     //const fileDataUrl = this.getFileUrl(content);
    visionMessage.innerHTML = `
         <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-          <div class="${visionMessageId} bg-gray-200 text-gray-800 dark:bg-gradient-to-tl dark:from-blue-500 dark:to-sky-500 dark:text-black rounded-lg shadow-md dark:shadow-blue-500 px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">
-            <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${marked(content[0].text)}</p>
+          <div class="${visionMessageId} bg-gray-200 text-gray-800 dark:bg-[#0c0b1a] dark:text-gray-300 rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(content[0].text)}</p>
           </div>
           <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
             <div class="opacity-70 hover:opacity-100 p-1" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
@@ -326,8 +341,8 @@ async function fetchConversations() {
         if (window.electron.getExt(file) === '.json') {
           const conversationId = window.electron.getBasename(file, '.json');
           const conversationItem = document.createElement('div');
-          const color = (index <= colors.length-1) ? colors[index] : colors[random(0, colors.length)]
-          conversationItem.classList.add('p-2', color, 'transition-transform', 'tranform', 'hover:scale-105', 'transition', 'duration-600', 'ease-in-out', 'scale-100', 'infinite', 'hover:bg-blue-800', 'decoration-underline', 'decoration-pink-400', 'dark:decoration-fuchsia-500', 'dark:hover:bg-cyan-700', 'cursor-pointer', 'rounded-lg', "space-y-2","w-full");
+          const color = (index <= colors.length-1) ? colors[index] : colors[Math.floor(Math.random() * colors.length)]
+          conversationItem.classList.add('p-2', color, 'transition-transform', "text-black", 'tranform', 'hover:scale-105', 'transition', 'duration-600', 'ease-in-out', 'scale-100', 'infinite', 'hover:bg-blue-800', 'decoration-underline', 'decoration-pink-400', 'dark:decoration-fuchsia-500', 'dark:hover:bg-cyan-700', 'cursor-pointer', 'rounded-lg', "space-y-2","w-full", "sm:w-[90%]", "md:w-[80%]", "lg:w-[90%]", "whitespace-nowrap", "max-w-full", "overflow-auto", "scrollbar-hide");
           conversationItem.setAttribute('data-text', conversationId);
           conversationItem.textContent = conversationId;
           conversationItem.onclick = () => renderConversationFromFile(conversationItem, conversationId);
