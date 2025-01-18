@@ -317,6 +317,9 @@ function initChat(client) {
                 chatArea.appendChild(aiMessage);
                 AutoScroll.checked ? scrollToBottom(chatArea) : null;
                 //console.log(JSON.stringify(window.electron.getChat()), null, 4);
+
+                const _Timer = new Timer();
+
                 try {
                     const stream = client.chatCompletionStream({
                         model: model,
@@ -327,6 +330,8 @@ function initChat(client) {
                     window.processing = true;
                     // change send button appearance to processing status
                     HandleProcessingEventChanges()
+                    //start timer
+                    _Timer.trackTime("start");
                     for await (const chunk of stream) {
                         const choice = chunk?.choices?.[0];
                         if (choice?.delta?.content) {
@@ -375,6 +380,9 @@ function initChat(client) {
                         }
                     }
 
+                    //stop timer
+                    _Timer.trackTime("stop");
+
                     // Resent send button appearance
                     window.processing = false;
                     HandleProcessingEventChanges()
@@ -410,6 +418,8 @@ function initChat(client) {
 
     async function VisionChat(text, fileType, fileDataUrl = null) {
         console.log(fileDataUrl.length)
+        const _Timer = new Timer();
+
         //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
         //switch to vission model
         modeSelect.value = "Vision"
@@ -500,6 +510,8 @@ function initChat(client) {
             window.processing = true;
             // change send button appearance to processing status
             HandleProcessingEventChanges()
+            //start timer
+            _Timer.trackTime("start");
             for await (const chunk of visionstream) {
                 const choice = chunk?.choices?.[0];
                 if (choice?.delta?.content) {
@@ -548,6 +560,8 @@ function initChat(client) {
                 }
             }
 
+            //stop timer
+            _Timer.trackTime("stop");
 
             window.processing = false;
             // Resent send button appearance
@@ -563,6 +577,10 @@ function initChat(client) {
             //console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
 
         } catch (error) {
+            //Interrupt timer
+            const _Timer = new Timer();
+            _Timer.trackTime("interrupt");
+
             window.processing = false;
             // change send button appearance to processing status
             HandleProcessingEventChanges()
@@ -692,6 +710,9 @@ function initChat(client) {
 
     function handleRequestError(error, userMessage, aiMessage) {
         try {
+            //start timer
+            const _Timer = new Timer();
+            _Timer.trackTime("interrupt");
             window.processing = false;
             // change send button appearance to processing status
             HandleProcessingEventChanges()
@@ -953,4 +974,47 @@ function HandleProcessingEventChanges(){
     }
 }
 
+class Timer {
+    constructor() {
+        this.startTime = undefined;
+    }
 
+    trackTime(action) {
+        // Store the start time
+        if (action === 'start') {
+            this.startTime = performance.now();
+            console.log('Timer started.');
+        }
+        // Calculate the elapsed time
+        else if (action === 'stop') {
+            if (this.startTime === undefined) {
+                console.log('Timer was not started.');
+                return null;
+            }
+            const endTime = performance.now();
+            const timeTaken = endTime - this.startTime;
+            console.log(`Time taken: ${timeTaken} milliseconds`);
+            delete this.startTime; // Clean up
+
+            // Ensure window.Notify is defined before calling it
+            if (typeof window.Notify === 'function') {
+                const seconds = Math.floor(timeTaken / 1000) % 60;
+                const milliseconds = Math.floor(timeTaken % 1000);
+                window.Notify(null, `${seconds} seconds and ${milliseconds} milliseconds`);
+            } else {
+                console.error('window.Notify is not defined.');
+            }
+
+            return timeTaken;
+        }
+        // Interrupt the timer
+        else if (action === 'interrupt') {
+            delete this.startTime;
+        }
+        // Invalid action
+        else {
+            console.log('Invalid action. Use "start" to start the timer and "stop" to stop the timer.');
+            return null;
+        }
+    }
+}

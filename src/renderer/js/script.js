@@ -450,11 +450,14 @@ displayPref();
 });
 
 // Function to show the modal
-function Notify(_color=null, text="") {
+function Notify(_color=null, time=null, text="") {
     const modal = document.getElementById('quickaiNotify');
     const message = document.getElementById('messageContent');
+    const timeTaken = document.getElementById('timeTaken');
     if (text){
         message.innerText = text;
+    } else if(time){
+        timeTaken.innerText = time;
     }
     // Slide modal to 20% height and make it visible after 1 second
     setTimeout(() => {
@@ -475,6 +478,9 @@ function Notify(_color=null, text="") {
     }, 1000); // 0.5s for fade out
 }
 
+
+//Store Notify to window
+window.Notify = Notify;
 //Handle custom model selection
 document.addEventListener('DOMContentLoaded', function() {
     const modeButton = document.getElementById('modeButton');

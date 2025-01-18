@@ -98,6 +98,9 @@
   "build": {
     "appId": "com.quickai.app",
     "productName": "QuickAi",
+    "electronDownload": {
+      "cache": true
+    },
     "mac": {
       "target": [
         "dmg"
