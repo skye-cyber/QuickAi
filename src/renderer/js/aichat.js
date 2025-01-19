@@ -733,39 +733,6 @@ function initChat(client) {
                 const retry = document.getElementById('retry');
                 const lastMessage = window.electron.getChat().slice(-1)[0]?.content; // Safely access the last message
 
-                function HideErrorModal(){
-                    // Slide modal to the left and fade out
-                    setTimeout(() => {
-                        modal.classList.remove('top-1/5', 'left-1/2', '-translate-x-1/2');
-                        modal.classList.add('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
-
-                    }, 4000); // 4 seconds for staying in the middle
-
-                    // Reset transform after fully fading out and moving off-screen
-                    setTimeout(() => {
-                        modal.classList.remove('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
-                        modal.classList.add('top-0', 'left-1/2', '-translate-x-1/2', 'pointer-events-none');
-                    }, 1000); // 0.5s for fade out
-
-                    if (aiMessage){
-                        if (aiMessage.firstElementChild.id === "loader-parent"){
-                            console.log("Removing loader")
-                            aiMessage.remove();
-                            userMessage.remove();
-                            errorContainer.classList.add('hidden');
-                        }
-                    }
-                }
-                // Remove existing event listeners before adding a new one
-                const retryHandler = () => {
-                    // Retry action
-                    classifyText(lastMessage);
-
-                    //console.log('Retry action triggered with:', lastMessage);
-                    HideErrorModal()
-                    if (aiMessage) aiMessage.remove();
-                    if (userMessage) userMessage.remove();
-                };
                 //window.retryHandler=retryHandler;
                 retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
                 const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
@@ -775,15 +742,45 @@ function initChat(client) {
                     HideErrorModal();
                 });
 
-                // Function to show the modal with an error message
                 function showError() {
                     setTimeout(() => {
                         errorContainer.classList.add('top-1/5', 'opacity-100', 'pointer-events-auto');
-                    }, 300); // 1 second delay
-                    errorArea.textContent = "An error occurred during response. Retry?";
+                    }, 200); // 0.3 second delay
+                    errorArea.textContent = "Error during response click to Retry?";
                     window.electron.popFromChat(); // Remove the last conversation entry
                 }
 
+                function HideErrorModal() {
+                    // Slide modal to the left and fade out
+                    setTimeout(() => {
+                        errorContainer.classList.remove('top-1/5', 'left-1/2', '-translate-x-1/2');
+                    errorContainer.classList.add('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
+                    }, 1000); // 4 seconds for staying in the middle
+
+                    // Reset transform after fully fading out and moving off-screen
+                    setTimeout(() => {
+                        errorContainer.classList.remove('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
+                    errorContainer.classList.add('top-0', 'left-1/2', '-translate-x-1/2', 'pointer-events-none');
+                    }, 5000); // 1 second for reset
+
+                    if (aiMessage && aiMessage.firstElementChild.id === "loader-parent") {
+                        //console.log("Removing loader");
+                        aiMessage.remove();
+                        userMessage.remove();
+                        errorContainer.classList.add('hidden');
+                    }
+                }
+                // Remove existing event listeners before adding a new one
+                const retryHandler = () => {
+                    //console.log('Retry action triggered with:', lastMessage);
+                    HideErrorModal()
+
+                    // Retry action
+                    classifyText(lastMessage);
+
+                    if (aiMessage) aiMessage.remove();
+                    if (userMessage) userMessage.remove();
+                };
                 showError();
             }
         } catch (err) {

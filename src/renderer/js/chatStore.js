@@ -1,7 +1,3 @@
-//const { electron } = require("process");
-
-//const { random } = require("lodash");
-
 const storagePath = window.electron.joinPath(window.electron.home_dir(), '.quickai.store');
 const chatArea = document.getElementById('chatArea');
 const conversationsPanel = document.getElementById('conversations');
@@ -446,7 +442,6 @@ async function renderConversationFromFile(item, conversationId) {
 
 // Listen for updates messages from ipc for Chat models and update the history files
 window.electron.receive('fromMain-ToChat', (data) => {
-  console.log("Chat")
   let Chat = data
   try {
     let conversationId = window.electron.getSuperCId() || window.electron.getNewChatUUId();

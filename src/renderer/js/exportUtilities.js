@@ -4,8 +4,6 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { toJpeg } from 'html-to-image';
 import { saveAs } from 'file-saver';
-//import htmlDocx from 'html-docx-js';
-//import { toPng, toJpeg, toBlob, toCanvas, toPixelData, toSvg, getFontEmbedCSS } from 'html-to-image';
 
 function HTML2Word(event, selector) {
     event.preventDefault(); // Prevent the default action of the anchor tag

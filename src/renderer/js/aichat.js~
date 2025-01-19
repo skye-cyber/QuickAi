@@ -317,6 +317,9 @@ function initChat(client) {
                 chatArea.appendChild(aiMessage);
                 AutoScroll.checked ? scrollToBottom(chatArea) : null;
                 //console.log(JSON.stringify(window.electron.getChat()), null, 4);
+
+                const _Timer = new Timer();
+
                 try {
                     const stream = client.chatCompletionStream({
                         model: model,
@@ -327,6 +330,8 @@ function initChat(client) {
                     window.processing = true;
                     // change send button appearance to processing status
                     HandleProcessingEventChanges()
+                    //start timer
+                    _Timer.trackTime("start");
                     for await (const chunk of stream) {
                         const choice = chunk?.choices?.[0];
                         if (choice?.delta?.content) {
@@ -334,7 +339,7 @@ function initChat(client) {
                             // Update innerHTML with marked output
                             aiMessage.innerHTML = `
                             <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-                                <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-[#0c0b1a] dark:text-gray-300 rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(output)}
+                                <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(output)}
                                 </div>
                                 <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
                                     <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
@@ -375,6 +380,9 @@ function initChat(client) {
                         }
                     }
 
+                    //stop timer
+                    _Timer.trackTime("stop");
+
                     // Resent send button appearance
                     window.processing = false;
                     HandleProcessingEventChanges()
@@ -410,6 +418,8 @@ function initChat(client) {
 
     async function VisionChat(text, fileType, fileDataUrl = null) {
         console.log(fileDataUrl.length)
+        const _Timer = new Timer();
+
         //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
         //switch to vission model
         modeSelect.value = "Vision"
@@ -500,6 +510,8 @@ function initChat(client) {
             window.processing = true;
             // change send button appearance to processing status
             HandleProcessingEventChanges()
+            //start timer
+            _Timer.trackTime("start");
             for await (const chunk of visionstream) {
                 const choice = chunk?.choices?.[0];
                 if (choice?.delta?.content) {
@@ -548,6 +560,8 @@ function initChat(client) {
                 }
             }
 
+            //stop timer
+            _Timer.trackTime("stop");
 
             window.processing = false;
             // Resent send button appearance
@@ -563,6 +577,10 @@ function initChat(client) {
             //console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
 
         } catch (error) {
+            //Interrupt timer
+            const _Timer = new Timer();
+            _Timer.trackTime("interrupt");
+
             window.processing = false;
             // change send button appearance to processing status
             HandleProcessingEventChanges()
@@ -692,6 +710,9 @@ function initChat(client) {
 
     function handleRequestError(error, userMessage, aiMessage) {
         try {
+            //start timer
+            const _Timer = new Timer();
+            _Timer.trackTime("interrupt");
             window.processing = false;
             // change send button appearance to processing status
             HandleProcessingEventChanges()
@@ -712,39 +733,6 @@ function initChat(client) {
                 const retry = document.getElementById('retry');
                 const lastMessage = window.electron.getChat().slice(-1)[0]?.content; // Safely access the last message
 
-                function HideErrorModal(){
-                    // Slide modal to the left and fade out
-                    setTimeout(() => {
-                        modal.classList.remove('top-1/5', 'left-1/2', '-translate-x-1/2');
-                        modal.classList.add('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
-
-                    }, 4000); // 4 seconds for staying in the middle
-
-                    // Reset transform after fully fading out and moving off-screen
-                    setTimeout(() => {
-                        modal.classList.remove('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
-                        modal.classList.add('top-0', 'left-1/2', '-translate-x-1/2', 'pointer-events-none');
-                    }, 1000); // 0.5s for fade out
-
-                    if (aiMessage){
-                        if (aiMessage.firstElementChild.id === "loader-parent"){
-                            console.log("Removing loader")
-                            aiMessage.remove();
-                            userMessage.remove();
-                            errorContainer.classList.add('hidden');
-                        }
-                    }
-                }
-                // Remove existing event listeners before adding a new one
-                const retryHandler = () => {
-                    // Retry action
-                    classifyText(lastMessage);
-
-                    //console.log('Retry action triggered with:', lastMessage);
-                    HideErrorModal()
-                    if (aiMessage) aiMessage.remove();
-                    if (userMessage) userMessage.remove();
-                };
                 //window.retryHandler=retryHandler;
                 retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
                 const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
@@ -754,15 +742,45 @@ function initChat(client) {
                     HideErrorModal();
                 });
 
-                // Function to show the modal with an error message
                 function showError() {
                     setTimeout(() => {
                         errorContainer.classList.add('top-1/5', 'opacity-100', 'pointer-events-auto');
-                    }, 300); // 1 second delay
-                    errorArea.textContent = "An error occurred during response. Retry?";
+                    }, 200); // 0.3 second delay
+                    errorArea.textContent = "Error during response click to Retry?";
                     window.electron.popFromChat(); // Remove the last conversation entry
                 }
 
+                function HideErrorModal() {
+                    // Slide modal to the left and fade out
+                    setTimeout(() => {
+                        errorContainer.classList.remove('top-1/5', 'left-1/2', '-translate-x-1/2');
+                    errorContainer.classList.add('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
+                    }, 1000); // 4 seconds for staying in the middle
+
+                    // Reset transform after fully fading out and moving off-screen
+                    setTimeout(() => {
+                        errorContainer.classList.remove('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
+                    errorContainer.classList.add('top-0', 'left-1/2', '-translate-x-1/2', 'pointer-events-none');
+                    }, 5000); // 1 second for reset
+
+                    if (aiMessage && aiMessage.firstElementChild.id === "loader-parent") {
+                        console.log("Removing loader");
+                        aiMessage.remove();
+                        userMessage.remove();
+                        errorContainer.classList.add('hidden');
+                    }
+                }
+                // Remove existing event listeners before adding a new one
+                const retryHandler = () => {
+                    //console.log('Retry action triggered with:', lastMessage);
+                    HideErrorModal()
+
+                    // Retry action
+                    classifyText(lastMessage);
+
+                    if (aiMessage) aiMessage.remove();
+                    if (userMessage) userMessage.remove();
+                };
                 showError();
             }
         } catch (err) {
@@ -953,4 +971,47 @@ function HandleProcessingEventChanges(){
     }
 }
 
+class Timer {
+    constructor() {
+        this.startTime = undefined;
+    }
 
+    trackTime(action) {
+        // Store the start time
+        if (action === 'start') {
+            this.startTime = performance.now();
+            console.log('Timer started.');
+        }
+        // Calculate the elapsed time
+        else if (action === 'stop') {
+            if (this.startTime === undefined) {
+                console.log('Timer was not started.');
+                return null;
+            }
+            const endTime = performance.now();
+            const timeTaken = endTime - this.startTime;
+            console.log(`Time taken: ${timeTaken} milliseconds`);
+            delete this.startTime; // Clean up
+
+            // Ensure window.Notify is defined before calling it
+            if (typeof window.Notify === 'function') {
+                const seconds = Math.floor(timeTaken / 1000) % 60;
+                const milliseconds = Math.floor(timeTaken % 1000);
+                window.Notify(null, `${seconds} seconds and ${milliseconds} milliseconds`);
+            } else {
+                console.error('window.Notify is not defined.');
+            }
+
+            return timeTaken;
+        }
+        // Interrupt the timer
+        else if (action === 'interrupt') {
+            delete this.startTime;
+        }
+        // Invalid action
+        else {
+            console.log('Invalid action. Use "start" to start the timer and "stop" to stop the timer.');
+            return null;
+        }
+    }
+}
