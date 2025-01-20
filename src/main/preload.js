@@ -190,7 +190,7 @@ contextBridge.exposeInMainWorld('electron', {
     },
     read: async (path, model) => {
         try {
-            console.log(model)
+            //console.log(model)
             if (fs.statSync) {
                 let data = JSON.parse(fs.readFileSync(path, 'utf-8'));
                 let sysInst = model === "text" ? ChatconversationHistory : VconversationHistory;

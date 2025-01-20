@@ -196,7 +196,6 @@ contextBridge.exposeInMainWorld('electron', {
                 let sysInst = model === "text" ? ChatconversationHistory : VconversationHistory;
                 // Add compartibility feature to maintaain conversations instegrity!
                 if (data[0].role !== "system") data.unshift(sysInst[0]);
-                console.log(data)
                 return data
             }
         } catch (err) {

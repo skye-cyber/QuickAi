@@ -56,18 +56,18 @@ function initChat(client) {
         try {
             highlighted = hljs.highlight(code, { language: validLanguage }).value;
         } catch (error) {
-            if (error.name === "Highlighting error"){
+            if (error.message === "Unknown language"){
                 console.log("Undetermined language")
             }
             else{
-                console.error("Highlighting error:", error);
+                console.error("Highlighting error:", error.name);
                 highlighted = hljs.highlightAuto(code).value; // Fallback to auto-detection
             }
         }
 
         // Generate unique ID for the copy button
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(2, 9)}`;
-        const bg = validLanguage && ['css', 'html'].includes(validLanguage) ? 'dark:bg-[#000000]' : 'dark:bg-[#161420]';
+        //const bg = validLanguage && ['css', 'html'].includes(validLanguage) ? 'dark:bg-[#000000]' : 'dark:bg-[#161420]';
 
         return `
         <div class="my-2 block bg-gray-200 dark:bg-zinc-800  rounded-md">
