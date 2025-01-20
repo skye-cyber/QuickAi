@@ -339,6 +339,7 @@ async function fetchConversations() {
 
   try {
     const files = await window.electron.readDir(storagePath);
+
     if (files.length > 0) {
       conversationsPanel.innerHTML = ''; // Clear the pane if conversations exist
       // Define the colors you want to cycle through
@@ -350,6 +351,7 @@ async function fetchConversations() {
           const color = (index <= colors.length-1) ? colors[index] : colors[Math.floor(Math.random() * colors.length)]
           conversationItem.classList.add('p-2', color, 'transition-transform', "text-black", 'tranform', 'hover:scale-105', 'transition', 'duration-600', 'ease-in-out', 'scale-100', 'infinite', 'hover:bg-blue-800', 'decoration-underline', 'decoration-pink-400', 'dark:decoration-fuchsia-500', 'dark:hover:bg-cyan-700', 'cursor-pointer', 'rounded-lg', "space-y-2","w-full", "sm:w-[90%]", "md:w-[80%]", "lg:w-[90%]", "whitespace-nowrap", "max-w-full", "overflow-auto", "scrollbar-hide");
           conversationItem.setAttribute('data-text', conversationId);
+
           conversationItem.textContent = conversationId;
           conversationItem.onclick = () => renderConversationFromFile(conversationItem, conversationId);
           conversationsPanel.appendChild(conversationItem);
@@ -410,6 +412,8 @@ async function fetchConversations() {
               });
 
               newNameInput.addEventListener('keypress', (event) => {
+                event.preventDefault()
+                event.stopPropagation()
                 if (event.key === 'Enter') {
                   renameButton.click();
                 }
@@ -418,9 +422,6 @@ async function fetchConversations() {
             });
           });
         }
-        Array.from(conversationsPanel.firstChild).forEach((child) =>
-        console.log(child)
-        )
 
     }
     } else {
