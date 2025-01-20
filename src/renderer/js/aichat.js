@@ -56,8 +56,13 @@ function initChat(client) {
         try {
             highlighted = hljs.highlight(code, { language: validLanguage }).value;
         } catch (error) {
-            console.error("Highlighting error:", error);
-            highlighted = hljs.highlightAuto(code).value; // Fallback to auto-detection
+            if (error.name === "Highlighting error"){
+                console.log("Undetermined language")
+            }
+            else{
+                console.error("Highlighting error:", error);
+                highlighted = hljs.highlightAuto(code).value; // Fallback to auto-detection
+            }
         }
 
         // Generate unique ID for the copy button

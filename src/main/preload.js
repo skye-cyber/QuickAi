@@ -179,6 +179,8 @@ contextBridge.exposeInMainWorld('electron', {
     },
     write: async (path, data) => {
         try {
+            // Remove system instructions before saving
+            data.shift()
             fs.writeFileSync(path, data);
             return true;
         } catch (err) {
@@ -186,10 +188,15 @@ contextBridge.exposeInMainWorld('electron', {
             return false;
         }
     },
-    read: async (path) => {
+    read: async (path, model) => {
         try {
+            console.log(model)
             if (fs.statSync) {
-                return JSON.parse(fs.readFileSync(path, 'utf-8'));
+                let data = JSON.parse(fs.readFileSync(path, 'utf-8'));
+                let sysInst = model === "text" ? ChatconversationHistory : VconversationHistory;
+                // Add compartibility feature to maintaain conversations instegrity!
+                if (data[0].role !== "system") data.unshift(sysInst[0]);
+                return data
             }
         } catch (err) {
             console.log(err);

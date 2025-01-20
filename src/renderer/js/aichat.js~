@@ -56,8 +56,12 @@ function initChat(client) {
         try {
             highlighted = hljs.highlight(code, { language: validLanguage }).value;
         } catch (error) {
-            console.error("Highlighting error:", error);
-            highlighted = hljs.highlightAuto(code).value; // Fallback to auto-detection
+            if (error.name === "Highlighting error"){
+                console.log("Undetermined language")
+            }
+            else{
+                console.error("Highlighting error:", error);
+                highlighted = hljs.highlightAuto(code).value; // Fallback to auto-detection
         }
 
         // Generate unique ID for the copy button
@@ -773,7 +777,7 @@ function initChat(client) {
                     setTimeout(() => {
                         errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
                     }, 200); // 0.3 second delay
-                    const ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check you Internet!    " : error.message;
+                    const ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check you Internet!" : error.message;
                     errorArea.textContent = ErrorMs;
                     window.electron.popFromChat(); // Remove the last conversation entry
                 }

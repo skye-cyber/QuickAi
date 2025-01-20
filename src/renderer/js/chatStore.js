@@ -48,8 +48,8 @@ class ConversationManager {
     const filePath = `${this.storagePath}/${conversationId}.json`;
     try {
       if (window.electron.stat(filePath)) {
-        const data = await window.electron.read(filePath);
         const model = conversationId.startsWith('V') ? "Vision" : "text";
+        const data = await window.electron.read(filePath, model);
         return [data, model]
       }
     } catch (err) {
@@ -122,18 +122,29 @@ class ConversationManager {
 
       // Find the item with type "image_url" or "file_url"
       const fileTypeItem = content.find(item => item.type === "image_url" || item.type === "file_url");
-      console.log(content.find(item => item.type))
+
+      // Log the type of the found item
+      console.log(fileTypeItem?.type);
+
       // Check if the found item exists and has a valid type
       if (fileTypeItem && fileDict[fileTypeItem.type]) {
         return fileDict[fileTypeItem.type];
       }
 
+      // If no valid file type is found, log and return null
+      console.log('No file attachment!');
       return null;
+
     } catch (error) {
-      console.error("Error determining file type:", error);
+      if (error.name === "TypeError") {
+        console.log('No file attachment!');
+      } else {
+        console.error("Error determining file type:", error.name);
+      }
       return null;
     }
   }
+
 getFileUrl(content) {
   try {
     // Find the item with type "image_url"
@@ -317,8 +328,6 @@ getFileUrl(content) {
         }
 }
 const conversationManager = new ConversationManager(storagePath);
-//let conversationHistory = window.electron.getChat();
-//let VconversationHistory = window.electron.getVisionChat();
 
 // Function to fetch conversation files and display their IDs
 async function fetchConversations() {
