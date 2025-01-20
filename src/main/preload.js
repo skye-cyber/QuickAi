@@ -181,6 +181,9 @@ contextBridge.exposeInMainWorld('electron', {
         try {
             // Remove system instructions before saving
             data.shift()
+
+            data = JSON.stringify(data, null, 2)
+
             fs.writeFileSync(path, data);
             return true;
         } catch (err) {

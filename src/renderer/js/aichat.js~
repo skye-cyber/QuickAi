@@ -60,7 +60,7 @@ function initChat(client) {
                 console.log("Undetermined language")
             }
             else{
-                console.error("Highlighting error:", error.message);
+                console.error("Highlighting error:", error.name);
                 highlighted = hljs.highlightAuto(code).value; // Fallback to auto-detection
             }
         }
@@ -177,12 +177,11 @@ function initChat(client) {
         const isImageRequest = text.startsWith("/image");
         const escapedText = escapeHTML(text);
         const mode = modeSelect.value;
-
         // Display user message
         const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
         const userMessage = document.createElement("div");
-        if (mode === "Vision"){
+        if (mode === "vision"){
             VisionChat(text=text)
 
         } else {
@@ -293,7 +292,7 @@ function initChat(client) {
                 }
             } else {
                 let model = "Qwen/Qwen2.5-72B-Instruct";
-                if (mode === 'Coding mode') {
+                if (mode === 'coding') {
                     model = "Qwen/Qwen2.5-Coder-32B-Instruct";
                 }
 

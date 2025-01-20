@@ -180,7 +180,11 @@ contextBridge.exposeInMainWorld('electron', {
     write: async (path, data) => {
         try {
             // Remove system instructions before saving
+             console.log(typeof(data))
             data.shift()
+
+            data = JSON.stringify(data, null, 2)
+
             fs.writeFileSync(path, data);
             return true;
         } catch (err) {
@@ -190,7 +194,7 @@ contextBridge.exposeInMainWorld('electron', {
     },
     read: async (path, model) => {
         try {
-            console.log(model)
+            //console.log(model)
             if (fs.statSync) {
                 let data = JSON.parse(fs.readFileSync(path, 'utf-8'));
                 let sysInst = model === "text" ? ChatconversationHistory : VconversationHistory;

@@ -37,7 +37,7 @@ class ConversationManager {
     //console.log(JSON.stringify(conversationData))
     try {
       //console.log("Saving: " + conversationId + filePath)
-      await window.electron.write(filePath, JSON.stringify(conversationData, null, 2));
+      await window.electron.write(filePath, conversationData);
     } catch (err) {
       console.error('Error saving conversation:', err);
     }

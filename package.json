@@ -1,6 +1,6 @@
 {
   "name": "QuickAi",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "An application to interact with AI assistants for free.",
   "main": "src/main/index.js",
   "homepage": "home.html",

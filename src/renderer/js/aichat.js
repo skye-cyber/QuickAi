@@ -182,7 +182,7 @@ function initChat(client) {
         const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
         const userMessage = document.createElement("div");
-        if (mode === "Vision"){
+        if (mode === "vision"){
             VisionChat(text=text)
 
         } else {
@@ -293,7 +293,7 @@ function initChat(client) {
                 }
             } else {
                 let model = "Qwen/Qwen2.5-72B-Instruct";
-                if (mode === 'Coding mode') {
+                if (mode === 'coding') {
                     model = "Qwen/Qwen2.5-Coder-32B-Instruct";
                 }
 
