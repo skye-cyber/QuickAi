@@ -165,7 +165,7 @@ getFileUrl(content) {
     const fileType = this.getFileType(content);
     var fileDataUrl = null;
     var userText = null;
-    console.log(fileType)
+    //console.log(fileType)
     if (fileType){
       fileDataUrl = this.getFileUrl(content);
     }
@@ -264,7 +264,7 @@ getFileUrl(content) {
     //const fileDataUrl = this.getFileUrl(content);
    visionMessage.innerHTML = `
         <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-          <div class="${visionMessageId} bg-gray-200 text-gray-800 dark:bg-[#0c0b1a] dark:text-gray-300 rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(content[0].text)}</p>
+          <div class="${visionMessageId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(content[0].text)}</p>
           </div>
           <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
             <div class="opacity-70 hover:opacity-100 p-1" id="exportButton" onclick="toggleExportOptions(this);" title="Export">

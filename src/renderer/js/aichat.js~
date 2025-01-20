@@ -730,51 +730,73 @@ function initChat(client) {
                 const errorContainer = document.getElementById('errorContainer');
                 const errorArea = document.getElementById('errorArea');
                 const closeModal = document.getElementById('closeEModal');
-                const retry = document.getElementById('retry');
-                const lastMessage = window.electron.getChat().slice(-1)[0]?.content; // Safely access the last message
+                const retry = document.getElementById('retryBt');
+                let lastMessage = window.electron.getChat().slice(-1)[0]?.content; // Safely access the last message
 
-                //window.retryHandler=retryHandler;
-                retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
-                const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
-                newRetry.addEventListener('click', retryHandler);
+                function HideLoaderUserAiMs(all=false){
+                    //Remove loading animation if present
+                    if (aiMessage){
+                        if (aiMessage.firstElementChild.id === "loader-parent"){
+                            if (all){
+                                userMessage.remove();
+                            } else{
+                                aiMessage.remove();
+                            }
+                        }
+                    }
+                }
+
+                // Initially remove loader
+                HideLoaderUserAiMs();
+
+                // Clone the retry button and replace the original one
+                const clonedRetry = retry.cloneNode(true);
+                retry.replaceWith(clonedRetry);
+
+                // Remove all event listeners from the cloned button
+                const newRetry = document.getElementById('retryBt');
+                //console.log(newRetry);
+                newRetry.removeEventListener('click', retryHandler);
+
+                // Re-attach the click event listener
+                newRetry.addEventListener('click', function() {
+                    //console.log("Clicked");
+                    retryHandler();
+                });
 
                 closeModal.addEventListener('click', () => {
                     HideErrorModal();
+                    HideLoaderUserAiMs(true);
                 });
 
                 function showError() {
                     setTimeout(() => {
-                        errorContainer.classList.add('top-1/5', 'opacity-100', 'pointer-events-auto');
+                        errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
                     }, 200); // 0.3 second delay
-                    errorArea.textContent = "Error during response click to Retry?";
+                    const ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check you Internet!    " : error.message;
+                    errorArea.textContent = ErrorMs;
                     window.electron.popFromChat(); // Remove the last conversation entry
                 }
 
-                function HideErrorModal() {
+                async function HideErrorModal() {
                     // Slide modal to the left and fade out
                     setTimeout(() => {
-                        errorContainer.classList.remove('top-1/5', 'left-1/2', '-translate-x-1/2');
-                    errorContainer.classList.add('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
-                    }, 1000); // 4 seconds for staying in the middle
+                        errorContainer.classList.remove('left-1/2', '-translate-x-1/2');
+                        errorContainer.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
+                    }, 0);
 
                     // Reset transform after fully fading out and moving off-screen
                     setTimeout(() => {
-                        errorContainer.classList.remove('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
-                    errorContainer.classList.add('top-0', 'left-1/2', '-translate-x-1/2', 'pointer-events-none');
-                    }, 5000); // 1 second for reset
-
-                    if (aiMessage && aiMessage.firstElementChild.id === "loader-parent") {
-                        console.log("Removing loader");
-                        aiMessage.remove();
-                        userMessage.remove();
-                        errorContainer.classList.add('hidden');
-                    }
+                        errorContainer.classList.remove('opacity-100', '-translate-x-full');
+                        errorContainer.classList.add('-translate-x-1/2');
+                    }, 0); // 1 second for reset
                 }
                 // Remove existing event listeners before adding a new one
-                const retryHandler = () => {
-                    //console.log('Retry action triggered with:', lastMessage);
-                    HideErrorModal()
+                async function retryHandler(){
+                    await HideErrorModal()
 
+                    // Strip date && time from user message
+                    lastMessage = lastMessage.slice(-1)===']' ? lastMessage.slice(0, lastMessage.length - 22) : lastMessage;
                     // Retry action
                     classifyText(lastMessage);
 

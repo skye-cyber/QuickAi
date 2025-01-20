@@ -55,18 +55,18 @@
     </div>
 
     <!-- Error Modal -->
-    <div id="errorContainer" role="alert" aria-modal="true" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 opacity-0 pointer-events-none transition-all duration-500 ease-in-out p-4">
+    <div id="errorContainer" role="alert" aria-modal="true" class="fixed top-0 left-0 transform -translate-x-1/2 z-50 opacity-0 pointer-events-none transition-all duration-500 ease-in-out p-4">
     <!-- Modal content -->
-    <div class="bg-[#fea97f] p-6 rounded-lg shadow-lg max-w-md w-full">
+    <div class="bg-[#fea97f] p-4 rounded-lg shadow-lg max-w-md w-full">
         <h1 class="text-red-500 text-2xl text-center">Error</h1>
         <div class="bg-red-100 border border-red-300 p-4 text-center">
             <p id="errorArea" class="text-red-700 font-bold">Error during Ai Response</p>
             <div class="flex justify-between gap-2 mt-4">
-                <button id="retry" title="Retry" aria-label="Retry" class="bg-red-500 text-white p-2 rounded-lg flex gap-2">
-                    <svg class="loader spin h-8 w-8 stroke-blue-500 hover:stroke-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+                <button id="retryBt" title="Retry" aria-label="Retry" class="bg-red-500 text-white p-2 rounded-lg flex gap-2 hover:bg-green-700">
+                    <svg class="loader spin h-8 w-8 hover:bg-green-400 rounded-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
                         <circle cx="25" cy="25" r="20" class="stroke-[#ffaa00]" stroke-width="5" fill="none"/>
-                        <circle cx="25" cy="25" r="20" stroke-width="5" fill="none" stroke-dasharray="31.4" stroke-dashoffset="0">
-                            <animate attributeName="stroke-dashoffset" from="0" to="31.4" dur="1s" repeatCount="indefinite" />
+                        <circle cx="25" cy="25" r="20" class="stroke-blue-500" stroke-width="5" fill="none" stroke-dasharray="31.4" stroke-dashoffset="0">
+                            <animate attributeName="stroke-dashoffset" from="0" to="360" dur="4s" repeatCount="indefinite" />
                         </circle>
                     </svg>Retry
                 </button>
@@ -182,7 +182,7 @@
     </div>
 
     <!-- Copied feedback modal -->
-    <div id="copyModal" class="fixed top-0 left-1/2 transform -translate-x-1/2 w-4/5 max-w-md bg-white dark:bg-slate-500 text-gray-800 dark:text-gray-100 p-4 shadow-md rounded text-center z-50 opacity-0 pointer-events-none transition-all duration-500 ease-in-out">
+    <div id="copyModal" class="fixed top-0 left-1/2 transform -translate-x-1/2 w-4/5 max-w-md bg-white dark:bg-zinc-700 text-gray-800 dark:text-gray-100 p-4 shadow-md rounded text-center z-50 opacity-0 pointer-events-none transition-all duration-500 ease-in-out">
         <div class="flex items-center justify-center">
             <svg class="w-6 h-6 text-green-500 dark:text-green-400 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -231,26 +231,6 @@
                 </div>
             </div>
         </section>
-<div id="errorContainer" role="alert" aria-modal="true" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 opacity-0 pointer-events-none transition-all  duration-500 ease-in-out p-4">
-                    <!--modal content-->
-                    <div class="bg-[#fea97f] p-6 rounded-lg shadow-lg max-w-md w-full">
-                        <h1 class="text-red-500 text-2xl text-center">Error</h1>
-                        <div class="bg-red-100 border border-red-300 p-4 text-center">
-                        <p id="errorArea" class="text-Red-700 font-bold">Error during Ai Response</p>
-                        <div class="flex justify-between gap-2 mt-4">
-                            <button id="retry" title="Retry" aria-label="Retry" class="bg-red-500 text-white p-2 rounded-lg flex gap-2">
-                                <svg class="loader spin h-8 w-8 stroke-blue-500 hover:stroke-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
-                                    <circle cx="25" cy="25" r="20" class="stroke-[#ffaa00]" stroke-width="5" fill="none"/>
-                                    <circle cx="25" cy="25" r="20" stroke-width="5" fill="none" stroke-dasharray="31.4" stroke-dashoffset="0">
-                                    <animate attributeName="stroke-dashoffset" from="0" to="31.4" dur="1s" repeatCount="indefinite" />
-                                    </circle>
-                                    </svg>Retry
-                                </button>
-                            <button id="closeEModal" class="bg-gray-500 text-white p-2 rounded-lg justify-end">Close</button>
-                        </div>
-                        </div>
-                    </div>
-                </div>
     </section>
 
 
@@ -406,7 +386,7 @@
         </div>
     </div>
 
-        <!-- Settings Modal Background -->
+    <!-- Settings Modal Background -->
     <div id="settingsModal" class="hidden fixed inset-2 z-50 flex items-center justify-center bg-black bg-opacity-60 dark:bg-opacity-80 dark:bg-gray-900 dark:bg-opacity-50" onclick="if (event.target.id === 'settingsModal') {                       this.classList.add('hidden');}">
     <!-- Modal Content -->
     <div class="relative bg-white dark:bg-zinc-900 dark:border-2 dark:border-black dark:shadow-md dark:shadow-black p-6 rounded-lg w-full mx-2 md:mx-auto max-w-md lg:max-w-lg xl:max-w-xl max-h-full">
