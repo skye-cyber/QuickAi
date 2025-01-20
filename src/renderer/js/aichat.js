@@ -422,15 +422,15 @@ function initChat(client) {
 
 
     async function VisionChat(text, fileType, fileDataUrl = null) {
-        console.log(fileDataUrl.length)
         const _Timer = new Timer();
 
         //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
         //switch to vission model
         modeSelect.value = "Vision"
 
+        const fileContainerId = `FCont_${Math.random().toString(35).substring(2, 8)}`;
         // Add user message to chat
-        const userMessage = addUserMessage(text, fileType, fileDataUrl);
+        const userMessage = addUserMessage(text, fileType, fileDataUrl, fileContainerId);
 
         //Add Timestamp
         text = `${text} [${window.electron.getDateTime()} UTC]`
@@ -462,14 +462,14 @@ function initChat(client) {
                     },
                     {
                         type: "file_url",
-                        file_url: {
-                            url: fileDataUrl,
-                        },
+                        files: fileDataUrl.map(_url => ({
+                                url: _url,
+                        }))
                     },
                 ];
             }
         } else {
-            console.log("Url not found");
+            //console.log("Url not found");
             userContent = [
                 {
                     type: "text",
@@ -485,7 +485,7 @@ function initChat(client) {
         });
 
         // Store the last message for retry purposes
-        const lastMessage = userContent;
+        //const lastMessage = userContent;
 
         const VisionMessage = document.createElement("div");
         const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
@@ -494,13 +494,22 @@ function initChat(client) {
 
         // Add loading animation
         VisionMessage.innerHTML = `
-        <div id="loader-parent" class="bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-black rounded-lg p-2 shadow-lg dark:shadow-md dark:shadow-blue-500 p-3 max-w-3xl mb-8">
-        <div class="loader space-x-2 flex">
-        <div class="bg-blue-500 dark:bg-cyan-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"></div>
-        <div class="bg-blue-400 dark:bg-sky-400 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-200"></div>
-        <div class="bg-rose-700 dark:bg-orange-700 w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce-400"></div>
-        </div>
-        </div>
+        <div id="loader-parent">
+                    <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" class="transform scale-75">
+                        <circle cx="12" cy="24" r="4" class="fill-green-500">
+                            <animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" />
+                            <animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="24" cy="24" r="4" class="fill-blue-500">
+                            <animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" begin="-0.4s" />
+                            <animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" begin="-0.4s" />
+                        </circle>
+                        <circle cx="36" cy="24" r="4" class="fill-yellow-500">
+                            <animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" begin="-0.8s" />
+                            <animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" begin="-0.8s" />
+                        </circle>
+                    </svg>
+                </div>
         `;
 
         try {
@@ -582,80 +591,16 @@ function initChat(client) {
             //console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
 
         } catch (error) {
-            //Interrupt timer
-            const _Timer = new Timer();
-            _Timer.trackTime("interrupt");
-
-            window.processing = false;
-            // change send button appearance to processing status
-            HandleProcessingEventChanges()
-            console.log("Error caught:", error);
-            // Get elements for error modal
-            const errorContainer = document.getElementById('errorContainer');
-            const errorArea = document.getElementById('errorArea');
-            const closeModal = document.getElementById('closeEModal');
-            const retry = document.getElementById('retry');
-
-            // Function to show the modal with an error message
-            function showError() {
-                errorContainer.classList.remove('hidden');
-                errorArea.textContent = "An error occurred during response. Retry?";
-                window.electron.popFromVisionChat(); // Remove the last conversation entry
-            }
-
-            // Remove existing event listeners before adding a new one
-            retry.replaceWith(retry.cloneNode(true)); // Reset `retry` to remove all attached event listeners
-            const newRetry = document.getElementById('retry'); // Re-fetch the newly cloned `retry` button
-
-            // Retry action
-            const retryHandler = () => {
-                // Retry action with previous data
-                if (lastMessage) {
-                    const textItem = lastMessage.find(item => item.type === "text");
-                    const text = textItem?.text;
-                    let fileDataUrl = null;
-                    if (fileType === "image"){
-                        const imageItem = lastMessage.find(item => item.type === "image_url");
-                        fileDataUrl = imageItem?.image_url?.url;
-                    } else if (fileType === "document") {
-                        const imageItem = lastMessage.find(item => item.type === "file_url");
-                        fileDataUrl = imageItem?.file_url?.url;
-                    }
-
-                    if (VisionMessage) VisionMessage.remove();
-                    if (userMessage) userMessage.remove();
-                    VisionChat(text, fileType, fileDataUrl);
-                }
-
-                errorContainer.classList.add('hidden');
-            };
-
-            newRetry.addEventListener('click', retryHandler);
-
-            closeModal.addEventListener('click', () => {
-                errorContainer.classList.add('hidden');
-                if (VisionMessage) {
-                    if (VisionMessage.firstElementChild.id === "loader-parent") {
-                        console.log("Loader present");
-                        VisionMessage.remove();
-                        userMessage.remove();
-                        errorContainer.classList.add('hidden');
-                    }
-                }
-            });
-
-            // Show error modal
-            showError();
+        handleRequestError(error, userMessage, VisionMessage, ["VS", fileType, fileContainerId])
         }
     }
 
-    function addUserMessage(text, fileType, fileDataUrl) {
-        console.log(fileDataUrl.length)
+    function addUserMessage(text, fileType, fileDataUrl, fileContainerId) {
         const VisionUserMessageUId = `msg_${Math.random().toString(35).substring(2, 8)}`;
         const VisioncopyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
         const userMessage = document.createElement("div");
         userMessage.classList.add("flex", "justify-end", "mb-4");
-        userMessage.innerHTML = `
+        const messageHtml = `
         <div data-id="${VisionUserMessageUId}" class="${VisionUserMessageUId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
             <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapeHTML(text)}</p>
             <button id="${VisioncopyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${VisionUserMessageUId}', this)">
@@ -667,7 +612,7 @@ function initChat(client) {
         // Create files container if they exist
         if (fileDataUrl){
         const fileHtml = `
-        <div class="flex justify-end">
+        <div id="${fileContainerId}" class="flex justify-end">
             <article class="flex flex-rows-1 md:flex-rows-3 bg-cyan-100 w-fit p-1 rounded-lg">
             ${fileDataUrl && fileType === "image" ? fileDataUrl.map(url => `<img src="${url}" alt="Uploaded Image" class="rounded-md w-14 h-14 my-auto mx-1" />`).join('') : fileType === "document" ? fileDataUrl.map(url => `<div class="inline-flex items-center"><svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16V4a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2zm1-1h4v10h-4V4z"/></svg><span>${url}</span></div>`).join('') : ""}
@@ -679,6 +624,9 @@ function initChat(client) {
         filesContainer.innerHTML = fileHtml;
         chatArea.appendChild(filesContainer);
         }
+        // Append the user text to the page
+        userMessage.innerHTML = messageHtml;
+        chatArea.appendChild(userMessage);
         scrollToBottom(chatArea)
         copyBMan();
         implementUserCopy();
@@ -713,7 +661,7 @@ function initChat(client) {
         }
     }
 
-    function handleRequestError(error, userMessage, aiMessage) {
+    function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
         try {
             //start timer
             const _Timer = new Timer();
@@ -721,11 +669,10 @@ function initChat(client) {
             window.processing = false;
             // change send button appearance to processing status
             HandleProcessingEventChanges()
-            const conversationHistory = window.electron.getChat()
+            const conversationHistory = VS_url ? window.electron.getVisionChat() : window.electron.getChat()
             if (!error.message === "Failed to fetch" && !error.message === "network error") {
                 console.log("History length:", conversationHistory.length);
                 console.log('Error:', JSON.stringify(error, null, 2));
-                console.log(error.details);
             } else {
                 if (error.message === "[object Object]"){
                     removeFirstConversationPairs(conversationHistory);
@@ -736,7 +683,8 @@ function initChat(client) {
                 const errorArea = document.getElementById('errorArea');
                 const closeModal = document.getElementById('closeEModal');
                 const retry = document.getElementById('retryBt');
-                let lastMessage = window.electron.getChat().slice(-1)[0]?.content; // Safely access the last message
+                let lastMessage = conversationHistory.slice(-1); // Safely access the last message
+                console.log(lastMessage)
 
                 function HideLoaderUserAiMs(all=false){
                     //Remove loading animation if present
@@ -751,9 +699,7 @@ function initChat(client) {
                     }
                 }
 
-                // Initially remove loader
                 HideLoaderUserAiMs();
-
                 // Clone the retry button and replace the original one
                 const clonedRetry = retry.cloneNode(true);
                 retry.replaceWith(clonedRetry);
@@ -769,13 +715,19 @@ function initChat(client) {
                     retryHandler();
                 });
 
-                closeModal.addEventListener('click', () => {
+                closeModal.addEventListener('click', (event) => {
+                    event.stopPropagation();
                     HideErrorModal();
                     HideLoaderUserAiMs(true);
+                    if (VS_url[1]) {
+                        const fileContainer = document.getElementById(VS_url[2])
+                        fileContainer.remove();
+                    }
                 });
 
                 function showError() {
                     setTimeout(() => {
+                        errorContainer.classList.remove("hidden");
                         errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
                     }, 200); // 0.3 second delay
                     const ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check you Internet!" : error.message;
@@ -793,17 +745,49 @@ function initChat(client) {
                     // Reset transform after fully fading out and moving off-screen
                     setTimeout(() => {
                         errorContainer.classList.remove('opacity-100', '-translate-x-full');
-                        errorContainer.classList.add('-translate-x-1/2');
+                        errorContainer.classList.add('hidden', '-translate-x-1/2');
                     }, 0); // 1 second for reset
                 }
                 // Remove existing event listeners before adding a new one
                 async function retryHandler(){
                     await HideErrorModal()
 
+                    if (VS_url) {
+
+                        try{
+                            var text = lastMessage[0].content[0].text;
+                            var fileDataUrl = [];
+
+                            if (VS_url[1] === "image") {
+                                const imageItem = lastMessage.find(item => item.type === "image_url");
+                                if (imageItem && imageItem.images) {
+                                    fileDataUrl.push(...imageItem.images.map(image => image.url));
+                                }
+
+                            } else if (VS_url[1] === "image") {
+                                const imageItem = lastMessage.find(item => item.type === "file_url");
+                                if (imageItem && imageItem.images) {
+                                    fileDataUrl.push(...imageItem.files.map(file => file.url));
+                                }
+                            }
+                        } catch (error) {
+                            if (error.name === "TypeError") {
+                                console.log('No file attachment!');
+                            } else {
+                                console.error("Error determining file type:", error);
+                            }
+                        }
+
+                        text = text.slice(-1)===']' ? text.slice(0, text.length - 22) : text;
+                        fileDataUrl = fileDataUrl.length !== 0 ? fileDataUrl : null;
+                        VisionChat(text, VS_url[1], fileDataUrl);
+                    } else {
+
                     // Strip date && time from user message
-                    lastMessage = lastMessage.slice(-1)===']' ? lastMessage.slice(0, lastMessage.length - 22) : lastMessage;
+                    lastMessage = lastMessage[0].content.slice(-1)===']' ? lastMessage[0].content.slice(0, lastMessage[0].content.length - 22) : lastMessage[0].content;
                     // Retry action
-                    classifyText(lastMessage);
+                    classifyText(lastMessage.trim());
+                    }
 
                     if (aiMessage) aiMessage.remove();
                     if (userMessage) userMessage.remove();
