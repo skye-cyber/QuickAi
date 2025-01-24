@@ -283,6 +283,9 @@ document.addEventListener('DOMContentLoaded', function() {
          } else if (event.ctrlKey && event.key === 'f' || event.ctrlKey && event.key === 'F') {
              event.preventDefault(); // Prevent any default action
              attachFiles.click();
+         } else if (event.altKey && event.key === 'a' || event.altKey && event.key === 'A') {
+             event.preventDefault(); // Prevent any default action
+             document.getElementById('AutoScroll').click();
          }
      });
 
