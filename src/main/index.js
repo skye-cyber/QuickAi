@@ -92,6 +92,20 @@ ipcMain.handle('get-buffer-from-iv', (event, iv) => {
     return ivBuffer;
 });
 
+//Handle Documentation shortcut
+ipcMain.handle('show-documentation', () => {
+  const _docWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+    preload: path.join(__dirname, 'preload.js'),
+    nodeIntegration: false,
+    contextIsolation: true
+    }
+  });
+  _docWindow.loadFile(path.join(__dirname, '../assets/documentation.html'));
+});
+
 const template = [
     {
         label: 'File',

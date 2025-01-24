@@ -180,7 +180,6 @@ contextBridge.exposeInMainWorld('electron', {
     write: async (path, data) => {
         try {
             // Remove system instructions before saving
-             console.log(typeof(data))
             data.shift()
 
             data = JSON.stringify(data, null, 2)
@@ -458,3 +457,11 @@ function getFormattedDateTime(reverse=false) {
     return formattedDateTime;
 }
 
+
+document.addEventListener('keydown', (event) => {
+    console.log(event)
+    if (event.ctrlKey && event.key === 'D' || event.ctrlKey && event.key === 'd') {
+        event.preventDefault(); // Prevent any default action
+        ipcRenderer.invoke('show-documentation')
+    }
+});
