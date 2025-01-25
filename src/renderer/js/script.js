@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         script.src = `src/renderer/js/${_script}.js`;
         script.async = true; // Optional: load the script asynchronously
         document.body.appendChild(script);
-        console.log(`Added ${_script} script`);
+        //console.log(`Added ${_script} script`);
     }
 
     // Show settings modal when settings button is clicked
