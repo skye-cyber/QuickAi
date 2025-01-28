@@ -186,7 +186,7 @@ function initChat(client) {
             VisionChat(text=text)
 
         } else {
-            console.log(typeof(escapedText))
+            //console.log(typeof(escapedText))
             userMessage.innerHTML = `
             <div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
             <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${(escapedText)}</p>
@@ -327,6 +327,7 @@ function initChat(client) {
                 const _Timer = new Timer();
 
                 try {
+                    console.log(typeof(window.electron.getChat()))
                     const stream = client.chatCompletionStream({
                         model: model,
                         messages: window.electron.getChat(), //Add conversation in json format to avoid size limitation
@@ -676,6 +677,7 @@ function initChat(client) {
                 console.log('Error:', JSON.stringify(error, null, 2));
             } else {
                 if (error.message === "[object Object]"){
+                    console.log('Error:', error);
                     removeFirstConversationPairs(conversationHistory);
                 }
                 console.log(`Intercepted '${error}'`);
@@ -685,7 +687,7 @@ function initChat(client) {
                 const closeModal = document.getElementById('closeEModal');
                 const retry = document.getElementById('retryBt');
                 let lastMessage = conversationHistory.slice(-1); // Safely access the last message
-                console.log(lastMessage)
+                //console.log(lastMessage)
 
                 function HideLoaderUserAiMs(all=false){
                     //Remove loading animation if present
@@ -731,7 +733,10 @@ function initChat(client) {
                         errorContainer.classList.remove("hidden");
                         errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
                     }, 200); // 0.3 second delay
-                    const ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check you Internet!" : error.message;
+                    let ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check your Internet!" : error.message;
+                    if (error.message === "[object Object]"){
+                        ErrorMs = "This model is unreachabble: It might be overloaded!"
+                    }
                     errorArea.textContent = ErrorMs;
                     window.electron.popFromChat(); // Remove the last conversation entry
                 }
@@ -905,6 +910,7 @@ function initChat(client) {
             if (firstPair.role !== "system") {
                 conversationHistory.shift();
                 removed++;
+                console.log("New conversation:", conversationHistory)
             } else {
                 // Skip system instructions
                 break;

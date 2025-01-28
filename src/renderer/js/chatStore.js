@@ -412,7 +412,7 @@ async function fetchConversations() {
               });
 
               newNameInput.addEventListener('keypress', (event) => {
-                event.preventDefault()
+                //event.preventDefault()
                 event.stopPropagation()
                 if (event.key === 'Enter') {
                   renameButton.click();

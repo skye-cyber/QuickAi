@@ -460,7 +460,7 @@ function getFormattedDateTime(reverse=false) {
 
 document.addEventListener('keydown', (event) => {
     if (event.ctrlKey && event.key === 'D' || event.ctrlKey && event.key === 'd') {
-        event.preventDefault(); // Prevent any default action
+        //event.preventDefault(); // Prevent any default action
         ipcRenderer.invoke('show-documentation')
     }
 });
