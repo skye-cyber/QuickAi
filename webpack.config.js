@@ -65,5 +65,5 @@ module.exports = {
     ],
   },
   devtool: 'source-map', // Consider using source maps for better debugging
-  mode: 'development',
+  mode: 'production',
 };
