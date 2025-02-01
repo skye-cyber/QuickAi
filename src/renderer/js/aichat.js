@@ -178,6 +178,8 @@ function initChat(client) {
         const escapedText = escapeHTML(text);
         const mode = modeSelect.value;
 
+        //let R1 = false
+
         // Display user message
         const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
@@ -293,11 +295,16 @@ function initChat(client) {
                     `;
                 }
             } else {
+
                 let model = "Qwen/Qwen2.5-72B-Instruct";
                 if (mode === 'coding') {
                     model = "Qwen/Qwen2.5-Coder-32B-Instruct";
+                } else if (mode === "DeepSeek-R1"){
+                    model = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B";
+                    //R1 = true
                 }
 
+                console.log(model)
                 const aiMessage = document.createElement("div");
                 aiMessage.innerHTML = `
                 <div id="loader-parent">
@@ -322,31 +329,86 @@ function initChat(client) {
                 aiMessage.classList.add("flex", "justify-start", "mb-12", "overflow-wrap");
                 chatArea.appendChild(aiMessage);
                 AutoScroll.checked ? scrollToBottom(chatArea) : null;
+                const foldId = `think-content-${Math.random().toString(33).substring(3, 9)}`;
+
                 //console.log(JSON.stringify(window.electron.getChat()), null, 4);
 
                 const _Timer = new Timer();
 
                 try {
-                    console.log(typeof(window.electron.getChat()))
-                    const stream = client.chatCompletionStream({
+                    //console.log(typeof(window.electron.getChat()))
+                    const options = {
                         model: model,
-                        messages: window.electron.getChat(), //Add conversation in json format to avoid size limitation
-                        max_tokens:3000
-                    });
+                        messages: window.electron.getChat(), // Add conversation in JSON format to avoid size limitation
+                        max_tokens: 3000
+                    };
+
+                    /*if (R1) {
+                        options.provider = "together";
+                    }*/
+
+                    const stream = client.chatCompletionStream(options);
+
                     let output = "";
                     window.processing = true;
                     // change send button appearance to processing status
                     HandleProcessingEventChanges()
                     //start timer
                     _Timer.trackTime("start");
+
+                    let thinkContent = "";
+                    let actualResponse = "";
+                    let isThinking = false;
+                    let fullResponse = "";
+
                     for await (const chunk of stream) {
                         const choice = chunk?.choices?.[0];
                         if (choice?.delta?.content) {
-                            output += choice.delta.content;
+                            const deltaContent = choice.delta.content;
+                            output += deltaContent;
+                            fullResponse += deltaContent
+
+                            if (!isThinking && output.includes("<think>")) {
+                                isThinking = true;
+                                thinkContent = deltaContent.replace("<think>", "");
+                                output = output.replace("<think>", ""); // Remove <think> from output
+                            } else if (isThinking && deltaContent.includes("</think>")) {
+                                isThinking = false;
+                                thinkContent += deltaContent.replace("</think>", "");
+                                output = output.replace("</think>", ""); // Remove </think> from output
+                            } else if (isThinking) {
+                                thinkContent += deltaContent;
+                            } else {
+                                actualResponse += deltaContent;
+                            }
+
+
                             // Update innerHTML with marked output
                             aiMessage.innerHTML = `
-                            <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-                                <div class="${aiMessageUId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(output)}
+                            <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
+                                ${isThinking || thinkContent ? `
+                                <div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 w-full lg:max-w-6xl">
+                                    <div class="flex items-center justify-between">
+                                        <strong style="color: #007bff;">Thinking:</strong>
+                                        <button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
+                                            <p class="flex">Fold
+                                                <svg class="mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="32" height="38" class="fold-icon">
+                                                    <path class="fill-blue-400 dark:fill-yellow-400" d="M6 9h12l-6 6z"/>
+                                                    <path fill="currentColor" d="M6 15h12l-6-6z"/>
+                                                </svg>
+                                                </p>
+                                        </button>
+                                    </div>
+                                    <div id="${foldId}" class="">
+                                        <p style="color: #333;">${marked(thinkContent)}</p>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                ${thinkContent && actualResponse ? `<p class="w-full rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>`: ""}
+                                ${actualResponse ? `
+                                <div class="${aiMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4 w-fit max-w-full lg:max-w-6xl">
+                                    ${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
+                                    <p style="color: #333;">${marked(actualResponse)}</p>
                                 </div>
                                 <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
                                     <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
@@ -356,19 +418,17 @@ function initChat(client) {
                                     </div>
                                     <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageUId}');">
                                         <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15    19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
+                                            <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"/></path>
                                         </svg>
                                     </div>
                                 </section>
-
                                 <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
-
                                     <ul class="list-none p-0">
                                         <li class="mb-2">
-                                        <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">1. Export to PDF</svg></a>
+                                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">1. Export to PDF</a>
                                         </li>
                                         <li class="mb-2">
-                                            <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">2. Export to JPG</a>
+                                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">2. Export to JPG</a>
                                         </li>
                                         <li>
                                             <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">3. Export to DOCX</a>
@@ -378,8 +438,11 @@ function initChat(client) {
                                         </li>
                                     </ul>
                                 </div>
-                            </section>
+                            </section>`:""}
                             `;
+
+
+
                             AutoScroll.checked ? scrollToBottom(chatArea) : null;
                             addCopyListeners(); // Assuming this function adds copy functionality to code blocks
                             // Debounce MathJax rendering to avoid freezing
@@ -403,7 +466,7 @@ function initChat(client) {
                     // Render mathjax immediately
                     debounceRenderMathJax(aiMessageUId, 0, true);
                     // Store conversation history
-                    window.electron.addToChat({ role: "assistant", content: output });
+                    window.electron.addToChat({ role: "assistant", content: fullResponse });
 
                 } catch (error) {
                     handleRequestError(error, userMessage, aiMessage);
@@ -480,6 +543,7 @@ function initChat(client) {
             ];
         }
 
+        console.log(userContent)
         // Add user message to VisionHistory
         window.electron.addToVisionChat({
             role: "user",

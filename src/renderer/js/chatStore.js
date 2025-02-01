@@ -74,7 +74,12 @@ class ConversationManager {
       }
       window.electron.addToVisionChat({ role, content: messageContent });
   } else {
+      /*const HasThink = (content.indexOf("</think>") && content.indexOf("</think>") != -1) ? true : false;
+      if (HasThink){
+        content = content.slice(content.indexOf('</think>') + 8, -1)
+      }*/
       messageContent = [{ type: "text", text: content }];
+      console.log(messageContent)
       window.electron.addToChat({ role, content: messageContent });
     }
   }
@@ -223,13 +228,48 @@ getFileUrl(content) {
   // Render text-based assistant message
   renderTextAssistantMessage(content) {
     const aiMessageId = `msg_${Math.random().toString(30).substring(3, 9)}`;
+    const foldId = `think-content-${Math.random().toString(28).substring(3, 9)}`;
     const aiMessage = document.createElement('div');
     aiMessage.classList.add('flex', 'justify-start', 'mb-12', 'overflow-wrap');
     chatArea.appendChild(aiMessage);
-    //console.log(content)
+
+    let actualResponse = "";
+    let thinkContent = "";
+
+    // Check whether it is an R1 response ie if it has thinking tags.
+    let R1 = (content.indexOf("</think>") && content.indexOf("</think>") != -1) ? true : false;
+    if (R1){
+      thinkContent = content.slice(7, content.indexOf('</think>'));
+      actualResponse = content.slice(content.indexOf('</think>') + 8, -1);
+    }else{
+      actualResponse = content;
+    }
+
     aiMessage.innerHTML = `
-    <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-        <div class="${aiMessageId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${window.marked(content)}
+    <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
+        ${thinkContent ? `
+        <div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 w-full lg:max-w-6xl">
+            <div class="flex items-center justify-between">
+                <strong style="color: #007bff;">Thinking:</strong>
+                <button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentNode.parentNode.children[1].id)">
+                    <p class="flex">Fold
+                        <svg class="mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="32" height="38" class="fold-icon">
+                            <path class="fill-blue-400 dark:fill-yellow-400" d="M6 9h12l-6 6z"/>
+                            <path fill="currentColor" d="M6 15h12l-6-6z"/>
+                        </svg>
+                        </p>
+                </button>
+            </div>
+            <div id="${foldId}" class="hidden">
+                <p style="color: #333;">${marked(thinkContent)}</p>
+            </div>
+        </div>
+        ` : ''}
+        ${thinkContent && actualResponse ? `<p class="w-full rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>`: ""}
+        ${actualResponse ? `
+        <div class="${aiMessageId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4 w-fit max-w-full lg:max-w-6xl">
+            ${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
+            <p style="color: #333;">${marked(actualResponse)}</p>
         </div>
         <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
             <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
@@ -238,20 +278,18 @@ getFileUrl(content) {
                 </svg>
             </div>
             <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageId}');">
-            <svg id="copy-svg-${aiMessageId}" class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
-            </svg>
+                <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"/></path>
+                </svg>
             </div>
         </section>
-
         <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
-
             <ul class="list-none p-0">
                 <li class="mb-2">
-                <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageId}')">1. Export to PDF</svg></a>
+                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageId}')">1. Export to PDF</a>
                 </li>
                 <li class="mb-2">
-                    <a href=""  class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageId}')">2. Export to JPG</a>
+                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageId}')">2. Export to JPG</a>
                 </li>
                 <li>
                     <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageId}')">3. Export to DOCX</a>
@@ -261,7 +299,7 @@ getFileUrl(content) {
                 </li>
             </ul>
         </div>
-    </section>
+    </section>`:""}
     `;
   }
 

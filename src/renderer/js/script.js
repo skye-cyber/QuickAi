@@ -531,3 +531,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial selection based on the select element's default value
     selectMode(modeSelect.value);
 });
+
+// Function to toggle the fold/unfold of the think section
+function toggleFold(event, selector) {
+    console.log(selector)
+    const content = document.getElementById(selector);
+    console.log(content)
+    if (content) {
+        content.classList.toggle('hidden');
+    }
+}
+// Make toggleFold available to the window
+window.toggleFold = toggleFold;
