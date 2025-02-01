@@ -149,24 +149,18 @@ class ConversationManager {
       return null;
     }
   }
+  getFileUrl(content) {
+    try {
+      // Find all items with type "image_url"
+      const fileMessages = content.filter(item => item.type === "image_url");
 
-getFileUrl(content) {
-  try {
-    // Find the item with type "image_url"
-    const fileMessage = content.find(item => item.type === "image_url");
-
-    // Check if the item exists and has an images array
-    if (fileMessage && fileMessage.images) {
-      // Extract all URLs from the images array
-      return fileMessage.images.map(image => image.url);
+      // Extract all URLs from the image_url properties
+      return fileMessages.map(fileMessage => fileMessage.image_url.url);
+    } catch (error) {
+      console.error("Error extracting file URL:", error);
+      return [];
     }
-
-    return [];
-  } catch (error) {
-    console.error("Error extracting file URL:", error);
-    return [];
   }
-}
 
   // Get message type (text or vision) from message content
   getMessageType(content) {
@@ -248,7 +242,7 @@ getFileUrl(content) {
     aiMessage.innerHTML = `
     <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
         ${thinkContent ? `
-        <div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 w-full lg:max-w-6xl">
+        <div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 lg:max-w-6xl">
             <div class="flex items-center justify-between">
                 <strong style="color: #007bff;">Thinking:</strong>
                 <button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentNode.parentNode.children[1].id)">
@@ -265,9 +259,9 @@ getFileUrl(content) {
             </div>
         </div>
         ` : ''}
-        ${thinkContent && actualResponse ? `<p class="w-full rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>`: ""}
+        ${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>`: ""}
         ${actualResponse ? `
-        <div class="${aiMessageId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4 w-fit max-w-full lg:max-w-6xl">
+        <div class="${aiMessageId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
             ${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
             <p style="color: #333;">${marked(actualResponse)}</p>
         </div>

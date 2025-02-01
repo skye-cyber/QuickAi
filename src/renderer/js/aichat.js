@@ -505,32 +505,36 @@ function initChat(client) {
         if (fileDataUrl) {
             //console.log("Image url present");
             if (fileType == "image") {
+                const imageContent = fileDataUrl.map(_url => ({
+                    type: "image_url",
+                    image_url: {
+                        url: _url,
+                    }
+                }));
+
                 userContent = [
                     {
                         type: "text",
                         text: text,
                     },
-                    {
-                        type: "image_url",
-                        images: fileDataUrl.map(_url => ({
-                            url: _url,
-                        }))
-                    }
+                    ...imageContent // Spread the image content objects
                 ];
             }
 
             else if (fileType == "document") {
+                const documentContent = fileDataUrl.map(_url => ({
+                    type: "file_url",
+                    image_url: {
+                        url: _url,
+                    }
+                }));
+
                 userContent = [
                     {
                         type: "text",
                         text: text,
                     },
-                    {
-                        type: "file_url",
-                        files: fileDataUrl.map(_url => ({
-                                url: _url,
-                        }))
-                    },
+                    ... documentContent // Spread the document content objects
                 ];
             }
         } else {
@@ -543,7 +547,6 @@ function initChat(client) {
             ];
         }
 
-        console.log(userContent)
         // Add user message to VisionHistory
         window.electron.addToVisionChat({
             role: "user",
@@ -583,7 +586,7 @@ function initChat(client) {
                 model: "meta-llama/Llama-3.2-11B-Vision-Instruct",
                 messages: window.electron.getVisionChat(),
                 max_tokens: 2000,
-                //temperature: window.electron.temperature(),
+                provider: "hf-inference",
             });
 
             let visionMs = "";

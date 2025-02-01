@@ -534,9 +534,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to toggle the fold/unfold of the think section
 function toggleFold(event, selector) {
-    console.log(selector)
     const content = document.getElementById(selector);
-    console.log(content)
     if (content) {
         content.classList.toggle('hidden');
     }
