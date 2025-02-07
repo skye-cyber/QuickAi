@@ -289,7 +289,8 @@ contextBridge.exposeInMainWorld('electron', {
     send: (channel, data) => {
         // List of valid channels
         //console.log(channel, data)
-        const validChannels = ['toMain'];
+        const validChannels = ['toMain', 'Notify'];
+        console.log(channel, message)
         if (validChannels.includes(channel)) {
             ipcRenderer.send(channel, data);
         }
@@ -464,6 +465,3 @@ document.addEventListener('keydown', (event) => {
         ipcRenderer.invoke('show-documentation')
     }
 });
-
-const renameInput = document.getElementById("newName");
-//renameInput.addEventListener('keydown', (event) => {

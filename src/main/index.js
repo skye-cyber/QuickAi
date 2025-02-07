@@ -1,8 +1,30 @@
-const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain, Notification } = require('electron');
 const path = require('path');
 const crypto = require('crypto');
 const { Buffer } = require('buffer');
 const dotenv = require('dotenv')
+let mainWindow;
+
+
+// Handle notify events
+ipcMain.on('Notify', (event, data) => {
+  console.log('Received time data from renderer:', data.message);
+
+  const timeTaken = data.message;
+  if (mainWindow && !mainWindow.isFocused()) {
+    const seconds = Math.floor(timeTaken / 1000) % 60;
+    const milliseconds = Math.floor(timeTaken % 1000);
+
+    // Create and send a system notification
+    new Notification({
+      title: 'QuickAi',
+      body: `Request completed in ${seconds} seconds and ${milliseconds} milliseconds`
+    }).show();
+  }
+
+  // Optionally send a response back
+  // event.reply('fromMain', data);
+});
 
 
 // Handle IPC messages from renderer
@@ -187,7 +209,7 @@ function createWindow() {
   loadingWindow.show(); // Show the loading window immediately
 
   // Create the main window
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     icon: path.join(process.resourcesPath, 'assets/QuickAi.png'), // Path to your icon file

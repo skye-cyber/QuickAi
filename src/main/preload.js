@@ -289,7 +289,8 @@ contextBridge.exposeInMainWorld('electron', {
     send: (channel, data) => {
         // List of valid channels
         //console.log(channel, data)
-        const validChannels = ['toMain'];
+        const validChannels = ['toMain', 'Notify'];
+        console.log(channel, data)
         if (validChannels.includes(channel)) {
             ipcRenderer.send(channel, data);
         }

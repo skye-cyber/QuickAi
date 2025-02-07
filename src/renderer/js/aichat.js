@@ -1087,6 +1087,8 @@ class Timer {
                 const seconds = Math.floor(timeTaken / 1000) % 60;
                 const milliseconds = Math.floor(timeTaken % 1000);
                 window.Notify(null, `${seconds} seconds and ${milliseconds} milliseconds`);
+                // Call app systewide notify
+                window.electron.send('Notify', { message: timeTaken });
             } else {
                 console.error('window.Notify is not defined.');
             }
