@@ -523,7 +523,7 @@ function initChat(client) {
 
             else if (fileType == "document") {
                 const documentContent = fileDataUrl.map(_url => ({
-                    type: "image_url",
+                    type: "file_url",
                     image_url: {
                         url: _url,
                     }
@@ -1058,18 +1058,22 @@ function HandleProcessingEventChanges(){
 
 class Timer {
     constructor() {
-        this.startTime = undefined;
+        this.startTime = null;
     }
 
     trackTime(action) {
         // Store the start time
         if (action === 'start') {
+            if (this.startTime !== null) {
+                console.log('Timer has already been started. Restarting');
+                //return null;
+            }
             this.startTime = performance.now();
             console.log('Timer started.');
         }
         // Calculate the elapsed time
         else if (action === 'stop') {
-            if (this.startTime === undefined) {
+            if (this.startTime === null) {
                 console.log('Timer was not started.');
                 return null;
             }
@@ -1091,7 +1095,8 @@ class Timer {
         }
         // Interrupt the timer
         else if (action === 'interrupt') {
-            delete this.startTime;
+            console.log("Timer InterruptedStop timer")
+            this.startTime = null;
         }
         // Invalid action
         else {
