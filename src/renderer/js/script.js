@@ -1,3 +1,4 @@
+const modelChange = new CustomEvent('ModelChange');
 document.addEventListener('DOMContentLoaded', function() {
     //for (const item of ['_chatStore']) {
         addScripts('_chatStore');
@@ -15,10 +16,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropZoneText = document.getElementById('dropZoneText');
     const uploadedFilesContainer = document.getElementById('uploadedFiles');
     const userInput = document.getElementById("userInput");
-    const mode = document.getElementById('mode');
-    let preValue = mode.value;
-    const modelChange = new CustomEvent('ModelChange');
+    const model = document.getElementById('model');
     const attachFiles = document.getElementById("AttachFiles");
+    const modeButton = document.getElementById('modeButton');
+    const modeDropdown = document.getElementById('modeDropdown');
+    const modeItems = document.querySelectorAll('[data-value]');
+    const selectedModeText = document.getElementById('selectedModeText');
+    const modeSelect = document.getElementById('model');
+
 
     // Query map for button actions
     const queryMap = {
@@ -333,34 +338,6 @@ document.addEventListener('DOMContentLoaded', function() {
      }
 
 
-     mode.addEventListener('change', function() {
-         const arr = [preValue, mode.value];
-         const validPairs = [['Basic mode', 'Coding mode'], ['Coding mode', 'Basic mode']];
-
-         // Check if arr is one of the valid pairs
-         const isValid = validPairs.some(pair =>
-         arr[0] === pair[0] && arr[1] === pair[1]
-         );
-
-         if (!isValid) {
-             console.log(preValue, mode.value);
-             document.dispatchEvent(modelChange);
-             ClearChatArea();
-         }
-         SetTitle(mode.value);
-         //currentValue = mode.value;
-     });
-
-    function SetTitle(value){
-        if (value.toLowerCase() == "vision"){
-            document.title = "QuickAi - Vision"
-        }
-        else if (value.toLowerCase() == "coding mode"){
-            document.title = "QuickAi - Coder"
-        }
-    }
-
-
 // ------Implement user preference handling ------
 const prefContent= document.getElementById('pref-content');
 const prefInput =document.getElementById('pref-input');
@@ -450,6 +427,55 @@ document.getElementById('imagePrompt').value = "";
 //Load preferences
 displayPref();
 //Notify();
+
+
+// Function to toggle dropdown visibility
+function toggleDropdown() {
+    modeDropdown.classList.toggle('hidden');
+}
+//Handle custom model selection
+// Function to select a mode
+function selectMode(value) {
+    const wasValid = (model.value !== 'Llama-3.2-11B-Vision-Instruct') ? true : false
+    modeItems.forEach(item => {
+        const isSelected = item.getAttribute('data-value') === value;
+        item.classList.toggle('dark:bg-stone-900', isSelected);
+        item.classList.toggle('bg-green-200', isSelected);
+    });
+
+    selectedModeText.innerText = modeSelect.options[modeSelect.selectedIndex].innerText;
+    modeDropdown.classList.add('hidden');
+    const isValid = (model.value !== 'Llama-3.2-11B-Vision-Instruct') ? true : false
+    const valid = (wasValid && isValid)
+    if (!valid){
+        document.dispatchEvent(modelChange);
+        ClearChatArea();
+    }
+    document.title = `QuickAI - ${model.value}`;
+
+}
+
+// Event listener for button click to toggle dropdown
+modeButton.addEventListener('click', toggleDropdown);
+
+// Event listener for clicking outside the dropdown to close it
+document.addEventListener('click', function(event) {
+    if (!modeButton.contains(event.target) && !modeDropdown.contains(event.target)) {
+        modeDropdown.classList.add('hidden');
+    }
+});
+
+// Event listener for selecting a mode
+modeItems.forEach(item => {
+    item.addEventListener('click', function() {
+        const value = this.getAttribute('data-value');
+        modeSelect.value = value;
+        selectMode(value);
+    });
+});
+
+// Initial selection based on the select element's default value
+selectMode(modeSelect.value);
 });
 
 // Function to show the modal
@@ -484,53 +510,6 @@ function Notify(_color=null, time=null, text="") {
 
 //Store Notify to window
 window.Notify = Notify;
-//Handle custom model selection
-document.addEventListener('DOMContentLoaded', function() {
-    const modeButton = document.getElementById('modeButton');
-    const modeDropdown = document.getElementById('modeDropdown');
-    const modeItems = document.querySelectorAll('[data-value]');
-    const selectedModeText = document.getElementById('selectedModeText');
-    const modeSelect = document.getElementById('mode');
-
-    // Function to toggle dropdown visibility
-    function toggleDropdown() {
-        modeDropdown.classList.toggle('hidden');
-    }
-
-    // Function to select a mode
-    function selectMode(value) {
-        modeItems.forEach(item => {
-            const isSelected = item.getAttribute('data-value') === value;
-            item.classList.toggle('dark:bg-stone-900', isSelected);
-            item.classList.toggle('bg-green-200', isSelected);
-        });
-
-        selectedModeText.innerText = modeSelect.options[modeSelect.selectedIndex].innerText;
-        modeDropdown.classList.add('hidden');
-    }
-
-    // Event listener for button click to toggle dropdown
-    modeButton.addEventListener('click', toggleDropdown);
-
-    // Event listener for clicking outside the dropdown to close it
-    document.addEventListener('click', function(event) {
-        if (!modeButton.contains(event.target) && !modeDropdown.contains(event.target)) {
-            modeDropdown.classList.add('hidden');
-        }
-    });
-
-    // Event listener for selecting a mode
-    modeItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const value = this.getAttribute('data-value');
-            modeSelect.value = value;
-            selectMode(value);
-        });
-    });
-
-    // Initial selection based on the select element's default value
-    selectMode(modeSelect.value);
-});
 
 // Function to toggle the fold/unfold of the think section
 function toggleFold(event, selector) {

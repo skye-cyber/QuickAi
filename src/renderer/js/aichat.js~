@@ -27,7 +27,7 @@ function initChat(client) {
     const chatArea = document.getElementById("chatArea");
     const userInput = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
-    const modeSelect = document.getElementById('mode');
+    const modelSelect = document.getElementById('model');
     const AutoScroll = document.getElementById("AutoScroll");
     let check = false;
     window.check = check;
@@ -176,7 +176,7 @@ function initChat(client) {
     async function classifyText(text) {
         const isImageRequest = text.startsWith("/image");
         const escapedText = escapeHTML(text);
-        const mode = modeSelect.value;
+        const modelSelection = modelSelect.value;
 
         //let R1 = false
 
@@ -184,7 +184,23 @@ function initChat(client) {
         const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
         const userMessage = document.createElement("div");
-        if (mode === "vision"){
+        const modelDict = {
+            "Qwen2.5-72B-Instruct":"Qwen/Qwen2.5-72B-Instruct",
+            "Qwen2.5-Coder-32B-Instruct": "Qwen/Qwen2.5-Coder-32B-Instruct",
+            "DeepSeek-R1": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+            "Llama-3.3-70B-Instruct": "meta-llama/Llama-3.3-70B-Instruct",
+            "c4ai-command-r-plus-08-2024": "CohereForAI/c4ai-command-r-plus-08-2024",
+            "Mistral-Nemo-Instruct-2407":"/Mistral-Nemo-Instruct-2407",
+            "Llama-3.1-Nemotron-70B-Instruct-HF":"nvidia/Llama-3.1-Nemotron-70B-Instruct-HF",
+            "Qwen/QwQ-32B-Preview":"Qwen/QwQ-32B-Preview",
+            "Llama-3.2-11B-Vision-Instruct":"meta-llama/Llama-3.2-11B-Vision-Instruct",
+            "Hermes-3-Llama-3.1-8B":"NousResearch/Hermes-3-Llama-3.1-8B",
+            "Phi-3.5-mini-instruct":"microsoft/Phi-3.5-mini-instruct"
+        }
+
+        const Currentmodel = modelDict[modelSelection]
+        console.log(Currentmodel)
+        if (Currentmodel === "Llama-3.2-11B-Vision-Instruct"){
             VisionChat(text=text)
 
         } else {
@@ -296,15 +312,6 @@ function initChat(client) {
                 }
             } else {
 
-                let model = "Qwen/Qwen2.5-72B-Instruct";
-                if (mode === 'coding') {
-                    model = "Qwen/Qwen2.5-Coder-32B-Instruct";
-                } else if (mode === "DeepSeek-R1"){
-                    model = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B";
-                    //R1 = true
-                }
-
-                console.log(model)
                 const aiMessage = document.createElement("div");
                 aiMessage.innerHTML = `
                 <div id="loader-parent">
@@ -334,11 +341,10 @@ function initChat(client) {
                 //console.log(JSON.stringify(window.electron.getChat()), null, 4);
 
                 const _Timer = new Timer();
-
                 try {
                     //console.log(typeof(window.electron.getChat()))
                     const options = {
-                        model: model,
+                        model: Currentmodel,
                         messages: window.electron.getChat(), // Add conversation in JSON format to avoid size limitation
                         max_tokens: 3000
                     };
@@ -368,11 +374,16 @@ function initChat(client) {
                             output += deltaContent;
                             fullResponse += deltaContent
 
-                            if (!isThinking && output.includes("<think>")) {
+                            const _eval = (!isThinking && output.indexOf("<think>")) ? true : false
+                            const _closeEval = (isThinking && output.indexOf("</think>")) ? true : false
+                            console.log("lastindexof", _closeEval, output.indexOf("</think>"))
+                            if (!isThinking && _eval) {
+                                console.log("Thinking...")
                                 isThinking = true;
                                 thinkContent = deltaContent.replace("<think>", "");
                                 output = output.replace("<think>", ""); // Remove <think> from output
-                            } else if (isThinking && deltaContent.includes("</think>")) {
+                            } else if (isThinking && output.includes("</think>")) {
+                                console.log("Finished Thinking.")
                                 isThinking = false;
                                 thinkContent += deltaContent.replace("</think>", "");
                                 output = output.replace("</think>", ""); // Remove </think> from output
@@ -491,7 +502,7 @@ function initChat(client) {
 
         //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
         //switch to vission model
-        modeSelect.value = "Vision"
+        modelSelect.value = "Llama-3.2-11B-Vision-Instruct"
 
         const fileContainerId = `FCont_${Math.random().toString(35).substring(2, 8)}`;
         // Add user message to chat
@@ -736,6 +747,7 @@ function initChat(client) {
             const _Timer = new Timer();
             _Timer.trackTime("interrupt");
             window.processing = false;
+
             // change send button appearance to processing status
             HandleProcessingEventChanges()
             const conversationHistory = VS_url ? window.electron.getVisionChat() : window.electron.getChat()
@@ -1088,7 +1100,7 @@ class Timer {
                 const milliseconds = Math.floor(timeTaken % 1000);
                 window.Notify(null, `${seconds} seconds and ${milliseconds} milliseconds`);
                 // Call app systewide notify
-                window.electron.send('Notify', { message: [seconds, milliseconds] });
+                window.electron.send('Notify', { message: timeTaken });
             } else {
                 console.error('window.Notify is not defined.');
             }

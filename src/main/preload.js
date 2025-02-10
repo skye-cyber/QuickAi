@@ -264,7 +264,11 @@ contextBridge.exposeInMainWorld('electron', {
         ChatconversationHistory.pop();
     },
     getVisionChat: () => {
-        return VconversationHistory
+        const lastMessage = VconversationHistory.slice(-1)[0]; // Get the last message
+        const _VconversationHistory = VconversationHistory
+        .filter(item => item.type !== "image_url" || item === lastMessage); // Filter out image_url items except the last message
+        console.log(JSON.stringify(_VconversationHistory));
+        return _VconversationHistory;
     },
     addToVisionChat: (item) => {
         VconversationHistory.push(item); // Modify the array
@@ -288,9 +292,7 @@ contextBridge.exposeInMainWorld('electron', {
     },
     send: (channel, data) => {
         // List of valid channels
-        //console.log(channel, data)
         const validChannels = ['toMain', 'Notify'];
-        console.log(channel, data)
         if (validChannels.includes(channel)) {
             ipcRenderer.send(channel, data);
         }

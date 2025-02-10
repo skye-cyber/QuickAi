@@ -79,7 +79,7 @@ class ConversationManager {
         content = content.slice(content.indexOf('</think>') + 8, -1)
       }*/
       messageContent = [{ type: "text", text: content }];
-      console.log(messageContent)
+      //console.log(messageContent)
       window.electron.addToChat({ role, content: messageContent });
     }
   }
@@ -88,9 +88,9 @@ class ConversationManager {
   renderConversation(conversationData, model = "text") {
     chatArea.innerHTML = '';
     if (model === 'Vision'){
-      document.getElementById('mode').value = 'Vision';
+      document.getElementById('model').value = 'Vision';
     } else{
-      document.getElementById('mode').value = 'Basic mode';
+      document.getElementById('model').value = 'Basic mode';
     }
     conversationData.forEach(message => {
       if (message.role === "user") {
@@ -502,7 +502,6 @@ window.electron.receive('fromMain-ToChat', (data) => {
 
 // Listen for updates messages from ipc for Vision models and update the history files
 window.electron.receive('fromMain-ToVision', (data) => {
-  console.log("Vision")
   try {
     let VChat = data
     //console.log(JSON.stringify(VChat));

@@ -75,4 +75,41 @@
 .pulse-hover:hover {
     animation: pulse 1s infinite;
 }
+/* Reset default scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
 
+/* Light theme scrollbar */
+::-webkit-scrollbar-track {
+    background:#aaffff;
+    border-radius: 4px;
+    opacity:0.5;
+}
+
+body.dark ::-webkit-scrollbar-track {
+    background:#24486b;
+    border-radius: 4px;
+    opacity:0.5;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00ffff, #4c00e3, #0099e5);
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #ff007f, #00ffff);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(135deg, #aa55ff, #aaaaff, #ff55ff);
+}
+
+/* Optional: Add transitions for more natural feel */
+ython.assistant-unused
+.note:-webkit-scrollbar {
+    scroll-behavior: smooth;
+}

@@ -11,7 +11,7 @@
     "build": "NODE_ENV=production npx tailwindcss -i ./src/renderer/css/css.css -o ./src/renderer/css/styles.css --minify",
     "watch": "npx tailwindcss -i ./src/renderer/css/css.css -o ./src/renderer/css/styles.css --watch",
     "package": "electron-packager .",
-    "forge":"electron-forge package"
+    "forge": "electron-forge package"
   },
   "keywords": [],
   "author": {
@@ -29,6 +29,7 @@
     "browserify-fs": "^1.0.0",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",
+    "call-bound": "^1.0.3",
     "canvg": "^4.0.2",
     "child-process-promise": "^2.2.1",
     "compression-webpack-plugin": "^11.1.0",
