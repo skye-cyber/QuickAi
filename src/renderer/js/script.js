@@ -18,11 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const userInput = document.getElementById("userInput");
     const model = document.getElementById('model');
     const attachFiles = document.getElementById("AttachFiles");
-    const modeButton = document.getElementById('modeButton');
-    const modeDropdown = document.getElementById('modeDropdown');
-    const modeItems = document.querySelectorAll('[data-value]');
-    const selectedModeText = document.getElementById('selectedModeText');
-    const modeSelect = document.getElementById('model');
+    const modelButton = document.getElementById('modelButton');
+    const modelDropdown = document.getElementById('modelDropdown');
+    const modelItems = document.querySelectorAll('[data-value]');
+    const selectedModelText = document.getElementById('selectedModelText');
+    const modelSelect = document.getElementById('model');
 
 
     // Query map for button actions
@@ -431,51 +431,51 @@ displayPref();
 
 // Function to toggle dropdown visibility
 function toggleDropdown() {
-    modeDropdown.classList.toggle('hidden');
+    modelDropdown.classList.toggle('hidden');
 }
 //Handle custom model selection
 // Function to select a mode
-function selectMode(value) {
+function selectModel(value) {
     const wasValid = (model.value !== 'Llama-3.2-11B-Vision-Instruct') ? true : false
-    modeItems.forEach(item => {
+    modelItems.forEach(item => {
         const isSelected = item.getAttribute('data-value') === value;
         item.classList.toggle('dark:bg-stone-900', isSelected);
         item.classList.toggle('bg-green-200', isSelected);
     });
 
-    selectedModeText.innerText = modeSelect.options[modeSelect.selectedIndex].innerText;
-    modeDropdown.classList.add('hidden');
-    const isValid = (model.value !== 'Llama-3.2-11B-Vision-Instruct') ? true : false
-    const valid = (wasValid && isValid)
-    if (!valid){
-        document.dispatchEvent(modelChange);
-        ClearChatArea();
-    }
+    selectedModelText.innerText = modelSelect.options[modelSelect.selectedIndex].innerText;
+    modelDropdown.classList.add('hidden');
+
     document.title = `QuickAI - ${model.value}`;
 
 }
 
+window.selectModel = selectModel;
 // Event listener for button click to toggle dropdown
-modeButton.addEventListener('click', toggleDropdown);
+modelButton.addEventListener('click', toggleDropdown);
 
 // Event listener for clicking outside the dropdown to close it
 document.addEventListener('click', function(event) {
-    if (!modeButton.contains(event.target) && !modeDropdown.contains(event.target)) {
-        modeDropdown.classList.add('hidden');
+    if (!modelButton.contains(event.target) && !modelDropdown.contains(event.target)) {
+        modelDropdown.classList.add('hidden');
     }
 });
 
 // Event listener for selecting a mode
-modeItems.forEach(item => {
+modelItems.forEach(item => {
     item.addEventListener('click', function() {
         const value = this.getAttribute('data-value');
-        modeSelect.value = value;
-        selectMode(value);
+        if ((model.value === 'Llama-3.2-11B-Vision-Instruct' && value !== model.value) || (model.value !== 'Llama-3.2-11B-Vision-Instruct' && value === 'Llama-3.2-11B-Vision-Instruct')){
+            document.dispatchEvent(modelChange);
+            ClearChatArea();
+        }
+        modelSelect.value = value;
+        selectModel(value);
     });
 });
 
 // Initial selection based on the select element's default value
-selectMode(modeSelect.value);
+selectModel(modelSelect.value);
 });
 
 // Function to show the modal

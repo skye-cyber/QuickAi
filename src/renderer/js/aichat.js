@@ -366,7 +366,8 @@ function initChat(client) {
                     let actualResponse = "";
                     let isThinking = false;
                     let fullResponse = "";
-
+                    // This will prevent re-evaluation of the thinking start loop once thinking is done since isThinking will be reset to false making the loop elligible for possible re-evaluation
+                    let hasfinishedThinking = false;
                     for await (const chunk of stream) {
                         const choice = chunk?.choices?.[0];
                         if (choice?.delta?.content) {
@@ -374,22 +375,26 @@ function initChat(client) {
                             output += deltaContent;
                             fullResponse += deltaContent
 
-                            const _eval = (!isThinking && output.indexOf("<think>")) ? true : false
-                            const _closeEval = (isThinking && output.indexOf("</think>")) ? true : false
-                            console.log("lastindexof", _closeEval, output.indexOf("</think>"))
-                            if (!isThinking && _eval) {
-                                console.log("Thinking...")
+                            //_eval determines start of the thinking content marked ither by <think> tag or model being deepseek where <think> is unintentionslly ommited.
+                            const _eval = (!isThinking && (output.indexOf("<think>") !== -1 || Currentmodel === "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B")) ? true : false
+                            const _closeEval = (isThinking && (output.indexOf("</think>") !== -1)) ? true : false
+
+                            if (_eval && !hasfinishedThinking) {
+                                //console.log("Thinking...")
                                 isThinking = true;
-                                thinkContent = deltaContent.replace("<think>", "");
                                 output = output.replace("<think>", ""); // Remove <think> from output
-                            } else if (isThinking && output.includes("</think>")) {
-                                console.log("Finished Thinking.")
+                                // Avoid redundancy as at this point bothe output and think are empty hence taking same value on thinking start
+                                thinkContent = output //deltaContent.replace("<think>", "");
+                            } else if (_closeEval) {
+                                //console.log("Finished Thinking.")
                                 isThinking = false;
+                                hasfinishedThinking = true;
                                 thinkContent += deltaContent.replace("</think>", "");
                                 output = output.replace("</think>", ""); // Remove </think> from output
                             } else if (isThinking) {
                                 thinkContent += deltaContent;
                             } else {
+                                //console.log("Final Res loop")
                                 actualResponse += deltaContent;
                             }
 
@@ -398,7 +403,7 @@ function initChat(client) {
                             aiMessage.innerHTML = `
                             <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
                                 ${isThinking || thinkContent ? `
-                                <div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 w-full lg:max-w-6xl">
+                                <div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 lg:max-w-6xl">
                                     <div class="flex items-center justify-between">
                                         <strong style="color: #007bff;">Thinking:</strong>
                                         <button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
@@ -415,9 +420,9 @@ function initChat(client) {
                                     </div>
                                 </div>
                                 ` : ''}
-                                ${thinkContent && actualResponse ? `<p class="w-full rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>`: ""}
+                                ${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>`: ""}
                                 ${actualResponse ? `
-                                <div class="${aiMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4 w-fit max-w-full lg:max-w-6xl">
+                                <div class="${aiMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
                                     ${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
                                     <p style="color: #333;">${marked(actualResponse)}</p>
                                 </div>
@@ -593,9 +598,10 @@ function initChat(client) {
         `;
 
         try {
+            console.log(window.electron.clearImages(window.electron.getVisionChat()),)
             const visionstream = client.chatCompletionStream({
                 model: "meta-llama/Llama-3.2-11B-Vision-Instruct",
-                messages: window.electron.getVisionChat(),
+                messages: window.electron.clearImages(window.electron.getVisionChat()),
                 max_tokens: 2000,
                 provider: "hf-inference",
             });

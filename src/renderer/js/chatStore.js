@@ -7,6 +7,8 @@ const modalTitle = document.getElementById('modalTitle');
 const newNameInput = document.getElementById('newName');
 const renameButton = document.getElementById('renameButton');
 const cancelButton = document.getElementById('cancelButton');
+const selectedModelText = document.getElementById('selectedModelText');
+const modelSelect = document.getElementById('model');
 let activeItem;
 
 async function checkAndCreateDirectory() {
@@ -87,11 +89,14 @@ class ConversationManager {
   // Render the conversation in the web interface
   renderConversation(conversationData, model = "text") {
     chatArea.innerHTML = '';
-    if (model === 'Vision'){
-      document.getElementById('model').value = 'Vision';
-    } else{
-      document.getElementById('model').value = 'Basic mode';
+    const value = (model ==="Vision") ? 'Llama-3.2-11B-Vision-Instruct' : 'Qwen2.5-72B-Instruct';
+    const element = document.querySelector(`[data-value="${value}"]`);
+    if (element) {
+      element.click();
+    } else {
+      console.error('Element not found with data-value: ', value);
     }
+
     conversationData.forEach(message => {
       if (message.role === "user") {
         //console.log(message.content[0]);
@@ -128,11 +133,9 @@ class ConversationManager {
       // Find the item with type "image_url" or "file_url"
       const fileTypeItem = content.find(item => item.type === "image_url" || item.type === "file_url");
 
-      // Log the type of the found item
-      console.log(fileTypeItem?.type);
-
       // Check if the found item exists and has a valid type
       if (fileTypeItem && fileDict[fileTypeItem.type]) {
+        //console.log(fileTypeItem?.type);
         return fileDict[fileTypeItem.type];
       }
 
@@ -183,8 +186,18 @@ class ConversationManager {
     userMessage.className = "flex justify-end mb-4";
 
     if (model.toLocaleLowerCase() === 'vision'){
-      // Exclude timestamp when rendering user messages
-      userText = content[0].text.slice(-1)===']' ? content[0].text.substring(0, content[0].text.length - 22) : content[0].text
+
+      // Check if content is an array and has at least one element before accessing content[0]
+      if (content && content.length > 0 && content[0].text) {
+        const lastChar = content[0].text.slice(-1);
+        if (lastChar === ']') {
+          userText = content[0].text.substring(0, content[0].text.length - 22);
+        } else {
+          userText = content[0].text;
+        }
+      } else {
+        userText = ''; // Set a default if the content is missing
+      }
     } else{
       userText = content.slice(-1) === ']' ? content.substring(0, content.length - 22) : content
     }
@@ -233,8 +246,9 @@ class ConversationManager {
     // Check whether it is an R1 response ie if it has thinking tags.
     let R1 = (content.indexOf("</think>") && content.indexOf("</think>") != -1) ? true : false;
     if (R1){
-      thinkContent = content.slice(7, content.indexOf('</think>'));
-      actualResponse = content.slice(content.indexOf('</think>') + 8, -1);
+      const start = (content.indexOf('<think>') !== -1) ? 7 : 0
+      thinkContent = content.slice(start, content.indexOf('</think>'));
+      actualResponse = content.slice(content.indexOf('</think>') + 8);
     }else{
       actualResponse = content;
     }

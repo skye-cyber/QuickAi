@@ -264,11 +264,7 @@ contextBridge.exposeInMainWorld('electron', {
         ChatconversationHistory.pop();
     },
     getVisionChat: () => {
-        const lastMessage = VconversationHistory.slice(-1)[0]; // Get the last message
-        const _VconversationHistory = VconversationHistory
-        .filter(item => item.type !== "image_url" || item === lastMessage); // Filter out image_url items except the last message
-        console.log(JSON.stringify(_VconversationHistory));
-        return _VconversationHistory;
+        return VconversationHistory;
     },
     addToVisionChat: (item) => {
         VconversationHistory.push(item); // Modify the array
@@ -276,6 +272,24 @@ contextBridge.exposeInMainWorld('electron', {
     },
     popFromVisionChat: () => {
         ChatconversationHistory.pop();
+    },
+    clearImages: (history) => {
+        // Convert history to array and process each message
+        return history.map(item => {
+            // Extract text content only and filter out image content
+            const cleanedContent = item.content.filter(val => val.type === "text").map(textContent => ({
+                ...textContent,
+                // Optional: Process text further if needed
+                text: textContent.text.trim() // Remove extra whitespace
+            }));
+
+            // Return the cleaned item with only text content
+            return {
+                ...item,
+                content: cleanedContent
+            };
+        });
+
     },
     CreateNew: (conversation, model) => {
         if (model == "text"){
