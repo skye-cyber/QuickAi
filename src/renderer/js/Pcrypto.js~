@@ -1,5 +1,4 @@
-const crypto = window.electron.crypto
-console.log(crypto)
+const crypto = require('crypto')
 
 function hide_key(apiKey, password) {
     // Derive a 32-byte key from the password

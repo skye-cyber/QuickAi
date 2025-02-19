@@ -1,6 +1,6 @@
 {
   "name": "QuickAi",
-  "version": "1.0.5",
+  "version": "1.1.5",
   "description": "An application to interact with AI assistants for free.",
   "main": "src/main/index.js",
   "homepage": "home.html",
@@ -10,36 +10,38 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "NODE_ENV=production npx tailwindcss -i ./src/renderer/css/css.css -o ./src/renderer/css/styles.css --minify",
     "watch": "npx tailwindcss -i ./src/renderer/css/css.css -o ./src/renderer/css/styles.css --watch",
-    "package": "electron-packager ."
+    "package": "electron-packager .",
+    "forge": "electron-forge package"
   },
   "keywords": [],
   "author": {
-    "name": "Wambua aka Skye",
+    "name": "Wambua Mwikya aka Skye",
     "email": "swskye17@gmail.com"
   },
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
+    "@electron-forge/cli": "^7.6.0",
     "assert": "^2.1.0",
     "babel-loader": "^9.2.1",
     "browser": "^0.2.6",
     "browserify-fs": "^1.0.0",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",
+    "call-bound": "^1.0.3",
     "canvg": "^4.0.2",
     "child-process-promise": "^2.2.1",
     "compression-webpack-plugin": "^11.1.0",
     "crypto-browserify": "^3.12.1",
     "dotenv": "^16.4.7",
     "dotenv-expand": "^12.0.1",
-    "electron": "^33.2.1",
+    "electron": "^34.1.1",
     "electron-builder": "^25.1.8",
     "electron-packager": "^17.1.2",
     "file-saver": "^2.0.5",
     "fs": "^0.0.1-security",
     "highlight": "^0.2.4",
-    "html-docx-js": "^0.3.1",
     "html-to-docx": "^1.8.0",
     "html-to-image": "^1.11.11",
     "html-to-pdf": "^0.1.11",
@@ -72,15 +74,11 @@
     "gulp-util": "^3.0.8",
     "js-yaml": "^4.1.0",
     "jszip": "^3.10.1",
-    "katex": "^0.16.15",
-    "lodash": "^4.17.21",
-    "lodash.merge": "^4.6.2",
     "map-schema": "^0.3.0",
     "minimatch": "^10.0.1",
     "set-value": "^4.1.0",
     "shelljs": "^0.8.5",
     "update": "^0.7.4",
-    "uuid": "^11.0.3",
     "webpack": "^5.97.1"
   },
   "files": [
@@ -89,14 +87,15 @@
     "loading.html",
     "README.md",
     "package.json",
-    "assets/documentation.html',
-    "!.dist",
-    "node_modules/**/*",
+    "assets/documentation.html",
     "src/**/*"
   ],
   "build": {
     "appId": "com.quickai.app",
     "productName": "QuickAi",
+    "electronDownload": {
+      "cache": true,
+    },
     "mac": {
       "target": [
         "dmg"
