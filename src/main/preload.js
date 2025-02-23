@@ -436,8 +436,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const formattedDateTime = getFormattedDateTime();
     VId = `V-${formattedDateTime}` //${Date.now()}-${Math.random().toString(34).substring(2, 12)}`;
     CId = `C-${formattedDateTime}` //${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    //console.log(VId, CId)
-    //console.log(CurrentId)
+
+    // Close export options when clicked outside its bounds
+    /*
+     const exportOpts = document.getElementById('exportOptions');
+
+    // Function to handle clicks outside the element
+    function handleClickOutside(event) {
+        if (!exportOpts.contains(event.target) && !exportOpts.classList.contains('hidden')) {
+            exportOpts.classList.add('hidden');
+            document.removeEventListener('click', handleClickOutside);
+
+        }
+    }
+
+    // Add an event listener for clicks on the document
+    document.addEventListener('click', handleClickOutside);
+    */
 })
 
 document.addEventListener('NewConversationOpened', function() {

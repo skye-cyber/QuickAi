@@ -83,25 +83,29 @@
 
 /* Light theme scrollbar */
 ::-webkit-scrollbar-track {
-    background:#aaffff;
+    background:#2c2c2c;
     border-radius: 4px;
     opacity:0.5;
 }
 
-body.dark ::-webkit-scrollbar-track {
+.dark ::-webkit-scrollbar-track {
     background:#24486b;
     border-radius: 4px;
     opacity:0.5;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #00ffff, #4c00e3, #0099e5);
+    background: linear-gradient(145deg, #00aa7f, #aaffff, #00aaff);
     border-radius: 4px;
     transition: background-color 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #ff007f, #00ffff);
+    background: #555500;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #ffffff;
 }
 
 ::-webkit-scrollbar-thumb:active {
@@ -112,4 +116,18 @@ body.dark ::-webkit-scrollbar-track {
 ython.assistant-unused
 .note:-webkit-scrollbar {
     scroll-behavior: smooth;
+}
+
+/* Simulate a placeholder on the contenteditable div */
+#userInput:empty:before {
+content: attr(data-placeholder);
+color: #9CA3AF;
+}
+/* Always ensure an extra empty row at the bottom */
+#userInput::after {
+content: "\A"; /* Inserts a newline */
+white-space: pre;
+display: block;
+visibility: hidden;
+height: 2.4em; /* Adjust this value to match the height of an empty row */
 }

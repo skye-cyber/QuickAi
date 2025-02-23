@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
      }
 
      // Ensure the textarea is empty initially
-     userInput.value = userInput.value.trim();
+     userInput.textContent = userInput.textContent.trim();
      // Trigger input event to adjust height
      userInput.dispatchEvent(new Event('input'));
 

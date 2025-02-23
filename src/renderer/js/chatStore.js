@@ -258,7 +258,7 @@ class ConversationManager {
         ${thinkContent ? `
         <div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 lg:max-w-6xl">
             <div class="flex items-center justify-between">
-                <strong style="color: #007bff;">Thinking:</strong>
+                <strong style="color: #007bff;">Thoughts:</strong>
                 <button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentNode.parentNode.children[1].id)">
                     <p class="flex">Fold
                         <svg class="mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="32" height="38" class="fold-icon">
@@ -279,31 +279,31 @@ class ConversationManager {
             ${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
             <p style="color: #333;">${marked(actualResponse)}</p>
         </div>
-        <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
-            <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
-                <svg class="fill-rose-700 dark:fill-gray-700 text-gray-600 bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
+        <section class="options flex absolute bottom-2 left-0 space-x-4 cursor-pointer">
+            <div class="p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
+                <svg class="fill-black dark:fill-gray-700 text-gray-600 bg-[#5555ff] dark:bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                 </svg>
             </div>
-            <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageId}');">
+            <div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageId}');">
                 <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"/></path>
                 </svg>
             </div>
         </section>
-        <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+        <div id="exportOptions" class="hidden block absolute bottom-10 left-0 bg-[#fdfdbd] dark:bg-[#002e43] p-2 rounded shadow-lg z-50 transition-300>
             <ul class="list-none p-0">
                 <li class="mb-2">
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageId}')">1. Export to PDF</a>
+                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageId}')">Export to PDF</a>
                 </li>
                 <li class="mb-2">
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageId}')">2. Export to JPG</a>
+                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageId}')">Export to JPG</a>
                 </li>
                 <li>
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageId}')">3. Export to DOCX</a>
+                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageId}')">Export to DOCX</a>
                 </li>
                 <li>
-                    <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageId}')">4. Word Export Advance</a>
+                    <a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageId}')">Word Export Advance</a>
                 </li>
             </ul>
         </div>
@@ -324,13 +324,13 @@ class ConversationManager {
         <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
           <div class="${visionMessageId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(content[0].text)}</p>
           </div>
-          <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
-            <div class="opacity-70 hover:opacity-100 p-1" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
-              <svg class="fill-rose-700 dark:fill-gray-700 text-gray-600 bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
+          <section class="options flex absolute bottom-2 left-0 space-x-4 cursor-pointer">
+            <div class="p-1" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
+              <svg class="fill-black dark:fill-gray-700 text-gray-600 bg-[#5555ff] dark:bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
               </svg>
             </div>
-            <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${visionMessageId}');">
+            <div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${visionMessageId}');">
               <svg id="copy-svg-${visionMessageId}"
                 class="w-5 md:w-6 h-5 md:h-6 cursor-pointer"
                 viewBox="0 0 24 24"
@@ -348,20 +348,20 @@ class ConversationManager {
               </svg>
             </div>
           </section>
-          <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+          <div id="exportOptions" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
 
             <ul class="list-none p-0">
                 <li class="mb-2">
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${visionMessageId}')">1. Export to PDF</a>
+                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${visionMessageId}')">Export to PDF</a>
                 </li>
                 <li class="mb-2">
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${visionMessageId}')">2. Export to JPG</a>
+                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${visionMessageId}')">Export to JPG</a>
                 </li>
                 <li>
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${visionMessageId}')">3. Export to DOCX</a>
+                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${visionMessageId}')">Export to DOCX</a>
                 </li>
                 <li>
-                    <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${visionMessageId}')">4. Word Export Advance</a>
+                    <a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${visionMessageId}')">Word Export Advance</a>
                 </li>
             </ul>
           </div>
@@ -379,7 +379,7 @@ const conversationManager = new ConversationManager(storagePath);
 // Function to fetch conversation files and display their IDs
 async function fetchConversations() {
   conversationsPanel.innerHTML = `<div class="justify-center items-center">
-  <p class="text-center text-rose-400 dark:text-slate-400 text-md font-semibold">Empty!</p>
+  <p class="text-center text-rose-400 dark:text-slate-400 text-md font-semibold h-full w-full">Empty!</p>
   </div>
   `;// Clear previous entries
 

@@ -176,7 +176,7 @@ function initChat(client) {
     async function classifyText(text) {
         const isImageRequest = text.startsWith("/image");
         const escapedText = escapeHTML(text);
-        const modelSelection = modelSelect.value;
+        const Currentmodel = modelSelect.value;
 
         //let R1 = false
 
@@ -184,31 +184,51 @@ function initChat(client) {
         const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
         const userMessage = document.createElement("div");
+        /*
         const modelDict = {
             "Qwen2.5-72B-Instruct":"Qwen/Qwen2.5-72B-Instruct",
             "Qwen2.5-Coder-32B-Instruct": "Qwen/Qwen2.5-Coder-32B-Instruct",
             "DeepSeek-R1": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
             "Llama-3.3-70B-Instruct": "meta-llama/Llama-3.3-70B-Instruct",
             "c4ai-command-r-plus-08-2024": "CohereForAI/c4ai-command-r-plus-08-2024",
-            "Mistral-Nemo-Instruct-2407":"/Mistral-Nemo-Instruct-2407",
+            "Mistral-Nemo-Instruct-2407":"mistralai/Mistral-Nemo-Instruct-2407",
             "Llama-3.1-Nemotron-70B-Instruct-HF":"nvidia/Llama-3.1-Nemotron-70B-Instruct-HF",
             "Qwen/QwQ-32B-Preview":"Qwen/QwQ-32B-Preview",
             "Llama-3.2-11B-Vision-Instruct":"meta-llama/Llama-3.2-11B-Vision-Instruct",
             "Hermes-3-Llama-3.1-8B":"NousResearch/Hermes-3-Llama-3.1-8B",
-            "Phi-3.5-mini-instruct":"microsoft/Phi-3.5-mini-instruct"
+            "Phi-3.5-mini-instruct":"microsoft/Phi-3.5-mini-instruct",
+            "Qwen2.5-Coder-7B-Instruct": "Qwen/Qwen2.5-Coder-7B-Instruct",
+            "Qwen2.5-Math-1.5B": "Qwen/Qwen2.5-Math-1.5B"
+        }
+        */
+
+        const VisioModels = [
+            "Qwen/Qwen2-VL-7B-Instruct",
+            "meta-llama/Llama-3.2-11B-Vision-Instruct",
+            "Qwen/QVQ-72B-Preview"
+        ]
+
+        const provider = {
+            "Qwen/Qwen2.5-Math-1.5B": "hf-inference",
+            "Qwen/Qwen2-VL-7B-Instruct": "hyperbolic",
+            "Qwen/Qwen2.5-Coder-7B-Instruct": "nebius",
+            "Qwen/QVQ-72B-Preview": "nebius",
+            "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B": "together",
+            "deepseek-ai/DeepSeek-R1": "together",
+            "meta-llama/Llama-3.2-11B-Vision-Instruct": "hf-inference"
         }
 
-        const Currentmodel = modelDict[modelSelection]
+
         console.log(Currentmodel)
-        if (Currentmodel === "Llama-3.2-11B-Vision-Instruct"){
-            VisionChat(text=text)
+        if (VisioModels.indexOf(Currentmodel) > -1){
+            VisionChat(text=text, null, null, Currentmodel, provider[Currentmodel])
 
         } else {
             //console.log(typeof(escapedText))
             userMessage.innerHTML = `
             <div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
             <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${(escapedText)}</p>
-            <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
+            <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80 " onclick="CopyAll('.${userMessageId}', this)">
             Copy
             </button>
             </div>
@@ -349,16 +369,18 @@ function initChat(client) {
                         max_tokens: 3000
                     };
 
-                    /*if (R1) {
-                        options.provider = "together";
-                    }*/
+                    if (provider[Currentmodel]) {
+                        options.provider = provider[Currentmodel];
+                    }
 
                     const stream = client.chatCompletionStream(options);
 
                     let output = "";
                     window.processing = true;
+
                     // change send button appearance to processing status
                     HandleProcessingEventChanges()
+
                     //start timer
                     _Timer.trackTime("start");
 
@@ -405,7 +427,7 @@ function initChat(client) {
                                 ${isThinking || thinkContent ? `
                                 <div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 lg:max-w-6xl">
                                     <div class="flex items-center justify-between">
-                                        <strong style="color: #007bff;">Thinking:</strong>
+                                        <strong style="color: #007bff;">Thoughts:</strong>
                                         <button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
                                             <p class="flex">Fold
                                                 <svg class="mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="32" height="38" class="fold-icon">
@@ -426,37 +448,36 @@ function initChat(client) {
                                     ${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
                                     <p style="color: #333;">${marked(actualResponse)}</p>
                                 </div>
-                                <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
-                                    <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
-                                        <svg class="fill-rose-700 dark:fill-gray-700 text-gray-600 bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
+                                <section class="options flex absolute bottom-2 left-0 space-x-4 cursor-pointer">
+                                    <div class="p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
+                                        <svg class="fill-black dark:fill-gray-700 text-gray-600 bg-[#5555ff] dark:bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
                                             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                                         </svg>
                                     </div>
-                                    <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageUId}');">
+                                    <div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageUId}');">
                                         <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"/></path>
                                         </svg>
                                     </div>
                                 </section>
-                                <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+                                <div id="exportOptions" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
                                     <ul class="list-none p-0">
                                         <li class="mb-2">
-                                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">1. Export to PDF</a>
+                                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">Export to PDF</a>
                                         </li>
                                         <li class="mb-2">
-                                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">2. Export to JPG</a>
+                                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">Export to JPG</a>
                                         </li>
                                         <li>
-                                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">3. Export to DOCX</a>
+                                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">Export to DOCX</a>
                                         </li>
                                         <li>
-                                            <a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageUId}')">4. Word Export Advance</a>
+                                            <a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageUId}')">Word Export Advance</a>
                                         </li>
                                     </ul>
                                 </div>
                             </section>`:""}
                             `;
-
 
 
                             AutoScroll.checked ? scrollToBottom(chatArea) : null;
@@ -502,12 +523,11 @@ function initChat(client) {
     });
 
 
-    async function VisionChat(text, fileType, fileDataUrl = null) {
+    async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null,  provider = null) {
         const _Timer = new Timer();
 
-        //console.log("Initial VisionHistory:", JSON.stringify(VisionHistory, null, 2));
-        //switch to vission model
-        modelSelect.value = "Llama-3.2-11B-Vision-Instruct"
+        //switch to vision model
+        modelSelect.value = Vmodel.split('/').slice(-1)[0]
 
         const fileContainerId = `FCont_${Math.random().toString(35).substring(2, 8)}`;
         // Add user message to chat
@@ -569,9 +589,6 @@ function initChat(client) {
             content: userContent,
         });
 
-        // Store the last message for retry purposes
-        //const lastMessage = userContent;
-
         const VisionMessage = document.createElement("div");
         const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
         VisionMessage.classList.add("flex", "justify-start", "mb-12", "overflow-wrap");
@@ -579,7 +596,7 @@ function initChat(client) {
 
         // Add loading animation
         VisionMessage.innerHTML = `
-        <div id="loader-parent">
+                <div id="loader-parent">
                     <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" class="transform scale-75">
                         <circle cx="12" cy="24" r="4" class="fill-green-500">
                             <animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" />
@@ -600,16 +617,22 @@ function initChat(client) {
         try {
             console.log(window.electron.clearImages(window.electron.getVisionChat()),)
             const visionstream = client.chatCompletionStream({
-                model: "meta-llama/Llama-3.2-11B-Vision-Instruct",
+                model: Vmodel,
                 messages: window.electron.clearImages(window.electron.getVisionChat()),
                 max_tokens: 2000,
-                provider: "hf-inference",
             });
 
+            if (provider) {
+                visionstream.provider = provider;
+            }
+
             let visionMs = "";
+
             window.processing = true;
+
             // change send button appearance to processing status
             HandleProcessingEventChanges()
+
             //start timer
             _Timer.trackTime("start");
             for await (const chunk of visionstream) {
@@ -620,20 +643,20 @@ function initChat(client) {
                     <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
                         <div class="${VisionMessageUId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(visionMs)}
                         </div>
-                        <section class="options flex absolute bottom-0 left-0 space-x-4 cursor-pointer">
-                            <div class="opacity-70 hover:opacity-100 p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
-                                <svg class="fill-rose-700 dark:fill-gray-700 text-gray-600 bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
+                        <section class="options flex absolute bottom-2 left-0 space-x-4 cursor-pointer">
+                            <div class="p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
+                                <svg class="fill-black dark:fill-gray-700 text-gray-600 bg-[#5555ff] dark:bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
                                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                                 </svg>
                             </div>
-                            <div class="rounded-lg p-1 opacity-70 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${VisionMessageUId}');">
+                            <div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${VisionMessageUId}');">
                                 <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"></path>
                                 </svg>
                             </div>
                         </section>
 
-                        <div id="exportOptions" class="hidden block absolute bottom-6 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+                        <div id="exportOptions" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
 
                             <ul class="list-none p-0">
                                 <li class="mb-2">
@@ -723,7 +746,7 @@ function initChat(client) {
     // Function to ensure MathJax renders dynamically injected content
     let renderTimeout;
 
-    function debounceRenderMathJax(_currentclass, delay = 700, noDelay = false) {
+    function debounceRenderMathJax(_currentclass, delay = 1000, noDelay = false) {
         if (renderTimeout) clearTimeout(renderTimeout);
 
         if (noDelay) {
@@ -799,7 +822,6 @@ function initChat(client) {
 
                 // Re-attach the click event listener
                 newRetry.addEventListener('click', function() {
-                    //console.log("Clicked");
                     retryHandler();
                 });
 
@@ -1004,9 +1026,9 @@ function initChat(client) {
     }
 
     sendBtn.addEventListener("click", () => {
-        const inputText = userInput.value.trim();
+        const inputText = userInput.textContent.trim();
         if (inputText) {
-            userInput.value = "";
+            userInput.textContent = "";
             classifyText(inputText);
             document.getElementById('suggestions').classList.add('hidden')
         }
@@ -1015,9 +1037,11 @@ function initChat(client) {
 
     userInput.addEventListener("keydown", (e) => {
         if (!window.processing === true && e.key === "Enter" && !e.shiftKey) {
-            const inputText = userInput.value.trim();
+            event.preventDefault();
+            const inputText = userInput.textContent.trim();
+
             if (inputText) {
-                userInput.value = "";
+                userInput.textContent = "";
                 classifyText(inputText);
                 document.getElementById('suggestions') ? document.getElementById('suggestions').classList.add('hidden') : "";
             }

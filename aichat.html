@@ -88,17 +88,24 @@
                     </svg>
                 </button>
                 <select id="model" class="hidden">
-                    <option value="Qwen2.5-72B-Instruct">Basic mode</option>
-                    <option value="Qwen2.5-Coder-32B-Instruct">Coding mode</option>
-                    <option value="Llama-3.2-11B-Vision-Instruct">Vision</option>
-                    <option value="DeepSeek-R1">DeepSeek-R1</option>
-                    <option value="Llama-3.3-70B-Instruct">Llama-3.3-70B-Instruct</option>
-                    <option value="Llama-3.1-Nemotron-70B-Instruct-HF">Llama-3.1-Nemotron-70B-Instruct-HF</option>
+                    <!--Chat & coding models-->
+                    <option value="Qwen/Qwen2.5-72B-Instruct">Basic mode</option>
+                    <option value="Qwen/Qwen2.5-Coder-32B-Instruct">Coding mode</option>
+                    <option value="deepseek-ai/DeepSeek-R1">DeepSeek-R1</option>
+                    <option value="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B">DeepSeek-R1-Distill-Qwen-32B</option>
+                    <option value="meta-llama/Llama-3.3-70B-Instruct">Llama-3.3-70B-Instruct</option>
+                    <option value="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF">Llama-3.1-Nemotron-70B-Instruct-HF</option>
                     <option value="Qwen/QwQ-32B-Preview">Qwen/QwQ-32B-Preview</option>
-                    <option value="Mistral-Nemo-Instruct-2407">Mistral-Nemo-Instruct-2407</option>
-                    <option value="Phi-3.5-mini-instruct">Phi-3.5-mini-instruct</option>
-                    <option value="c4ai-command-r-plus-08-2024">c4ai-command-r-plus-08-2024</option>
-                    <option value="Hermes-3-Llama-3.1-8B">Hermes-3-Llama-3.1-8B</option>
+                    <option value="mistralai/Mistral-Nemo-Instruct-2407">Mistral-Nemo-Instruct-2407</option>
+                    <option value="microsoft/Phi-3.5-mini-instruct">Phi-3.5-mini-instruct</option>
+                    <option value="CohereForAI/c4ai-command-r-plus-08-2024">c4ai-command-r-plus-08-2024</option>
+                    <option value="NousResearch/Hermes-3-Llama-3.1-8B">Hermes-3-Llama-3.1-8B</option>
+                    <option value="Qwen/Qwen2.5-Coder-7B-Instruct">Qwen/Qwen2.5-Coder-7B-Instruct</option>
+                    <!--Vision/multimodal models-->
+                    <option value="meta-llama/Llama-3.2-11B-Vision-Instruct">Vision</option>
+                    <option value="Qwen/Qwen2-VL-7B-Instruct">Qwen2-VL-7B-Instruct</option>
+                    <!--Math models-->
+                    <option value="Qwen/Qwen2.5-Math-1.5B">Qwen2.5-Math-1.5B</option>
                 </select>
 
                 <div class="relative">
@@ -108,9 +115,9 @@
                         <svg class="mt-1" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </div>
                     </button>
-                    <div id="modelDropdown" class="fixed z-50 mt-1 hidden w-fit max-h-[88vh] overflow-y-auto py-4 max-w-md bg-white border-2 border-gray-300 dark:border-none dark:bg-neutral-700 text-gray-800 dark:text-gray-300 rounded-lg shadow-lg overflow-x-hidden whitespace-wrap text-ellipsis ::-webkit-scrollbar-track:rounded-lg ::-webkit-scrollbar-color-[#0055ff]">
+                    <div id="modelDropdown" class="fixed z-50 mt-1 hidden w-fit max-h-[88vh] overflow-y-auto py-1 max-w-md bg-white border-2 border-gray-300 dark:border-none dark:bg-neutral-700 text-gray-800 dark:text-gray-300 rounded-lg shadow-lg overflow-x-hidden whitespace-wrap text-ellipsis ::-webkit-scrollbar-track:rounded-lg ::-webkit-scrollbar-color-[#0055ff]">
                         <div role="menu" aria-orientation="vertical">
-                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="Qwen2.5-72B-Instruct">
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="Qwen/Qwen2.5-72B-Instruct">
                                 <div class="flex grow items-center justify-between gap-2">
                                     <div class="flex items-center gap-3">
                                         <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
@@ -120,13 +127,14 @@
                                         </svg>
                                         </div>
                                         <div>
-                                        Basic mode
+                                        Basic mode <sub><span class="text-yellow-500 text-xl">{</span>
+                                    <span class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-700 to-orange-400 text-sm"> <span class="">Qwen2.5-72B-Instruct<span class="text-orange-500 text-xl">}</span></sub>
                                         <div class="text-gray-500 dark:text-gray-400 text-xs">Default conversation model</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="Qwen2.5-Coder-32B-Instruct">
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="Qwen/Qwen2.5-Coder-32B-Instruct">
                                 <div class="flex grow items-center justify-between gap-2">
                                 <div class="flex items-center gap-3">
                                     <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
@@ -135,159 +143,243 @@
                                     </svg>
                                     </div>
                                     <div>
-                                    Coding mode
+                                    Coding mode <sub><span class="text-yellow-500 text-xl">{</span>
+                                    <span class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-700 to-orange-400 text-sm"> <span class="">Qwen2.5-Coder-32B-Instruct<span class="text-orange-500 text-xl">}</span></sub>
                                     <div class="text-gray-500 dark:text-gray-400 text-xs">Supports advanced coding tasks</div>
                                     </div>
                                 </div>
                                 </div>
                             </div>
-                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="Llama-3.2-11B-Vision-Instruct">
-                                <div class="flex grow items-center justify-between gap-2">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-black dark:text-gray-200">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM16.0755 7.93219C16.5272 8.25003 16.6356 8.87383 16.3178 9.32549L11.5678 16.0755C11.3931 16.3237 11.1152 16.4792 10.8123 16.4981C10.5093 16.517 10.2142 16.3973 10.0101 16.1727L7.51006 13.4227C7.13855 13.014 7.16867 12.3816 7.57733 12.0101C7.98598 11.6386 8.61843 11.6687 8.98994 12.0773L10.6504 13.9039L14.6822 8.17451C15 7.72284 15.6238 7.61436 16.0755 7.93219Z" fill="currentColor"></path>
-                                    </svg>
-                                    </div>
-                                    <div>
-                                    Vision
-                                    <div class="text-gray-500 dark:text-gray-400 text-xs">The latest multimodal model from Meta! Supports image inputs natively.</div>
-                                    </div>
-                                </div>
-                                </div>
-                            </div>
-                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="DeepSeek-R1">
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="deepseek-ai/DeepSeek-R1">
                                 <div class="flex grow items-center justify-between gap-2">
                                     <div class="flex items-center gap-3">
                                         <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-sky-300 dark:bg-zinc-700">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="28" height="28" class="h-4 w-4 text-black dark:text-gray-200 rounded-full">
-                                                <defs>
-                                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                        <stop offset="0%" style="stop-color:#007bff;stop-opacity:1" />
-                                                        <stop offset="100%" style="stop-color:#00c6ff;stop-opacity:1" />
-                                                    </linearGradient>
-                                                </defs>
-                                                <rect x="0" y="0" class="h-28 w-28 p-2" fill="url(#gradient)" />
-                                                <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">R1</text>
-                                            </svg>
+                                            <img class="rounded-full overflown aspect-square size-6 rounded border dark:border-gray-700" src="src/assets/deepseek-logo.webp" alt="/deepseek-logo logo">
                                         </div>
                                         <div>
                                         DeepSeek-R1
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">The first reasoning model from DeepSeek.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-sky-300 dark:bg-zinc-700">
+                                            <img class="rounded-full overflown aspect-square size-6 rounded border dark:border-gray-700" src="src/assets/deepseek-logo.webp" alt="/deepseek-logo logo">
+                                        </div>
+                                        <div>
+                                        DeepSeek-R1-Distill-Qwen-32B
                                         <div class="text-gray-500 dark:text-gray-400 text-xs">The first reasoning model from DeepSeek, distilled into a 32B dense model. Outperforms o1-mini on multiple benchmarks.</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div role="separator" aria-orientation="horizontal" class="mx-5 my-1 h-px bg-gray-700"></div>
+                            <div role="separator" aria-orientation="horizontal" class="mx-5 my-1 h-px bg-gray-700 dark:bg-sky-400"></div>
 
-                        </div>
-                <!--New-->
-                <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="Phi-3.5-mini-instruct">
-                    <div class="flex grow items-center justify-between gap-2">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                               <img width="24" height="24" class="overflown aspect-square size-6 rounded border dark:border-gray-700" src="src/assets/microsoft-logo.png" alt="Phi-3.5-mini-instruct logo">
-                            </div>
-                            <div>
-                            Phi-3.5-mini-instruct
-                            <div class="text-gray-500 dark:text-gray-400 text-xs">One of the best small models (3.8B parameters), super fast for simple tasks.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="Qwen/QwQ-32B-Preview">
-                    <div class="flex grow items-center justify-between gap-2">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                                <img width="24" height="24" class="overflown aspect-square size-6 rounded border dark:border-gray-700" src="src/assets/qwen-logo.png" alt="Qwen/QwQ-32B-Preview logo">
-                            </div>
-                            <div>
-                            Qwen/QwQ-32B-Preview
-                            <div class="text-gray-500 dark:text-gray-400 text-xs">QwQ is an experiment model from the Qwen Team with advanced reasoning capabilities.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="Mistral-Nemo-Instruct-2407">
-                    <div class="flex grow items-center justify-between gap-2">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                                <img class="overflown aspect-square size-6 rounded border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="Mistral-Nemo-Instruct-2407 logo">
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="microsoft/Phi-3.5-mini-instruct">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                        <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/microsoft-logo.png" alt="Phi-3.5-mini-instruct logo">
+                                        </div>
+                                        <div>
+                                        Phi-3.5-mini-instruct
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">One of the best small models (3.8B parameters), super fast for simple tasks.</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                            Mistral-Nemo-Instruct-2407
-                            <div class="text-gray-500 dark:text-gray-400 text-xs">A small model with good capabilities in language understanding and commonsense reasoning.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="Hermes-3-Llama-3.1-8B">
-                    <div class="flex grow items-center justify-between gap-2">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                               <img width="24" height="24" class="overflown aspect-square size-6 rounded border dark:border-gray-700" src="src/assets/nous-logo.png" alt="Hermes-3-Llama-3.1-8B logo">
-                            </div>
-                            <div>
-                            Hermes-3-Llama-3.1-8B
-                            <div class="text-gray-500 dark:text-gray-400 text-xs">Nous Research's latest Hermes 3 release in 8B size. Follows instruction closely.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div role="separator" aria-orientation="horizontal" class="mx-5 my-1 flex items-center justify-center">
-                    <div class="flex-1 h-px bg-gradient-to-r from-purple-500 to-pink-500"></div>
-                    <div class="px-8">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-[#00aaff]" fill="b" viewBox="0 0 24 24" class="w-12 h-12 text-purple-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm12-8v2a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" />
-                        </svg>
-                    </div>
-                    <div class="flex-1 h-px bg-gradient-to-r from-purple-500 to-pink-500"></div>
-                </div>
-                <div class="mx-5 my-2 text-center text-purple-500 font-bold">
-                    <p>Pro Models</p>
-                </div>
-                <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="Llama-3.3-70B-Instruct">
-                    <div class="flex grow items-center justify-between gap-2">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                                <img width="24" height="24" class="overflown aspect-square size-6 rounded border dark:border-gray-700" src="src/assets/meta-logo.png" alt="Llama-3.3-70B-Instruct logo">
-                            </div>
-                            <div>
-                            Llama-3.3-70B-Instruct
-                            <div class="text-gray-500 dark:text-gray-400 text-xs">A fast and extremely capable model matching closed sourced models' capabilities</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="Llama-3.1-Nemotron-70B-Instruct-HF">
-                    <div class="flex grow items-center justify-between gap-2">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                                <img width="24" height="24" class="overflown aspect-square size-6 rounded border dark:border-gray-700" src="src/assets/nvidia-logo.png" alt="Llama-3.1-Nemotron-70B-Instruct-HF logo">
-                            </div>
-                            <div>
-                            Llama-3.1-Nemotron-70B-Instruct-HF
-                            <div class="text-gray-500 dark:text-gray-400 text-xs">Nvidia's latest Llama fine-tune, topping alignment benchmarks and optimized for instruction following.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5" tabindex="-1" data-value="c4ai-command-r-plus-08-2024">
-                    <div class="flex grow items-center justify-between gap-2">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                                <img class="overflown aspect-square size-6 rounded border dark:border-gray-700" src="src/assets/cohere-logo.png" alt="c4ai-command-r-plus-08-2024 logo">
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="Qwen/QwQ-32B-Preview">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/qwen-logo.png" alt="Qwen/QwQ-32B-Preview logo">
+                                        </div>
+                                        <div>
+                                        Qwen/QwQ-32B-Preview
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">QwQ is an experiment model from the Qwen Team with advanced reasoning capabilities.</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                            c4ai-command-r-plus-08-2024
-                            <div class="text-gray-500 dark:text-gray-400 text-xs">Cohere's largest language model, optimized for conversational interaction and tool use. Now with the 2024 update!</div>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
 
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistralai/Mistral-Nemo-Instruct-2407">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="Mistral-Nemo-Instruct-2407 logo">
+                                        </div>
+                                        <div>
+                                        Mistral-Nemo-Instruct-2407
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">A small model with good capabilities in language understanding and commonsense reasoning.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="NousResearch/Hermes-3-Llama-3.1-8B">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                        <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/nous-logo.png" alt="Hermes-3-Llama-3.1-8B logo">
+                                        </div>
+                                        <div>
+                                        Hermes-3-Llama-3.1-8B
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">Nous Research's latest Hermes 3 release in 8B size. Follows instruction closely.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="Qwen/Qwen2.5-Coder-7B-Instruct">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/qwen-logo.png" alt="Qwen/QwQ-32B-Preview logo">
+                                        </div>
+                                        <div>
+                                        Qwen2.5-Coder-7B-Instruct
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">latest series of Code-Specific Qwen large language models (formerly known as CodeQwen).</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Math Seperator-->
+                            <div role="separator" aria-orientation="horizontal" class="mx-5 my-1 flex items-center justify-center">
+                                <div class="flex-1 h-px bg-gradient-to-r from-[#ffaa00] to-[#00ff00]"></div>
+                                <div class="px-8">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-[#00aaff]" fill="b" viewBox="0 0 24 24" class="w-12 h-12 text-purple-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm12-8v2a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1 h-px bg-gradient-to-r from-[#55ff7f] to-[#0055ff]"></div>
+                            </div>
+                            <div class="mx-5 my-2 text-sm text-center font-mono text-[#55aaff] font-semibold">
+                                <p>Math models</p>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="Qwen/Qwen2.5-Math-1.5B">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/qwen-logo.png" alt="Qwen/QwQ-32B-Preview logo">
+                                        </div>
+                                        <div>
+                                        Qwen2.5-Math-1.5B
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">Mathematical Model by qwen Team.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Multimodal Seperator-->
+                            <div role="separator" aria-orientation="horizontal" class="mx-5 my-1 flex items-center justify-center">
+                                <div class="flex-1 h-px bg-gradient-to-r from-purple-500 to-[#ffaa00]"></div>
+                                <div class="px-8">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-[#00aaff]" fill="b" viewBox="0 0 24 24" class="w-12 h-12 text-purple-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm12-8v2a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1 h-px bg-gradient-to-r from-[#55ff7f] to-pink-500"></div>
+                            </div>
+                            <div class="mx-5 my-2 text-sm text-center font-mono text-[#55aaff] font-semibold">
+                                <p>Multi-modal models</p>
+                            </div>
+
+                            <!--Multimodal models -->
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="meta-llama/Llama-3.2-11B-Vision-Instruct">
+                                <div class="flex grow items-center justify-between gap-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-[#00aaff]">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-black dark:text-gray-200">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM16.0755 7.93219C16.5272 8.25003 16.6356 8.87383 16.3178 9.32549L11.5678 16.0755C11.3931 16.3237 11.1152 16.4792 10.8123 16.4981C10.5093 16.517 10.2142 16.3973 10.0101 16.1727L7.51006 13.4227C7.13855 13.014 7.16867 12.3816 7.57733 12.0101C7.98598 11.6386 8.61843 11.6687 8.98994 12.0773L10.6504 13.9039L14.6822 8.17451C15 7.72284 15.6238 7.61436 16.0755 7.93219Z" fill="currentColor"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                    Vision <sub><span class="text-yellow-500 text-xl">{</span>
+                                    <span class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-700 to-orange-400 text-sm"> <span class="">Llama-3.2-11B-Vision-Instruct<span class="text-orange-500 text-xl">}</span></sub>
+                                    <div class="text-gray-500 dark:text-gray-400 text-xs">The latest multimodal model from Meta! Supports image inputs natively.</div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="Qwen/Qwen2-VL-7B-Instruct">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img width="24" height="24" class="overflown aspect-square size-6 rounded border dark:border-gray-700" src="src/assets/qwen-logo.png" alt="Qwen/QwQ-32B-Preview logo">
+                                        </div>
+                                        <div>
+                                        Qwen2-VL-7B-Instruct
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">Latest iteration of Qwen-VL model.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Pro Seperator-->
+                            <div role="separator" aria-orientation="horizontal" class="mx-5 my-1 flex items-center justify-center">
+                                <div class="flex-1 h-px bg-gradient-to-r from-purple-500 to-pink-500"></div>
+                                <div class="px-8">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-[#00aaff]" fill="b" viewBox="0 0 24 24" class="w-12 h-12 text-purple-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm12-8v2a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1 h-px bg-gradient-to-r from-purple-500 to-pink-500"></div>
+                            </div>
+                            <div class="mx-5 my-2 text-center text-purple-500 font-bold">
+                                <p class="text-sm">Pro Models</p>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="meta-llama/Llama-3.3-70B-Instruct">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/meta-logo.png" alt="Llama-3.3-70B-Instruct logo">
+                                        </div>
+                                        <div>
+                                        Llama-3.3-70B-Instruct
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">A fast and extremely capable model matching closed sourced models' capabilities</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="nvidia/Llama-3.1-Nemotron-70B-Instruct-HF">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/nvidia-logo.png" alt="Llama-3.1-Nemotron-70B-Instruct-HF logo">
+                                        </div>
+                                        <div>
+                                        Llama-3.1-Nemotron-70B-Instruct-HF
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">Nvidia's latest Llama fine-tune, topping alignment benchmarks and optimized for instruction following.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="CohereForAI/c4ai-command-r-plus-08-2024">
+                        <div class="flex grow items-center justify-between gap-2">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                    <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/cohere-logo.png" alt="c4ai-command-r-plus-08-2024 logo">
+                                </div>
+                                <div>
+                                c4ai-command-r-plus-08-2024
+                                <div class="text-gray-500 dark:text-gray-400 text-xs">Cohere's largest language model, optimized for conversational interaction and tool use. Now with the 2024 update!</div>
+                                </div>
+                            </div>
+                            </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -315,7 +407,7 @@
             </div>
             <hr>
         </section>
-        <div id="conversations" class="h-[calc(90vh-72px)] overflow-y-auto mb-2 w-full space-y-2 mt-7  overflow-x-hidden">
+        <div id="conversations" class="h-[calc(90vh-72px)] overflow-y-auto mb-2 w-full space-y-2 mt-7 overflow-x-hidden">
             <!-- Conversation items will be added here -->
         </div>
     </div>
@@ -378,33 +470,53 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-md text-token-text-primary"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z" fill="currentColor"></path>
             </svg>
     </button>
-
-   <!-- User Message Input Section -->
+    <!-- User Message Input Section -->
     <div class="fixed flex left-0 lg:left-auto w-full lg:items-center lg:justify-center z-30 bottom-[1%] transition-opacity duration-200">
-        <section class="w-full lg:w-[80vw] flex space-x-4 z-30">
-            <section class="relative w-full p-2 border dark:border-black dark:bg-gray-700 rounded-lg">
-                <textarea id="userInput"
-                    oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';" cols="10"
-                    class="w-full rows-10 scrollbar-hide resize-none overflow-wrap py-1 px-[10%] md:py-3 md:pl-[4%] md:pr-[7%] max-h-[15vh] border border-gray-500 dark:border-none rounded-lg focus:outline-none dark:outline-sky-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-gray-900 dark:ring-1 dark:bg-gray-800 dark:text-white"
-                    autofocus
-                    placeholder="Message QuickAi 💫 To generate an image, start with `/image`" aria-label="Message input">
-                </textarea>
+        <section class="relative w-full lg:w-[70vw] flex space-x-4 z-30">
+            <!-- Custom input field -->
+            <div id="userInput"
+                contenteditable="true"
+                role="textbox"
+                aria-label="Message input"
+                autofocus
+                data-placeholder="Message QuickAi 💫 To generate an image, start with `/image`"
+                oninput="this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 28 * window.innerHeight / 100) + 'px'; this.scrollTop = this.scrollHeight;"
+                value="this.textContent()"
+                class="w-full overflow-auto scrollbar-hide py-1 px-[4%] md:py-3 md:pl-[2%] md:pr-[7%] border border-gray-500 dark:border-none rounded-lg focus:outline-none dark:outline-sky-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-gray-900 dark:ring-1 dark:bg-gray-800 dark:text-white max-h-[28vh] pb-2"></div>
 
-                <div id="AttachFiles" class="absolute left-3 bottom-5 flex rounded-lg opacity-70 hover:opacity-90" title="Attach files">
-                    <button aria-label="Attach files" class="items-center justify-center h-8 w-8 rounded-lg rounded-bl-xl text-token-text-primary dark:text-white focus-visible:outline-black dark:focus-visible:outline-white hover:bg-black/10">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M9 7C9 4.23858 11.2386 2 14 2C16.7614 2 19 4.23858 19 7V15C19 18.866 15.866 22 12 22C8.13401 22 5 18.866 5 15V9C5 8.44772 5.44772 8 6 8C6.55228 8 7 8.44772 7 9V15C7 17.7614 9.23858 20 12 20C14.7614 20 17 17.7614 17 15V7C17 5.34315 15.6569 4 14 4C12.3431 4 11 5.34315 11 7V15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15V9C13 8.44772 13.4477 8 14 8C14.5523 8 15 8.44772 15 9V15C15 16.6569 13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z" fill="currentColor"></path>
-                        </svg>
-                    </button>
+            <section class="absolute right-[0.5px] bottom-0 p-1 flex w-full rounded-b-md dark:bg-gray-800 shadow-xl">
+                <!-- Tools section (Attach Files and Preview) -->
+                <div class="flex px-3">
+                    <div id="AttachFiles" class="flex rounded-lg" title="Attach files">
+                        <button aria-label="Attach files" class="flex items-center justify-center h-8 w-8 rounded-lg rounded-bl-xl text-token-text-primary dark:text-white dark:hover:text-blue-400 focus-visible:outline-black dark:focus-visible:outline-white hover:bg-black/20">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M9 7C9 4.23858 11.2386 2 14 2C16.7614 2 19 4.23858 19 7V15C19 18.866 15.866 22 12 22C8.13401 22 5 18.866 5 15V9C5 8.44772 5.44772 8 6 8C6.55228 8 7 8.44772 7 9V15C7 17.7614 9.23858 20 12 20C14.7614 20 17 17.7614 17 15V7C17 5.34315 15.6569 4 14 4C12.3431 4 11 5.34315 11 7V15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15V9C13 8.44772 13.4477 8 14 8C14.5523 8 15 8.44772 15 9V15C15 16.6569 13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z" fill="currentColor"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
-                <button
-                    id="sendBtn"
-                    class="absolute right-2 h-14 w-14 bottom-4 rounded-full transition ease-in-out duration-200 z-32"
-                    aria-label="Send message" title="Send message">
+                <div class="flex">
+                    <div style="view-transition-name: var(--vt-composer-reason-action);">
+                        <div>
+                            <span data-state="closed">
+                                <button class="flex h-9 min-w-8 items-center justify-center rounded-full border p-2 text-[13px] font-medium border-2 border-stone-600 bg-violet-600/10 hover:bg-teal-100/50 dark:border-zinc-600 dark:outline-white/50 text-gray-400 dark:hover:bg-[#2b245a]" aria-pressed="false" aria-label="Preview">
+                                    <div class="h-[18px] w-[18px]">
+                                        <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path class="fill-[#25374a] dark:fill-gray-100 dark:hover:fill-blue-400" d="m12 3c-3.585 0-6.5 2.9225-6.5 6.5385 0 2.2826 1.162 4.2913 2.9248 5.4615h7.1504c1.7628-1.1702 2.9248-3.1789 2.9248-5.4615 0-3.6159-2.915-6.5385-6.5-6.5385zm2.8653 14h-5.7306v1h5.7306v-1zm-1.1329 3h-3.4648c0.3458 0.5978 0.9921 1 1.7324 1s1.3866-0.4022 1.7324-1zm-5.6064 0c0.44403 1.7252 2.0101 3 3.874 3s3.43-1.2748 3.874-3c0.5483-0.0047 0.9913-0.4506 0.9913-1v-2.4593c2.1969-1.5431 3.6347-4.1045 3.6347-7.0022 0-4.7108-3.8008-8.5385-8.5-8.5385-4.6992 0-8.5 3.8276-8.5 8.5385 0 2.8977 1.4378 5.4591 3.6347 7.0022v2.4593c0 0.5494 0.44301 0.9953 0.99128 1z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="whitespace-nowrap pl-1 pr-1 text-[#25374a] dark:text-gray-100 dark:hover:text-blue-400">Preview</div>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="sendBtn" class="absolute right-2 h-14 w-14 bottom-4 rounded-full transition ease-in-out duration-200 z-32" aria-label="Send message" title="Send message">
                     <i class="fasfa-paper-plane"></i>
                     <div id="normalSend" class="">
-                        <svg class="w-full h-full fill-black dark:fill-stone-600 stroke-blue-500 hover:stroke-green-500 dark:stroke-gray-700 dark:hover:stroke-green-200 dark:hover:fill-gray-900 dark:hover:fill-opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send">
+                        <svg class="w-full h-full fill-black dark:fill-stone-600 stroke-blue-500 hover:stroke-green-500 dark:stroke-gray-700 dark:hover:stroke-green-200 dark:hover:fill-gray-900 dark:hover:fill-opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 8 16 12 12 16"></polyline>
                             <line x1="8" y1="12" x2="16" y2="12"></line>
@@ -427,9 +539,10 @@
                         </svg>
                     </div>
                 </button>
+
             </section>
+
         </section>
-    </div>
     </div>
 
     <!--Attachment modal and file input -->
