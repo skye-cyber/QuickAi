@@ -7,10 +7,13 @@ module.exports = {
   entry: {
     aichat: './src/renderer/js/aichat.js',
     utility: './src/renderer/js/exportUtilities.js',
-    chatStore: './src/renderer/js/chatStore.js'
+    //chatStore: './src/renderer/js/chatStore.js',
+    //preference: './src/renderer/js/preference.js',
+    //keyshortcuts:'./src/renderer/js/keyshortcuts.js',
+    //fileHandler:'./src/renderer/js/fileHandler.js'
   },
   output: {
-    filename: '_[name].js', // This will generate files named after the entry points
+    filename: 'packed_[name].js', // This will generate files named after the entry points
     path: path.resolve(__dirname, './src/renderer/js'),
   },
   plugins: [

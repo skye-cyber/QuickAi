@@ -131,3 +131,34 @@ display: block;
 visibility: hidden;
 height: 2.4em; /* Adjust this value to match the height of an empty row */
 }
+
+
+@keyframes modalEnter {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes modalExit {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.animate-enter {
+    animation: modalEnter 0.4s ease-out forwards;
+}
+
+.animate-exit {
+    animation: modalExit 0.3s ease-in forwards;
+}

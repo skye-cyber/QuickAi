@@ -95,7 +95,7 @@ function initChat(client) {
     // Configure marked.js
     marked.setOptions({
         renderer: renderer,
-        highlight: function (code, lang) {
+        highlight: function (code) {
             // Handle case where `code` is an object
             const validLanguage = code.lang || 'plaintext';
             if (typeof code === "object" && code.text !== undefined) {
@@ -184,23 +184,6 @@ function initChat(client) {
         const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
         const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
         const userMessage = document.createElement("div");
-        /*
-        const modelDict = {
-            "Qwen2.5-72B-Instruct":"Qwen/Qwen2.5-72B-Instruct",
-            "Qwen2.5-Coder-32B-Instruct": "Qwen/Qwen2.5-Coder-32B-Instruct",
-            "DeepSeek-R1": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
-            "Llama-3.3-70B-Instruct": "meta-llama/Llama-3.3-70B-Instruct",
-            "c4ai-command-r-plus-08-2024": "CohereForAI/c4ai-command-r-plus-08-2024",
-            "Mistral-Nemo-Instruct-2407":"mistralai/Mistral-Nemo-Instruct-2407",
-            "Llama-3.1-Nemotron-70B-Instruct-HF":"nvidia/Llama-3.1-Nemotron-70B-Instruct-HF",
-            "Qwen/QwQ-32B-Preview":"Qwen/QwQ-32B-Preview",
-            "Llama-3.2-11B-Vision-Instruct":"meta-llama/Llama-3.2-11B-Vision-Instruct",
-            "Hermes-3-Llama-3.1-8B":"NousResearch/Hermes-3-Llama-3.1-8B",
-            "Phi-3.5-mini-instruct":"microsoft/Phi-3.5-mini-instruct",
-            "Qwen2.5-Coder-7B-Instruct": "Qwen/Qwen2.5-Coder-7B-Instruct",
-            "Qwen2.5-Math-1.5B": "Qwen/Qwen2.5-Math-1.5B"
-        }
-        */
 
         const VisioModels = [
             "Qwen/Qwen2-VL-7B-Instruct",
@@ -1037,11 +1020,16 @@ function initChat(client) {
 
     userInput.addEventListener("keydown", (e) => {
         if (!window.processing === true && e.key === "Enter" && !e.shiftKey) {
-            event.preventDefault();
+            e.preventDefault();
             const inputText = userInput.textContent.trim();
 
             if (inputText) {
+                //Reset the input field content
                 userInput.textContent = "";
+                // Reset th input field size/height
+                userInput.style.height = 'auto';
+                userInput.style.height = Math.min(userInput.scrollHeight, 28 * window.innerHeight / 100) + 'px';
+                userInput.scrollTop = userInput.scrollHeight;
                 classifyText(inputText);
                 document.getElementById('suggestions') ? document.getElementById('suggestions').classList.add('hidden') : "";
             }

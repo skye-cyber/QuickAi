@@ -2,7 +2,6 @@ const storagePath = window.electron.joinPath(window.electron.home_dir(), '.quick
 const chatArea = document.getElementById('chatArea');
 const conversationsPanel = document.getElementById('conversations');
 escapeHTML = window.escapeHTML;
-const modal = document.getElementById('renameModal');
 const modalTitle = document.getElementById('modalTitle');
 const newNameInput = document.getElementById('newName');
 const renameButton = document.getElementById('renameButton');
@@ -29,179 +28,179 @@ async function checkAndCreateDirectory() {
 
 
 class ConversationManager {
-  constructor(storagePath) {
-    this.storagePath = storagePath;
-  }
-
-  // Save conversation to a JSON file
-  async saveConversation(conversationData, conversationId) {
-    const filePath = `${this.storagePath}/${conversationId}.json`;
-    //console.log(JSON.stringify(conversationData))
-    try {
-      //console.log("Saving: " + conversationId + filePath)
-      await window.electron.write(filePath, conversationData);
-    } catch (err) {
-      console.error('Error saving conversation:', err);
-    }
-  }
-
-  // Load conversation from a JSON file
-  async loadConversation(conversationId) {
-    const filePath = `${this.storagePath}/${conversationId}.json`;
-    try {
-      if (window.electron.stat(filePath)) {
-        const model = conversationId.startsWith('V') ? "Vision" : "text";
-        const data = await window.electron.read(filePath, model);
-        return [data, model]
-      }
-    } catch (err) {
-      console.error('Error loading conversation:', err);
-    }
-    return null;
-  }
-
-  // Add a message to the conversation history
-  addMessage(role, content, type = "text", fileDataUrl = null, fileType = null) {
-    let messageContent = [];
-    if (type === "vision") {
-      if (fileDataUrl){
-        messageContent = [
-          { type: "text", text: content },
-          { type: fileType, [fileType]: { url: fileDataUrl } }
-        ];
-      } else {
-        messageContent = [
-          { type: "text", text: content }
-        ];
-      }
-      window.electron.addToVisionChat({ role, content: messageContent });
-  } else {
-      /*const HasThink = (content.indexOf("</think>") && content.indexOf("</think>") != -1) ? true : false;
-      if (HasThink){
-        content = content.slice(content.indexOf('</think>') + 8, -1)
-      }*/
-      messageContent = [{ type: "text", text: content }];
-      //console.log(messageContent)
-      window.electron.addToChat({ role, content: messageContent });
-    }
-  }
-
-  // Render the conversation in the web interface
-  renderConversation(conversationData, model = "text") {
-    chatArea.innerHTML = '';
-    const value = (model ==="Vision") ? 'Llama-3.2-11B-Vision-Instruct' : 'Qwen2.5-72B-Instruct';
-    const element = document.querySelector(`[data-value="${value}"]`);
-    if (element) {
-      element.click();
-    } else {
-      console.error('Element not found with data-value: ', value);
+    constructor(storagePath) {
+        this.storagePath = storagePath;
     }
 
-    conversationData.forEach(message => {
-      if (message.role === "user") {
-        //console.log(message.content[0]);
-        this.renderUserMessage(message.content, model);
-      } else if (message.role === "assistant") {
-        if (model.toLocaleLowerCase() === "vision") { //this.getMessageType(message.content)
-          this.renderVisionAssistantMessage(message.content);
-        } else {
-          this.renderTextAssistantMessage(message.content);
+    // Save conversation to a JSON file
+    async saveConversation(conversationData, conversationId) {
+        const filePath = `${this.storagePath}/${conversationId}.json`;
+        //console.log(JSON.stringify(conversationData))
+        try {
+            //console.log("Saving: " + conversationId + filePath)
+            await window.electron.write(filePath, conversationData);
+        } catch (err) {
+            console.error('Error saving conversation:', err);
         }
-      }
-      window.electron.CreateNew(conversationData, model)
-    });
-
-    window.implementUserCopy();
-    window.copyBMan();
-    window.addCopyListeners();
-
-    if (check === false) {
-      // Sending a message to the main process
-      window.electron.send('toMain', { message: 'set-Utitility-Script' });
-      check = true;
     }
-  }
 
-  // Get file type from message content
-  getFileType(content) {
-    try {
-      const fileDict = {
-        "image_url": "image",
-        "file_url": "document"
-      };
-
-      // Find the item with type "image_url" or "file_url"
-      const fileTypeItem = content.find(item => item.type === "image_url" || item.type === "file_url");
-
-      // Check if the found item exists and has a valid type
-      if (fileTypeItem && fileDict[fileTypeItem.type]) {
-        //console.log(fileTypeItem?.type);
-        return fileDict[fileTypeItem.type];
-      }
-
-      // If no valid file type is found, log and return null
-      console.log('No file attachment!');
-      return null;
-
-    } catch (error) {
-      if (error.name === "TypeError") {
-        console.log('No file attachment!');
-      } else {
-        console.error("Error determining file type:", error.name);
-      }
-      return null;
-    }
-  }
-  getFileUrl(content) {
-    try {
-      // Find all items with type "image_url"
-      const fileMessages = content.filter(item => item.type === "image_url");
-
-      // Extract all URLs from the image_url properties
-      return fileMessages.map(fileMessage => fileMessage.image_url.url);
-    } catch (error) {
-      console.error("Error extracting file URL:", error);
-      return [];
-    }
-  }
-
-  // Get message type (text or vision) from message content
-  getMessageType(content) {
-    const fileMessage = content.find(item => item.type === "image_url" || item.type === "file_url");
-    return fileMessage ? "vision" : "text";
-  }
-
-  // Render user message
-  renderUserMessage(content, model='text') {
-    const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
-    const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
-    const fileType = this.getFileType(content);
-    var fileDataUrl = null;
-    var userText = null;
-    //console.log(fileType)
-    if (fileType){
-      fileDataUrl = this.getFileUrl(content);
-    }
-    const userMessage = document.createElement("div");
-    userMessage.className = "flex justify-end mb-4";
-
-    if (model.toLocaleLowerCase() === 'vision'){
-
-      // Check if content is an array and has at least one element before accessing content[0]
-      if (content && content.length > 0 && content[0].text) {
-        const lastChar = content[0].text.slice(-1);
-        if (lastChar === ']') {
-          userText = content[0].text.substring(0, content[0].text.length - 22);
-        } else {
-          userText = content[0].text;
+    // Load conversation from a JSON file
+    async loadConversation(conversationId) {
+        const filePath = `${this.storagePath}/${conversationId}.json`;
+        try {
+            if (window.electron.stat(filePath)) {
+                const model = conversationId.startsWith('V') ? "Vision" : "text";
+                const data = await window.electron.read(filePath, model);
+                return [data, model]
+            }
+        } catch (err) {
+            console.error('Error loading conversation:', err);
         }
-      } else {
-        userText = ''; // Set a default if the content is missing
-      }
-    } else{
-      userText = content.slice(-1) === ']' ? content.substring(0, content.length - 22) : content
+        return null;
     }
-    const messageHtml =`
+
+    // Add a message to the conversation history
+    addMessage(role, content, type = "text", fileDataUrl = null, fileType = null) {
+        let messageContent = [];
+        if (type === "vision") {
+            if (fileDataUrl) {
+                messageContent = [
+                    { type: "text", text: content },
+                    { type: fileType, [fileType]: { url: fileDataUrl } }
+                ];
+            } else {
+                messageContent = [
+                    { type: "text", text: content }
+                ];
+            }
+            window.electron.addToVisionChat({ role, content: messageContent });
+        } else {
+            /*const HasThink = (content.indexOf("</think>") && content.indexOf("</think>") != -1) ? true : false;
+            if (HasThink){
+              content = content.slice(content.indexOf('</think>') + 8, -1)
+            }*/
+            messageContent = [{ type: "text", text: content }];
+            //console.log(messageContent)
+            window.electron.addToChat({ role, content: messageContent });
+        }
+    }
+
+    // Render the conversation in the web interface
+    renderConversation(conversationData, model = "text") {
+        chatArea.innerHTML = '';
+        const value = (model === "Vision") ? 'meta-llama/Llama-3.2-11B-Vision-Instruct' : 'Qwen/Qwen2.5-72B-Instruct';
+        const element = document.querySelector(`[data-value="${value}"]`);
+        if (element) {
+            element.click();
+        } else {
+            console.error('Element not found with data-value: ', value);
+        }
+
+        conversationData.forEach(message => {
+            if (message.role === "user") {
+                //console.log(message.content[0]);
+                this.renderUserMessage(message.content, model);
+            } else if (message.role === "assistant") {
+                if (model.toLocaleLowerCase() === "vision") { //this.getMessageType(message.content)
+                    this.renderVisionAssistantMessage(message.content);
+                } else {
+                    this.renderTextAssistantMessage(message.content);
+                }
+            }
+            window.electron.CreateNew(conversationData, model)
+        });
+
+        window.implementUserCopy();
+        window.copyBMan();
+        window.addCopyListeners();
+
+        if (check === false) {
+            // Sending a message to the main process
+            window.electron.send('toMain', { message: 'set-Utitility-Script' });
+            check = true;
+        }
+    }
+
+    // Get file type from message content
+    getFileType(content) {
+        try {
+            const fileDict = {
+                "image_url": "image",
+                "file_url": "document"
+            };
+
+            // Find the item with type "image_url" or "file_url"
+            const fileTypeItem = content.find(item => item.type === "image_url" || item.type === "file_url");
+
+            // Check if the found item exists and has a valid type
+            if (fileTypeItem && fileDict[fileTypeItem.type]) {
+                //console.log(fileTypeItem?.type);
+                return fileDict[fileTypeItem.type];
+            }
+
+            // If no valid file type is found, log and return null
+            console.log('No file attachment!');
+            return null;
+
+        } catch (error) {
+            if (error.name === "TypeError") {
+                console.log('No file attachment!');
+            } else {
+                console.error("Error determining file type:", error.name);
+            }
+            return null;
+        }
+    }
+    getFileUrl(content) {
+        try {
+            // Find all items with type "image_url"
+            const fileMessages = content.filter(item => item.type === "image_url");
+
+            // Extract all URLs from the image_url properties
+            return fileMessages.map(fileMessage => fileMessage.image_url.url);
+        } catch (error) {
+            console.error("Error extracting file URL:", error);
+            return [];
+        }
+    }
+
+    // Get message type (text or vision) from message content
+    getMessageType(content) {
+        const fileMessage = content.find(item => item.type === "image_url" || item.type === "file_url");
+        return fileMessage ? "vision" : "text";
+    }
+
+    // Render user message
+    renderUserMessage(content, model = 'text') {
+        const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
+        const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
+        const fileType = this.getFileType(content);
+        var fileDataUrl = null;
+        var userText = null;
+        //console.log(fileType)
+        if (fileType) {
+            fileDataUrl = this.getFileUrl(content);
+        }
+        const userMessage = document.createElement("div");
+        userMessage.className = "flex justify-end mb-4";
+
+        if (model.toLocaleLowerCase() === 'vision') {
+
+            // Check if content is an array and has at least one element before accessing content[0]
+            if (content && content.length > 0 && content[0].text) {
+                const lastChar = content[0].text.slice(-1);
+                if (lastChar === ']') {
+                    userText = content[0].text.substring(0, content[0].text.length - 22);
+                } else {
+                    userText = content[0].text;
+                }
+            } else {
+                userText = ''; // Set a default if the content is missing
+            }
+        } else {
+            userText = content.slice(-1) === ']' ? content.substring(0, content.length - 22) : content
+        }
+        const messageHtml = `
         <div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
             <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapeHTML(userText)}</p>
             <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
@@ -210,10 +209,10 @@ class ConversationManager {
         </div>
         `;
 
-    // Create files container if they exist
-    if (fileDataUrl){
-      const fileContainerId = `FCont_${Math.random().toString(35).substring(2, 8)}`;
-      const fileHtml = `
+        // Create files container if they exist
+        if (fileDataUrl) {
+            const fileContainerId = `FCont_${Math.random().toString(35).substring(2, 8)}`;
+            const fileHtml = `
       <div id="${fileContainerId}" class="flex justify-end">
         <article class="flex flex-rows-1 md:flex-rows-3 bg-cyan-100 w-fit p-1 rounded-lg">
         ${fileDataUrl && fileType === "image" ? fileDataUrl.map(url => `<img src="${url}" alt="Uploaded Image" class="rounded-md w-14 h-14 my-auto mx-1" />`).join('') : fileType === "document" ? fileDataUrl.map(url => `<div class="inline-flex items-center"><svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -221,39 +220,39 @@ class ConversationManager {
         </article>
       </div>
       `;
-      const filesContainer = document.createElement("div");
-      filesContainer.className = "flex justify-end";
-      filesContainer.innerHTML = fileHtml;
-      chatArea.appendChild(filesContainer);
+            const filesContainer = document.createElement("div");
+            filesContainer.className = "flex justify-end";
+            filesContainer.innerHTML = fileHtml;
+            chatArea.appendChild(filesContainer);
+        }
+
+        // Append the user text to the page
+        userMessage.innerHTML = messageHtml;
+        chatArea.appendChild(userMessage);
     }
 
-    // Append the user text to the page
-    userMessage.innerHTML = messageHtml;
-    chatArea.appendChild(userMessage);
-  }
+    // Render text-based assistant message
+    renderTextAssistantMessage(content) {
+        const aiMessageId = `msg_${Math.random().toString(30).substring(3, 9)}`;
+        const foldId = `think-content-${Math.random().toString(28).substring(3, 9)}`;
+        const aiMessage = document.createElement('div');
+        aiMessage.classList.add('flex', 'justify-start', 'mb-12', 'overflow-wrap');
+        chatArea.appendChild(aiMessage);
 
-  // Render text-based assistant message
-  renderTextAssistantMessage(content) {
-    const aiMessageId = `msg_${Math.random().toString(30).substring(3, 9)}`;
-    const foldId = `think-content-${Math.random().toString(28).substring(3, 9)}`;
-    const aiMessage = document.createElement('div');
-    aiMessage.classList.add('flex', 'justify-start', 'mb-12', 'overflow-wrap');
-    chatArea.appendChild(aiMessage);
+        let actualResponse = "";
+        let thinkContent = "";
 
-    let actualResponse = "";
-    let thinkContent = "";
+        // Check whether it is an R1 response ie if it has thinking tags.
+        let R1 = (content.indexOf("</think>") && content.indexOf("</think>") != -1) ? true : false;
+        if (R1) {
+            const start = (content.indexOf('<think>') !== -1) ? 7 : 0
+            thinkContent = content.slice(start, content.indexOf('</think>'));
+            actualResponse = content.slice(content.indexOf('</think>') + 8);
+        } else {
+            actualResponse = content;
+        }
 
-    // Check whether it is an R1 response ie if it has thinking tags.
-    let R1 = (content.indexOf("</think>") && content.indexOf("</think>") != -1) ? true : false;
-    if (R1){
-      const start = (content.indexOf('<think>') !== -1) ? 7 : 0
-      thinkContent = content.slice(start, content.indexOf('</think>'));
-      actualResponse = content.slice(content.indexOf('</think>') + 8);
-    }else{
-      actualResponse = content;
-    }
-
-    aiMessage.innerHTML = `
+        aiMessage.innerHTML = `
     <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
         ${thinkContent ? `
         <div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 lg:max-w-6xl">
@@ -273,7 +272,7 @@ class ConversationManager {
             </div>
         </div>
         ` : ''}
-        ${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>`: ""}
+        ${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
         ${actualResponse ? `
         <div class="${aiMessageId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
             ${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
@@ -307,20 +306,20 @@ class ConversationManager {
                 </li>
             </ul>
         </div>
-    </section>`:""}
+    </section>`: ""}
     `;
-  }
+    }
 
-  // Render vision-based assistant message
-  renderVisionAssistantMessage(content) {
-    const visionMessageId = `msg_${Math.random().toString(30).substring(3, 9)}`;
-    const visionMessage = document.createElement('div');
-    visionMessage.classList.add('flex', 'justify-start', 'mb-12', 'overflow-wrap');
-    chatArea.appendChild(visionMessage);
+    // Render vision-based assistant message
+    renderVisionAssistantMessage(content) {
+        const visionMessageId = `msg_${Math.random().toString(30).substring(3, 9)}`;
+        const visionMessage = document.createElement('div');
+        visionMessage.classList.add('flex', 'justify-start', 'mb-12', 'overflow-wrap');
+        chatArea.appendChild(visionMessage);
 
-    //const fileType = this.getFileType(content);
-    //const fileDataUrl = this.getFileUrl(content);
-   visionMessage.innerHTML = `
+        //const fileType = this.getFileType(content);
+        //const fileDataUrl = this.getFileUrl(content);
+        visionMessage.innerHTML = `
         <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
           <div class="${visionMessageId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(content[0].text)}</p>
           </div>
@@ -366,173 +365,258 @@ class ConversationManager {
             </ul>
           </div>
           </section>`;
-          /*
-          ${(fileDataUrl && fileType) ? `<div class="mt-2">${fileType === "image_url" ? `<img src="${fileDataUrl}" alt="Uploaded Image" class="rounded-md my-auto" />` : `<svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2-2H14a2 2 0 0 0 2 2V6a2 2 0 0 0-2-2zM14 2H10a2 2 0 0 1 2v10a2 2 0 0 1 2 2V14z"/>
-              </svg>`}</div>` : ""}
-        </section>
-          */
-        }
+        /*
+        ${(fileDataUrl && fileType) ? `<div class="mt-2">${fileType === "image_url" ? `<img src="${fileDataUrl}" alt="Uploaded Image" class="rounded-md my-auto" />` : `<svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2-2H14a2 2 0 0 0 2 2V6a2 2 0 0 0-2-2zM14 2H10a2 2 0 0 1 2v10a2 2 0 0 1 2 2V14z"/>
+            </svg>`}</div>` : ""}
+      </section>
+        */
+    }
 }
 const conversationManager = new ConversationManager(storagePath);
 
 // Function to fetch conversation files and display their IDs
 async function fetchConversations() {
-  conversationsPanel.innerHTML = `<div class="justify-center items-center">
+    conversationsPanel.innerHTML = `<div class="justify-center items-center">
   <p class="text-center text-rose-400 dark:text-slate-400 text-md font-semibold h-full w-full">Empty!</p>
   </div>
   `;// Clear previous entries
 
-  try {
-    const files = await window.electron.readDir(storagePath);
+    try {
+        const files = await window.electron.readDir(storagePath);
 
-    if (files.length > 0) {
-      conversationsPanel.innerHTML = ''; // Clear the pane if conversations exist
-      // Define the colors you want to cycle through
-      const colors = ['bg-amber-500', 'bg-rose-900', 'bg-teal-700', 'bg-red-500', 'bg-blue-500', 'bg-green-600', 'bg-yellow-800', 'bg-purple-500','bg-fuchsia-500'];
-      for (let [index, file] of files.entries()) {
-        if (window.electron.getExt(file) === '.json') {
-          const conversationId = window.electron.getBasename(file, '.json');
-          const conversationItem = document.createElement('div');
-          const color = (index <= colors.length-1) ? colors[index] : colors[Math.floor(Math.random() * colors.length)]
-          conversationItem.classList.add('p-2', color, 'transition-transform', "text-black", 'tranform', 'hover:scale-105', 'transition', 'duration-600', 'ease-in-out', 'scale-100', 'infinite', 'hover:bg-blue-800', 'decoration-underline', 'decoration-pink-400', 'dark:decoration-fuchsia-500', 'dark:hover:bg-cyan-700', 'cursor-pointer', 'rounded-lg', "space-y-2","w-full", "sm:w-[90%]", "md:w-[80%]", "lg:w-[90%]", "whitespace-nowrap", "max-w-full", "overflow-auto", "scrollbar-hide");
-          conversationItem.setAttribute('data-text', conversationId);
+        if (files.length > 0) {
+            conversationsPanel.innerHTML = ''; // Clear the pane if conversations exist
+            // Define the colors you want to cycle through
+            const colors = ['bg-amber-500', 'bg-rose-900', 'bg-teal-700', 'bg-red-500', 'bg-blue-500', 'bg-green-600', 'bg-yellow-800', 'bg-purple-500', 'bg-fuchsia-500'];
+            for (let [index, file] of files.entries()) {
+                if (window.electron.getExt(file) === '.json') {
+                    const conversationId = window.electron.getBasename(file, '.json');
+                    const conversationItem = document.createElement('div');
+                    const color = (index <= colors.length - 1) ? colors[index] : colors[Math.floor(Math.random() * colors.length)]
+                    conversationItem.classList.add('p-2', color, 'transition-transform', "text-black", 'tranform', 'hover:scale-105', 'transition', 'duration-600', 'ease-in-out', 'scale-100', 'infinite', 'hover:bg-blue-800', 'decoration-underline', 'decoration-pink-400', 'dark:decoration-fuchsia-500', 'dark:hover:bg-cyan-700', 'cursor-pointer', 'rounded-lg', "space-y-2", "w-full", "sm:w-[90%]", "md:w-[80%]", "lg:w-[90%]", "whitespace-nowrap", "max-w-full", "overflow-auto", "scrollbar-hide");
+                    conversationItem.setAttribute('data-text', conversationId);
 
-          conversationItem.textContent = conversationId;
-          conversationItem.onclick = () => renderConversationFromFile(conversationItem, conversationId);
-          conversationsPanel.appendChild(conversationItem);
+                    conversationItem.textContent = conversationId;
+                    conversationItem.onclick = () => renderConversationFromFile(conversationItem, conversationId);
+                    conversationsPanel.appendChild(conversationItem);
 
-          //Chat Options
-          conversationItem.addEventListener('contextmenu', (event) => {
-
-            // Prevent the default context menu
-            event.preventDefault();
-
-            const ChatOpts = document.getElementById('chatOptions-overlay');
-            const renameBt = document.getElementById('renameBt');
-            ChatOpts.classList.remove('hidden');
-            document.getElementById('CornfirmDelete').addEventListener('click', () => {
-              const _delete = window.electron.deleteChat(storagePath, conversationId)
-              if (_delete){
-                  window.showDeletionStatus("text-red-400", `Deleted ${conversationId}`)
-                  console.log(`Deleted ${conversationId}`);
-              } else{
-
-              }
-              document.getElementById('chatOptions-overlay').classList.add('hidden');
-              document.getElementById('confirm-modal').classList.add('hidden');
-              fetchConversations();
-            });
-            renameBt.addEventListener('click', () =>{
-              ChatOpts.classList.add('hidden'); //Hide the chat options as they are nolonger needed
-              selectedItem = event;
-              modalTitle.textContent = `Rename ${conversationItem.getAttribute('data-text')}`;
-              modal.classList.remove('hidden');
-
-              renameButton.addEventListener('click', () => {
-                try{
-                  const newName = `${conversationId[0]}-${newNameInput.value.trim()}`;
-                  if (conversationItem && newNameInput.value.trim() !== '') {
-                    const rename = window.electron.Rename(storagePath, conversationId, newName)
-                    if (rename){
-                      conversationItem.textContent = newName;
-                      conversationItem.setAttribute('data-text', newName);
-                      modal.classList.add('hidden');
-                    }
-                  }
-                  fetchConversations();
-                }catch (err){
-                  console.log("Failed to rename file", err)
+                    //Chat Options
+                    conversationItem.addEventListener('contextmenu', (event) => {
+                        // Prevent the default context menu
+                        event.preventDefault();
+                        ConversationAdmin(conversationId)
+                    });
+                } else {
+                    console.log("No conversations saved!")
                 }
-              });
-
-              cancelButton.addEventListener('click', () => {
-                modal.classList.add('hidden');
-              });
-
-              //Hide modal once clicked outside
-              modal.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                  modal.classList.add('hidden');
-                }
-              });
-
-              newNameInput.addEventListener('keypress', (event) => {
-                //event.preventDefault()
-                event.stopPropagation()
-                if (event.key === 'Enter') {
-                  renameButton.click();
-                }
-              });
-
-            });
-          });
+            }
         }
+    } catch (err) {
+        console.error('Error reading conversation files:', err);
+    }
+}
 
-    }
+// Global variable to store current conversationId
+let currentConversationId = null;
+
+// Attach event listeners only once after DOM load
+const cancelOptsBt = document.getElementById('renameOptionsBt');
+const DeleteOption = document.getElementById('DeleteOption');
+const cancelDeleteBt = document.getElementById('CancelDeleteBt');
+const canceRenamelButton = document.getElementById('canceRenamelButton');
+const renameModal = document.getElementById('renameModal');
+const renameOption = document.getElementById('renameOption');
+const confirmDeleteBt = document.getElementById('ConfirmDelete');
+const SubmitRenameButton = document.getElementById('SubmitRenameButton');
+
+
+cancelOptsBt.addEventListener('click', () => {
+    HandleOptions('hide');
+});
+
+DeleteOption.addEventListener('click', () => {
+    HandleConfirmDelete();
+});
+
+confirmDeleteBt.addEventListener('click', () => {
+    HandleLoading('show', `Deleting ${currentConversationId}`);
+    const _delete = window.electron.deleteChat(storagePath, currentConversationId);
+    if (_delete) {
+        HandleLoading('hide');
+        HandleConfirmDelete();
+        HandleOptions('hide');
+        window.showDeletionStatus("text-red-400", `Deleted ${currentConversationId}`);
+        console.log(`Deleted ${currentConversationId}`);
     } else {
-      console.log("No conversations saved!")
+        HandleConfirmDelete();
+        HandleOptions('hide');
     }
-  } catch (err) {
-    console.error('Error reading conversation files:', err);
-  }
+    // Hide options and refresh
+    HandleConfirmDelete();
+    HandleOptions('hide');
+    fetchConversations();
+});
+
+cancelDeleteBt.addEventListener('click', () => {
+    HandleConfirmDelete();
+});
+
+renameOption.addEventListener('click', () => {
+    HandleRenameModal();
+    modalTitle.textContent = `Rename ${currentConversationId}`;
+
+    canceRenamelButton.addEventListener('click', () => {
+        HandleRenameModal();
+    }, { once: true });
+
+    renameModal.addEventListener('click', (event) => {
+        if (event.target === renameModal) {
+            HandleRenameModal();
+        }
+    }, { once: true });
+
+    SubmitRenameButton.addEventListener('click', () => {
+        HandleLoading('show', `Renaming ${currentConversationId} ...`);
+        try {
+            const newName = `${currentConversationId[0]}-${newNameInput.value.trim()}`;
+            const conversationItem = document.querySelector(`[data-text="${currentConversationId}"]`);
+            if (conversationItem && newNameInput.value.trim() !== '') {
+                const rename = window.electron.Rename(storagePath, currentConversationId, newName);
+                if (rename) {
+                    conversationItem.textContent = newName;
+                    conversationItem.setAttribute('data-text', newName);
+                    HandleRenameModal();
+                }
+            }
+            HandleLoading('hide');
+            HandleOptions('hide');
+            fetchConversations();
+        } catch (err) {
+            HandleLoading('hide');
+            console.log("Failed to rename file", err);
+        }
+    });
+
+    newNameInput.addEventListener('keypress', (event) => {
+        event.stopPropagation();
+        if (event.key === 'Enter') {
+            SubmitRenameButton.click();
+        }
+    }, { once: true });
+});
+
+// Function called on context menu event to update currentConversationId
+function ConversationAdmin(conversationId) {
+    currentConversationId = conversationId;
+    HandleOptions('show');
+}
+
+
+function HandleOptions(task) {
+    const chatOptionsOverlay = document.getElementById('chatOptions-overlay');
+    const chatOptions = document.getElementById('chatOptions');
+    if (task === "show") {
+        chatOptionsOverlay.classList.remove('hidden');
+        chatOptions.classList.remove('animate-exit');
+        chatOptions.classList.add('animate-enter')
+    } else {
+        chatOptions.classList.remove('animate-enter')
+        chatOptions.classList.add('animate-exit');
+        setTimeout(() => {
+            chatOptionsOverlay.classList.add('hidden');
+        }, 310)
+    }
+}
+
+function HandleConfirmDelete() {
+    const confirmDeleteModal = document.getElementById('confirm-delete-modal');
+    confirmDeleteModal.classList.toggle('-translate-x-full');
+    confirmDeleteModal.classList.toggle('-translate-x-1')
+}
+
+function HandleRenameModal() {
+    const renameModal = document.getElementById('renameModal');
+    renameModal.classList.toggle('translate-y-full');
+    renameModal.classList.toggle('translate-y-1')
+}
+
+function HandleLoading(task, message = null) {
+
+    const loadingModal = document.getElementById('loadingModal');
+    const modalMainBox = document.getElementById('modalMainBox');
+    if (task === "show") {
+        if (message) {
+            const msgBox = document.getElementById('loadingMSG');
+            msgBox.textContent = message;
+        }
+        loadingModal.classList.remove('hidden');
+        modalMainBox.classList.remove('animate-exit');
+        modalMainBox.classList.add('animate-enter')
+    } else {
+        modalMainBox.classList.remove('animate-enter')
+        modalMainBox.classList.add('animate-exit');
+        setTimeout(() => {
+            loadingModal.classList.add('hidden');
+        }, 310)
+    }
 }
 
 // Function to render a conversation from a file
 async function renderConversationFromFile(item, conversationId) {
-  // Remove animation from previous item as it active item is changing
-  if (activeItem){
-    activeItem.classList.remove('animate-heartpulse');
-  }
-  activeItem = item;
-  item.classList.add('animate-heartpulse');
-  const [conversationData, model] = await conversationManager.loadConversation(conversationId);
-  //console.log(conversationData, model)
-  if (conversationData) {
-    window.electron.setSuperCId(conversationId);  //Set global conversation id to the current conversation id
-    //console.log(conversationData)
-    conversationManager.renderConversation(conversationData, model);
-  } else {
-    alert(`Conversation ${conversationId} not found.`);
-  }
+    // Remove animation from previous item as it active item is changing
+    if (activeItem) {
+        activeItem.classList.remove('animate-heartpulse');
+    }
+    activeItem = item;
+    item.classList.add('animate-heartpulse');
+    const [conversationData, model] = await conversationManager.loadConversation(conversationId);
+    //console.log(conversationData, model)
+    if (conversationData) {
+        window.electron.setSuperCId(conversationId);  //Set global conversation id to the current conversation id
+        //console.log(conversationData)
+        conversationManager.renderConversation(conversationData, model);
+    } else {
+        alert(`Conversation ${conversationId} not found.`);
+    }
 }
 
 // Listen for updates messages from ipc for Chat models and update the history files
 window.electron.receive('fromMain-ToChat', (data) => {
-  let Chat = data
-  try {
-    let conversationId = window.electron.getSuperCId() || window.electron.getNewChatUUId();
-    console.log('ChatUpdated::');
-    if (Chat.length > 1) {
-      conversationManager.saveConversation(Chat, conversationId);
-      console.log("Saved conversation, size:", Chat.length);
-    }
+    let Chat = data
+    try {
+        let conversationId = window.electron.getSuperCId() || window.electron.getNewChatUUId();
+        console.log('ChatUpdated::');
+        if (Chat.length > 1) {
+            conversationManager.saveConversation(Chat, conversationId);
+            console.log("Saved conversation, size:", Chat.length);
+        }
     } catch (err) {
-      console.log("Outer loop error:", err);
-  }
+        console.log("Outer loop error:", err);
+    }
 
 });
 
 
 // Listen for updates messages from ipc for Vision models and update the history files
 window.electron.receive('fromMain-ToVision', (data) => {
-  try {
-    let VChat = data
-    //console.log(JSON.stringify(VChat));
-    let VconversationId = window.electron.getSuperCId() || window.electron.getNewVisionUUId()
-    console.log("VChatUpdated::");
-    if (VChat && VChat.length > 1) {
-      conversationManager.saveConversation(VChat, VconversationId);
-      console.log("Saved V conversation, size:", VChat.length);
-    } else if (typeof VChat === 'object' && Object.keys(VChat).length > 1) {
-      conversationManager.saveConversation(VChat, VconversationId);
-      //console.log("Saved V conversation, size length", VChat.length);
-    } else {
-      console.log("VChat is not an array or object with more than one entry.");
+    try {
+        let VChat = data
+        //console.log(JSON.stringify(VChat));
+        let VconversationId = window.electron.getSuperCId() || window.electron.getNewVisionUUId()
+        console.log("VChatUpdated::");
+        if (VChat && VChat.length > 1) {
+            conversationManager.saveConversation(VChat, VconversationId);
+            console.log("Saved V conversation, size:", VChat.length);
+        } else if (typeof VChat === 'object' && Object.keys(VChat).length > 1) {
+            conversationManager.saveConversation(VChat, VconversationId);
+            //console.log("Saved V conversation, size length", VChat.length);
+        } else {
+            console.log("VChat is not an array or object with more than one entry.");
+        }
+    } catch (err) {
+        console.error("Error in VChatUpdated handler:", err);
     }
-  } catch (err) {
-    console.error("Error in VChatUpdated handler:", err);
-  }
 });
 
 checkAndCreateDirectory();
@@ -540,5 +624,5 @@ checkAndCreateDirectory();
 fetchConversations();
 //AutoChatHistSync();
 document.addEventListener('NewConversationOpened', function() {
-  fetchConversations();
+    fetchConversations();
 })

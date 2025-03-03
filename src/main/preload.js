@@ -318,7 +318,7 @@ contextBridge.exposeInMainWorld('electron', {
     addUtilityScript: () => {
         //console.log("Executing")
         const script = document.createElement('script');
-        script.src = 'src/renderer/js/_utility.js';
+        script.src = 'src/renderer/js/packed_utility.js';
         script.async = true; // Optional: load the script asynchronously
         document.body.appendChild(script);
     },

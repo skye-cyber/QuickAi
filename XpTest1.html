@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Loading Icon</title>
+    <style>
+        .loader {
+            width: 80px; /* Change size */
+            height: 80px;
+            margin: auto;
+            display: block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spin {
+            animation: spin 1.5s linear infinite; /* Change speed */
+        }
+    </style>
+</head>
+<body>
+<svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <circle cx="20" cy="50" r="10" fill="#3498db">
+        <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite" begin="0.1" />
+    </circle>
+    <circle cx="50" cy="50" r="10" fill="#3498db">
+        <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite" begin="0.2" />
+    </circle>
+    <circle cx="80" cy="50" r="10" fill="#3498db">
+        <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite" begin="0.3" />
+    </circle>
+</svg>
+</body>
+</html>

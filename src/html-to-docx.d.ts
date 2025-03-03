@@ -1,1 +1,0 @@
-//declare 'html-to-docx';

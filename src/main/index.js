@@ -154,7 +154,7 @@ const template = [
         label: 'View',
         submenu: [
             { label: 'Reload', accelerator: 'CmdOrCtrl+R', click: (item, focusedWindow) => focusedWindow.reload() },
-            { label: 'Toggle Developer Tools', accelerator: 'Alt+CmdOrCtrl+I', click: (item, focusedWindow) => focusedWindow.webContents.toggleDevTools() },
+            { label: 'Toggle Developer Tools', accelerator: 'F12', click: (item, focusedWindow) => focusedWindow.webContents.toggleDevTools() },
             { type: 'separator' },
             { label: 'Zoom In', accelerator: 'CmdOrCtrl+=', click: (item, focusedWindow) => focusedWindow.webContents.send('zoom-in') },
             { label: 'Zoom Out', accelerator: 'CmdOrCtrl+-', click: (item, focusedWindow) => focusedWindow.webContents.send('zoom-out') }
