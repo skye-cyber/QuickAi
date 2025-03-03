@@ -67,7 +67,7 @@
   "dependencies": {
     "@tailwindcss/typography": "^0.5.15",
     "base": "^3.0.0",
-    "bl": "^6.0.16",
+    "bl": "^6.0.20",
     "braces": "^3.0.3",
     "dotenv": "^16.4.7",
     "engine-base": "^1.0.0",
@@ -78,7 +78,7 @@
     "minimatch": "^10.0.1",
     "set-value": "^4.1.0",
     "shelljs": "^0.8.5",
-    "update": "^0.4.2",
+    "update": "^0.7.4",
     "webpack": "^5.97.1"
   },
   "files": [
