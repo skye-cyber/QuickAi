@@ -140,38 +140,6 @@ function initChat(client) {
         });
     }
 
-    async function generateImage(data, useFlux = false) {
-        const url = useFlux ? "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev" :
-        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large";
-        //console.log(url);
-        try {
-            const response = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${h_faceKey}`,
-                    "Content-Type": "application/json",
-                },
-                method: "POST",
-                body: JSON.stringify(data),
-            });
-            const blob = await response.blob();
-            return URL.createObjectURL(blob);
-        } catch (error) {
-            console.error("Image generation error:", error);
-            return null;
-        }
-    }
-
-    function escapeHTML(unsafe) {
-        if (typeof unsafe !== 'string') {
-            return '';
-        }
-        return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
 
     async function classifyText(text) {
         const isImageRequest = text.startsWith("/image");
@@ -217,103 +185,20 @@ function initChat(client) {
             </div>
             `;
 
-            // Add Timestamp
-            text = `${text} [${window.electron.getDateTime()} UTC]`
-
             userMessage.classList.add("flex", "justify-end", "mb-4", "overflow-wrap");
             chatArea.appendChild(userMessage);
             implementUserCopy();
             chatArea.scrollTop = chatArea.scrollHeight;
-            if (!isImageRequest) {
-                window.electron.addToChat({ role: "user", content: text });
-            }
 
             if (isImageRequest) {
-                const imageData = { inputs: text.replace("/image", "").trim() };
-                const imageId = `image_${Math.random().toString(36).substring(2, 7)}`;
-                const loadingMessage = document.createElement("div");
-                loadingMessage.innerHTML = `
-                <div id="${imageId}" class="w-fit dark:text-gray-100 rounded-lg font-normal bg-gray-50 dark:bg-zinc-900 max-w-3xl mb-[7%] lg:mb-[5%]">
-                    <div class="space-x-1 flex">
-                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" class="transform scale-75">
-                            <circle cx="12" cy="24" r="4" class="fill-green-500">
-                                <animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" />
-                                <animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" />
-                            </circle>
-                            <circle cx="24" cy="24" r="4" class="fill-blue-500">
-                                <animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" begin="-0.4s" />
-                                <animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" begin="-0.4s" />
-                            </circle>
-                            <circle cx="36" cy="24" r="4" class="fill-yellow-500">
-                                <animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" begin="-0.8s" />
-                                <animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" begin="-0.8s" />
-                            </circle>
-                        </svg>
-                        <span class="text-sm mt-3 text-gray-700 dark:text-gray-200">0s</span>
-                    </div>
-                </div>
-                `;
-                chatArea.appendChild(loadingMessage);
-                chatArea.scrollTop = chatArea.scrollHeight;
-                let secondsElapsed = 0;
-                const timerInterval = setInterval(() => {
-                    secondsElapsed++;
-                    loadingMessage.querySelector('span').textContent = `${secondsElapsed}s`;
-                }, 1000);
-
-                const useFlux = document.getElementById('CModel').checked;
-                const imageUrl = await generateImage(imageData, useFlux);
-                clearInterval(timerInterval);
-
-                if (imageUrl) {
-                    const imageContainer = document.createElement("div");
-                    imageContainer.classList.add("relative", "mb-[5%]")
-                    const imageElement = document.createElement("img");
-                    imageElement.src = imageUrl;
-                    imageElement.classList.add("rounded-lg", "shadow-lg", "mt-4", "max-w-xs", "cursor-pointer");
-                    imageElement.addEventListener("click", () => {
-                        if (imageElement.requestFullscreen) {
-                            imageElement.requestFullscreen();
-                        } else if (imageElement.webkitRequestFullscreen) {
-                            imageElement.webkitRequestFullscreen();
-                        } else if (imageElement.msRequestFullscreen) {
-                            imageElement.msRequestFullscreen();
-                        }
-                    });
-
-                    const downloadButtonContainer = document.createElement("button");
-                    downloadButtonContainer.classList.add("absolute", "flex", "items-center", "text-white", "rounded-bl-md", "bg-gradient-to-r", "from-blue-500", "to-purple-500", "hover:from-blue-600", "hover:to-purple-600", "font-semibold", "py-2", "px-4", "focus:outline-none", "shadow-md", "w-fit", "h-fit", "bottom-0", "left-0", "opacity-60", "hover:opacity-100");
-
-                    const downloadButton = document.createElement("a");
-                    downloadButton.classList.add("flex", "items-center", "text-white", "no-underline");
-                    downloadButton.href = imageUrl;
-                    downloadButton.download = "generated_image.png";
-                    downloadButton.innerHTML = `
-                    <div class="flex items-center">
-                    <span>Download</span>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ml-2">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z" fill="currentColor"></path>
-                    </svg>
-                    </div>
-                    `;
-
-                    downloadButtonContainer.appendChild(downloadButton);
-                    document.body.appendChild(downloadButtonContainer);
-
-                    downloadButtonContainer.appendChild(downloadButton);
-                    imageContainer.appendChild(imageElement);
-                    imageContainer.appendChild(downloadButtonContainer);
-
-                    loadingMessage.innerHTML = '';
-                    loadingMessage.appendChild(imageContainer);
-                } else {
-                    loadingMessage.innerHTML = `
-                    <div id="${imageId}" class="w-fit bg-red-400 text-gray-950 dark:bg-rose-500 rounded-lg p-2 font-normal shadow-lg dark:shadow-red-500 max-w-3xl mb-[5%]">
-                    <span class="text-sm text-gray-950 dark:text-black">Could not Process request!⚠️</span>
-                    </div>
-                    `;
-                }
+                const imageGen = new ImageGenerator(chatArea);
+                imageGen.createImage(text)
             } else {
+                // Add user prompt to history
+                window.electron.addToChat({ role: "user", content: text });
+
+                // Add Timestamp
+                text = `${text} [${window.electron.getDateTime()} UTC]`
 
                 const aiMessage = document.createElement("div");
                 aiMessage.innerHTML = `
@@ -1035,6 +920,7 @@ function initChat(client) {
             }
         }
         });
+
     function copyBMan(){
         document.querySelectorAll(".Vision-user-copy-button").forEach(button => {
             //console.log("Adding copy control")
@@ -1056,12 +942,28 @@ function initChat(client) {
     }
 
 
+    function escapeHTML(unsafe) {
+        if (typeof unsafe !== 'string') {
+            return '';
+        }
+        return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     window.escapeHTML = escapeHTML;
     window.CopyAll = CopyAll;
     window.copyBMan =copyBMan;
     window.implementUserCopy = implementUserCopy;
     window.addCopyListeners = addCopyListeners;
     window.showDeletionStatus = showCopyModal;
+    window.showCopyModal = showCopyModal;
+    window.handleRequestError = handleRequestError;
+    window.debounceRenderMathJax = debounceRenderMathJax;
+    window.removeFirstConversationPairs = removeFirstConversationPairs;
 }
 
 function HandleProcessingEventChanges(){
@@ -1085,6 +987,8 @@ function HandleProcessingEventChanges(){
         sendBtn.classList.remove('cursor-disable');
     }
 }
+
+window.HandleProcessingEventChanges = HandleProcessingEventChanges;
 
 class Timer {
     constructor() {
@@ -1137,3 +1041,101 @@ class Timer {
         }
     }
 }
+
+window.Timer = Timer;
+
+class ImageGenerator {
+    constructor(chatArea) {
+        this.chatArea = chatArea;
+    }
+
+    async generateImage(data, useFlux = false) {
+        const url = useFlux
+        ? "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev"
+        : "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large";
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${h_faceKey}`,
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: JSON.stringify(data),
+            });
+            const blob = await response.blob();
+            return URL.createObjectURL(blob);
+        } catch (error) {
+            console.error("Image generation error:", error);
+            return null;
+        }
+    }
+
+    createLoadingMessage(imageId) {
+        const loadingMessage = document.createElement("div");
+        loadingMessage.innerHTML = `
+        <div id="${imageId}" class="w-fit dark:text-gray-100 rounded-lg font-normal bg-gray-50 dark:bg-zinc-900 max-w-3xl mb-[7%] lg:mb-[5%]">
+        <div class="space-x-1 flex">
+        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" class="transform scale-75">
+        <circle cx="12" cy="24" r="4" class="fill-green-500">
+        <animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" />
+        <animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="24" cy="24" r="4" class="fill-blue-500">
+        <animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" begin="-0.4s" />
+        <animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" begin="-0.4s" />
+        </circle>
+        <circle cx="36" cy="24" r="4" class="fill-yellow-500">
+        <animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" begin="-0.8s" />
+        <animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" begin="-0.8s" />
+        </circle>
+        </svg>
+        <span class="text-sm mt-3 text-gray-700 dark:text-gray-200">0s</span>
+        </div>
+        </div>`;
+        this.chatArea.appendChild(loadingMessage);
+        this.chatArea.scrollTop = this.chatArea.scrollHeight;
+        return loadingMessage;
+    }
+
+    async createImage(text) {
+        const imageData = { inputs: text.replace("/image", "").trim() };
+        const imageId = `image_${Math.random().toString(36).substring(2, 7)}`;
+        const loadingMessage = this.createLoadingMessage(imageId);
+        let secondsElapsed = 0;
+        const timerInterval = setInterval(() => {
+            secondsElapsed++;
+            loadingMessage.querySelector('span').textContent = `${secondsElapsed}s`;
+        }, 1000);
+
+        const useFlux = document.getElementById('CModel').checked;
+        const imageUrl = await this.generateImage(imageData, useFlux);
+        clearInterval(timerInterval);
+
+        if (imageUrl) {
+            loadingMessage.innerHTML = this.createImageElement(imageUrl);
+        } else {
+            loadingMessage.innerHTML = `
+            <div id="${imageId}" class="w-fit bg-red-400 text-gray-950 dark:bg-rose-500 rounded-lg p-2 font-normal shadow-lg dark:shadow-red-500 max-w-3xl mb-[5%]">
+            <span class="text-sm text-gray-950 dark:text-black">Could not Process request!⚠️</span>
+            </div>`;
+        }
+    }
+
+    createImageElement(imageUrl) {
+        return `
+        <div class="relative mb-[5%]">
+        <img src="${imageUrl}" class="rounded-lg shadow-lg mt-4 max-w-xs cursor-pointer" onclick="this.requestFullscreen()"/>
+        <button class="absolute flex items-center text-white rounded-bl-md bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 font-semibold py-2 px-4 focus:outline-none shadow-md w-fit h-fit bottom-0 left-0 opacity-60 hover:opacity-100">
+        <a href="${imageUrl}" download="generated_image.png" class="flex items-center text-white no-underline">
+        <span>Download</span>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ml-2">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z" fill="currentColor"></path>
+        </svg>
+        </a>
+        </button>
+        </div>`;
+    }
+}
+
+

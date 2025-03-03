@@ -54,6 +54,7 @@
     "marked": "^15.0.3",
     "mathjax": "^3.2.2",
     "mathjax-electron": "^3.0.0",
+    "mistral": "^0.0.4",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
