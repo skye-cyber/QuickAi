@@ -5,8 +5,10 @@ const webpack = require('webpack');
 module.exports = {
   //target:'electron-renderer',
   entry: {
-    aichat: './src/renderer/js/aichat.js',
+    hfaichat: './src/renderer/js/hfaichat.js',
     utility: './src/renderer/js/exportUtilities.js',
+    MistralChatsAdmin: './src/renderer/js/MistralChatsAdmin.js',
+    chatUtils: './src/renderer/js/chatUtils.js',
     //chatStore: './src/renderer/js/chatStore.js',
     //preference: './src/renderer/js/preference.js',
     //keyshortcuts:'./src/renderer/js/keyshortcuts.js',

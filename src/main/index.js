@@ -5,7 +5,6 @@ const { Buffer } = require('buffer');
 const dotenv = require('dotenv')
 let mainWindow;
 
-
 // Handle notify events
 ipcMain.on('Notify', (event, data) => {
   console.log('Received time data from renderer:', data.message);

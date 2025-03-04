@@ -6,9 +6,10 @@ const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
 const modelSelect = document.getElementById('model');
 const AutoScroll = document.getElementById("AutoScroll");
-const apiKey = process.env.MISTRAL_API_KEY;
+const MISTRAL_API_KEY = window.electron.MISTRAL_API_KEY();
+const MISTRAL_CODESTRAL_API_KEY = window.electron.MISTRAL_CODESTRAL_API_KEY();
 
-const client = new Mistral({ apiKey: apiKey });
+const client = new Mistral({ apiKey: MISTRAL_API_KEY });
 
 let Utilitycheck = false
 
@@ -41,6 +42,7 @@ const MSmodels = [
 	"mistral-moderation-2411"
 ]
 
+
 async function MistraChat() {
 	const aiMessage = document.createElement("div");
 
@@ -60,7 +62,7 @@ async function MistraChat() {
 	//start timer
 	_Timer.trackTime("start");
 
-	window.processing = true;
+	window.electron.processing(true);
 
 	const stream = await client.chat.stream({
 		model: "mistral-small-latest",
@@ -76,7 +78,6 @@ async function MistraChat() {
 			aiMessage.innerHTML = `
             <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
 				<div class="${aiMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
-				${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
 					<p style="color: #333;">${window.marked(output)}</p>
 				</div>
                 <section class="options flex absolute bottom-2 left-0 space-x-4 cursor-pointer">
@@ -123,7 +124,7 @@ async function MistraChat() {
 	_Timer.trackTime("stop");
 
 	// Resent send button appearance
-	window.processing = false;
+	window.electron.processing(false);
 	window.HandleProcessingEventChanges()
 
 	if (Utilitycheck === false) {

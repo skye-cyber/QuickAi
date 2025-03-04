@@ -480,9 +480,9 @@
                 data-placeholder="Message QuickAi 💫 To generate an image, start with `/image`"
                 oninput="this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 28 * window.innerHeight / 100) + 'px'; this.scrollTop = this.scrollHeight;"
                 value="this.textContent()"
-                class="w-full overflow-auto scrollbar-hide py-1 px-[4%] md:py-3 md:pl-[2%] md:pr-[7%] border border-gray-500 dark:border-none rounded-lg focus:outline-none dark:outline-sky-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-gray-900 dark:ring-1 dark:bg-gray-800 dark:text-white max-h-[28vh] pb-2"></div>
+                class="w-full overflow-auto scrollbar-hide py-1 px-[4%] md:py-3 md:pl-[2%] md:pr-[7%] border border-teal-400 dark:border-teal-600 rounded-lg focus:outline-none dark:outline-teal-600 focus:border-2 bg-gray-50 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-700 dark:text-white max-h-[28vh] pb-2"></div>
 
-            <section class="absolute right-[0.5px] bottom-0 p-1 flex w-full rounded-b-md dark:bg-gray-800 shadow-xl">
+            <section class="absolute right-[0.5px] bottom-0 p-1 flex w-full rounded-b-md dark:border-teal-600 shadow-xl">
                 <!-- Tools section (Attach Files and Preview) -->
                 <div class="flex px-3">
                     <div id="AttachFiles" class="flex rounded-lg" title="Attach files">
@@ -497,46 +497,46 @@
                 <div class="flex">
                     <div style="view-transition-name: var(--vt-composer-reason-action);">
                         <div>
-                            <span data-state="closed">
-                                <button class="flex h-9 min-w-8 items-center justify-center rounded-full border p-2 text-[13px] font-medium border-2 border-stone-600 bg-violet-600/10 hover:bg-teal-100/50 dark:border-zinc-600 dark:outline-white/50 text-gray-400 dark:hover:bg-[#2b245a]" aria-pressed="false" aria-label="Preview">
-                                    <div class="h-[18px] w-[18px]">
-                                        <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path class="fill-[#25374a] dark:fill-gray-100 dark:hover:fill-blue-400" d="m12 3c-3.585 0-6.5 2.9225-6.5 6.5385 0 2.2826 1.162 4.2913 2.9248 5.4615h7.1504c1.7628-1.1702 2.9248-3.1789 2.9248-5.4615 0-3.6159-2.915-6.5385-6.5-6.5385zm2.8653 14h-5.7306v1h5.7306v-1zm-1.1329 3h-3.4648c0.3458 0.5978 0.9921 1 1.7324 1s1.3866-0.4022 1.7324-1zm-5.6064 0c0.44403 1.7252 2.0101 3 3.874 3s3.43-1.2748 3.874-3c0.5483-0.0047 0.9913-0.4506 0.9913-1v-2.4593c2.1969-1.5431 3.6347-4.1045 3.6347-7.0022 0-4.7108-3.8008-8.5385-8.5-8.5385-4.6992 0-8.5 3.8276-8.5 8.5385 0 2.8977 1.4378 5.4591 3.6347 7.0022v2.4593c0 0.5494 0.44301 0.9953 0.99128 1z" clip-rule="evenodd" fill-rule="evenodd"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="whitespace-nowrap pl-1 pr-1 text-[#25374a] dark:text-gray-100 dark:hover:text-blue-400">Preview</div>
-                                </button>
-                            </span>
+                        <!-- Toggle button with aria-pressed to indicate state -->
+                        <button id="previewBtn"
+                                class="flex h-9 min-w-8 items-center justify-center rounded-full border p-2 text-[13px] font-medium
+                                        border-red-500 bg-red-300 hover:bg-red-400 dark:border-red-400 dark:bg-red-700 dark:hover:bg-red-600
+                                        text-gray-900 dark:text-white"
+                                aria-pressed="false"
+                                aria-label="Preview">
+                            <div class="h-[18px] w-[18px]">
+                            <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path class="fill-current"
+                                    d="M12 3c-3.585 0-6.5 2.9225-6.5 6.5385 0 2.2826 1.162 4.2913 2.9248 5.4615h7.1504c1.7628-1.1702 2.9248-3.1789 2.9248-5.4615 0-3.6159-2.915-6.5385-6.5-6.5385zm2.8653 14h-5.7306v1h5.7306v-1zm-1.1329 3h-3.4648c0.3458 0.5978 0.9921 1 1.7324 1s1.3866-0.4022 1.7324-1zm-5.6064 0c0.44403 1.7252 2.0101 3 3.874 3s3.43-1.2748 3.874-3c0.5483-0.0047 0.9913-0.4506 0.9913-1v-2.4593c2.1969-1.5431 3.6347-4.1045 3.6347-7.0022 0-4.7108-3.8008-8.5385-8.5-8.5385-4.6992 0-8.5 3.8276-8.5 8.5385 0 2.8977 1.4378 5.4591 3.6347 7.0022v2.4593c0 0.5494 0.44301 0.9953 0.99128 1z"
+                                    clip-rule="evenodd" fill-rule="evenodd"></path>
+                            </svg>
+                            </div>
+                            <div class="whitespace-nowrap pl-1 pr-1">Preview</div>
+                        </button>
                         </div>
                     </div>
                 </div>
 
-                <button id="sendBtn" class="absolute right-2 h-14 w-14 bottom-4 rounded-full transition ease-in-out duration-200 z-32" aria-label="Send message" title="Send message">
-                    <i class="fasfa-paper-plane"></i>
-                    <div id="normalSend" class="">
-                        <svg class="w-full h-full fill-black dark:fill-stone-600 stroke-blue-500 hover:stroke-green-500 dark:stroke-gray-700 dark:hover:stroke-green-200 dark:hover:fill-gray-900 dark:hover:fill-opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 8 16 12 12 16"></polyline>
-                            <line x1="8" y1="12" x2="16" y2="12"></line>
-                        </svg>
-                    </div>
-                    <div id="spinningSquares" class="hidden">
-                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" class="transform scale-75">
-                            <rect x="10" y="10" width="8" height="8" class="fill-green-500">
-                                <animateTransform attributeName="transform" type="rotate" from="0 14 14" to="360 14 14" dur="1s" repeatCount="indefinite" />
-                            </rect>
-                            <rect x="28" y="10" width="8" height="8" class="fill-blue-500">
-                                <animateTransform attributeName="transform" type="rotate" from="0 34 14" to="360 34 14" dur="1s" repeatCount="indefinite" begin="-0.5s" />
-                            </rect>
-                            <rect x="10" y="28" width="8" height="8" class="fill-yellow-500">
-                                <animateTransform attributeName="transform" type="rotate" from="0 14 34" to="360 14 34" dur="1s" repeatCount="indefinite" begin="-0.25s" />
-                            </rect>
-                            <rect x="28" y="28" width="8" height="8" class="fill-pink-500">
-                                <animateTransform attributeName="transform" type="rotate" from="0 34 34" to="360 34 34" dur="1s" repeatCount="indefinite" />
-                            </rect>
-                        </svg>
-                    </div>
-                </button>
+            <!-- Variation 2 Improved: Triple Ripple with Gradient Border -->
+            <button id="sendBtn" class="absolute right-2 h-14 w-14 bottom-4 rounded-full transition ease-in-out duration-200 z-32 bg-white border border-gray-200 bg-gradient-to-br from-[#00246c] dark:from-[#a800fc] to-[#008dd3] dark:to-indigo-900 overflow-hidden" aria-label="Send message" title="Send message">
+            <div id="normalSend" class=" flex items-center justify-center h-full w-full">
+                <!-- Alternative Send Icon with a warm gradient -->
+                <svg class="w-8 h-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="planeGradient2" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ff8a65" />
+                    <stop offset="100%" stop-color="#ff7043" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#planeGradient2)" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </div>
+            <div id="spinningSquares" class="hidden absolute inset-0 flex items-center justify-center">
+                <span class="ripple-single-1 ripple-single-1"></span>
+                <span class="ripple-single-2 ripple-single-2"></span>
+                <span class="ripple-single-3 ripple-single-3"></span>
+            </div>
+            </button>
 
             </section>
 
@@ -638,115 +638,116 @@
 
     <!-- Settings Modal Background -->
     <div id="settingsModal" class="hidden fixed inset-2 z-50 flex items-center justify-center bg-black bg-opacity-60 dark:bg-opacity-80 dark:bg-gray-900 dark:bg-opacity-50" onclick="if (event.target.id === 'settingsModal') {this.classList.add('hidden');}">
-    <!-- Modal Content -->
-    <div class="relative bg-white dark:bg-zinc-900 dark:border-2 dark:border-black dark:shadow-md dark:shadow-black p-6 rounded-lg w-full mx-2 md:mx-auto max-w-md lg:max-w-lg xl:max-w-xl max-h-full">
+        <!-- Modal Content -->
+        <div class="relative bg-white dark:bg-zinc-900 dark:border-2 dark:border-black dark:shadow-md dark:shadow-black p-6 rounded-lg w-full mx-2 md:mx-auto max-w-md lg:max-w-lg xl:max-w-xl max-h-full">
 
-    <!-- Close Button -->
-        <button id="closeModal" class="absolute top-2 right-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
+        <!-- Close Button -->
+            <button id="closeModal" class="absolute top-2 right-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
 
-        <!-- Modal Title -->
-        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Settings</h2>
+            <!-- Modal Title -->
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Settings</h2>
 
-        <!--Scrollable content container-->
-        <section class="bg-white dark:bg-zinc-800 overflow-auto max-h-[80vh] shadow-inner shadow-slate-400 dark:shadow-sky-400 rounded-md p-2">
+            <!--Scrollable content container-->
+            <section class="bg-white dark:bg-zinc-800 overflow-auto max-h-[80vh] shadow-inner shadow-slate-400 dark:shadow-sky-400 rounded-md p-2">
 
-            <section class="grid grid-cols-2 grid-rows-2 md:grid-cols-3 mb-4 space-y-1" arial-label="switch theme" title="switch theme">
-                <!-- Theme Switching Option -->
-                <div class="flex items-center">
-                    <label for="themeSwitch" class="text-gray-700 dark:text-gray-200">Dark Mode</label>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input id="themeSwitch" type="checkbox" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </label>
-                </div>
+                <section class="grid grid-cols-2 grid-rows-2 md:grid-cols-3 mb-4 space-y-1" arial-label="switch theme" title="switch theme">
+                    <!-- Theme Switching Option -->
+                    <div class="flex items-center">
+                        <label for="themeSwitch" class="text-gray-700 dark:text-gray-200">Dark Mode</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input id="themeSwitch" type="checkbox" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
 
-                <!-- AutoScroll option -->
-                <div class="flex items-center" title="scroll on content" aial-label="scroll on content">
-                    <label for="AutoScroll" class="text-gray-700 dark:text-gray-200">Auto scroll</label>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input id="AutoScroll" checked type="checkbox" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </label>
-                </div>
-                <!-- Image Generation model change -->
-                <div class="flex items-center">
-                    <label class="relative inline-flex items-center cursor-pointer text-gray-700 dark:text-gray-200">Use Flux</label>
-                    <label class="relative inline-flex items-center cursor-pointer" title="Change image generation model to FLUX">
-                        <input id="CModel" type="checkbox" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </label>
-                </div>
-            </section>
-
-            <!--Misceleneous-->
-
-            <div id="pref-inputSection" class="mb-6">
-                <label for="recommendations" class="block text-lg font-medium mb-2 text-gray-600 dark:text-gray-300 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m4 0h1M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    Enter Your &nbsp;<i> <span class="text-orange-500">wish</span></i> /<span class="text-pink-500"> infor</span>/<span class="text-purple-500"> preference</span>:
-                </label>
-                <section title="What would you like quickai to know about you? Tell me what you would want me to do for you and in what manner?" class="w-full rounded-lg border-2 border-blue-500 dark:border-blue-300 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50 dark:bg-gray-700">
-                     <textarea id="pref-input" class="scrollbar-hide resize-none overflow-wrap w-full text-rose-950 dark:text-green-600 pt-3 px-4 rounded-lg bg-gray-50 dark:bg-gray-700 ring-none outline-none" placeholder="What would you like quickai to do or know about you?..."></textarea>
-                     <div class="flex justify-end">
-                        <!-- Checkmark Circle Icon Button -->
-                        <button id="pref-submit" class="bg-green-500 hover:bg-yellow-500 text-white p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-green-300">
-                            Submit
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </button>
-                     </div>
+                    <!-- AutoScroll option -->
+                    <div class="flex items-center" title="scroll on content" aial-label="scroll on content">
+                        <label for="AutoScroll" class="text-gray-700 dark:text-gray-200">Auto scroll</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input id="AutoScroll" checked type="checkbox" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <!-- Image Generation model change -->
+                    <div class="flex items-center">
+                        <label class="relative inline-flex items-center cursor-pointer text-gray-700 dark:text-gray-200">Use Flux</label>
+                        <label class="relative inline-flex items-center cursor-pointer" title="Change image generation model to FLUX">
+                            <input id="CModel" type="checkbox" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
                 </section>
-            </div>
 
-            <div id="pref-section" class="mb-6">
-                <label class="block text-lg font-medium mb-2 text-gray-600 dark:text-gray-300 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 4 12 4c4.477 0 8.268 3.943 9.542 9-.145 1.326-.678 2.43-1.482 3.379l-.548-.548c.139-.441.208-.901.208-1.374 0-1.11-.89-2-2-2s-2 .89-2 2c0 .473.069.933.209 1.374l-.548.549c-.804-.879-1.91-1.482-3.166-1.482zm0 0C5.522 8.268 2.733 5.477 2.458 12C3.732 16.057 7.523 20 12 20s8.268-3.943 9.542-9-.145-1.326-.678-2.43-.208-.901-.208-1.374 0-1.11.89-2 2-2s2 .89 2 2c0 .473-.069.933-.209 1.374l-.548-.549C16.866 13.912 15.76 12 12 12z"></path>
-                    </svg>
-                    User &nbsp;<span class="text-sky-500">command</span> &nbsp;/ &nbsp;<span class="text-pink-900 font-semibold">Data</span>
-                </label>
-                <div id="pref-preview" class="relative p-6 bg-blue-200 dark:bg-stone-900 border-none border-blue-300 rounded-lg shadow-md shandow-gray-700">
-                    <p id="pref-content" class="text-gray-800 dark:text-orange-400"></p>
-                    <section class="absolute top-0.5 right-1 flex flex-col space-y-2">
-                        <button id="pref-delete" aria-label="Delete preference" title="Delete preference" class="rounded-md p-1 bg-slate-600 dark:bg-gray-800 text-red-400 hover:text-red-500 shadow-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.981-1.858L5 7m5 4v6m4-6v6"></path>
-                            </svg>
-                        </button>
-                        <button id="pref-edit" aria-label="Edit" title="Edit" class="p-1 rounded-md bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white hover:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                        </button>
+                <!--Misceleneous-->
+
+                <div id="pref-inputSection" class="mb-6">
+                    <label for="recommendations" class="block text-lg font-medium mb-2 text-gray-600 dark:text-gray-300 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m4 0h1M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Enter Your &nbsp;<i> <span class="text-orange-500">wish</span></i> /<span class="text-pink-500"> infor</span>/<span class="text-purple-500"> preference</span>:
+                    </label>
+                    <section title="What would you like quickai to know about you? Tell me what you would want me to do for you and in what manner?" class="w-full rounded-lg border-2 border-blue-500 dark:border-blue-300 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50 dark:bg-gray-700">
+                        <textarea id="pref-input" class="scrollbar-hide resize-none overflow-wrap w-full text-rose-950 dark:text-green-600 pt-3 px-4 rounded-lg bg-gray-50 dark:bg-gray-700 ring-none outline-none" placeholder="What would you like quickai to do or know about you?..."></textarea>
+                        <div class="flex justify-end">
+                            <!-- Checkmark Circle Icon Button -->
+                            <button id="pref-submit" class="bg-green-500 hover:bg-yellow-500 text-white p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-green-300">
+                                Submit
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </button>
+                        </div>
                     </section>
                 </div>
-            </div>
 
-            <!-- Additional Settings Options -->
-            <div class="mb-4">
-            <label class="block text-gray-700 dark:text-gray-300 mb-2">Language:</label>
-            <select class="form-select w-fit font-bold bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500">
-                <option value="en" class="text-yellow-400 font bold"><b>English</b></option>
-                <option value="fr">French</option>
-                <option value="es">Spanish</option>
-            </select>
-            </div>
+                <div id="pref-section" class="mb-6">
+                    <label class="block text-lg font-medium mb-2 text-gray-600 dark:text-gray-300 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 4 12 4c4.477 0 8.268 3.943 9.542 9-.145 1.326-.678 2.43-1.482 3.379l-.548-.548c.139-.441.208-.901.208-1.374 0-1.11-.89-2-2-2s-2 .89-2 2c0 .473.069.933.209 1.374l-.548.549c-.804-.879-1.91-1.482-3.166-1.482zm0 0C5.522 8.268 2.733 5.477 2.458 12C3.732 16.057 7.523 20 12 20s8.268-3.943 9.542-9-.145-1.326-.678-2.43-.208-.901-.208-1.374 0-1.11.89-2 2-2s2 .89 2 2c0 .473-.069.933-.209 1.374l-.548-.549C16.866 13.912 15.76 12 12 12z"></path>
+                        </svg>
+                        User &nbsp;<span class="text-sky-500">command</span> &nbsp;/ &nbsp;<span class="text-pink-900 font-semibold">Data</span>
+                    </label>
+                    <div id="pref-preview" class="relative p-6 bg-blue-200 dark:bg-stone-900 border-none border-blue-300 rounded-lg shadow-md shandow-gray-700">
+                        <p id="pref-content" class="text-gray-800 dark:text-orange-400"></p>
+                        <section class="absolute top-0.5 right-1 flex flex-col space-y-2">
+                            <button id="pref-delete" aria-label="Delete preference" title="Delete preference" class="rounded-md p-1 bg-slate-600 dark:bg-gray-800 text-red-400 hover:text-red-500 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.981-1.858L5 7m5 4v6m4-6v6"></path>
+                                </svg>
+                            </button>
+                            <button id="pref-edit" aria-label="Edit" title="Edit" class="p-1 rounded-md bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white hover:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                        </section>
+                    </div>
+                </div>
 
-            <!-- Save Settings Button -->
-            <section class="w-full flex justify-center">
-                <button id="saveSettings" class="w-fit bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
-                Save Settings
-                </button>
+                <!-- Additional Settings Options -->
+                <div class="mb-4">
+                <label class="block text-gray-700 dark:text-gray-300 mb-2">Language:</label>
+                <select class="form-select w-fit font-bold bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500">
+                    <option value="en" class="text-yellow-400 font bold"><b>English</b></option>
+                    <option value="fr">French</option>
+                    <option value="es">Spanish</option>
+                </select>
+                </div>
+
+                <!-- Save Settings Button -->
+                <section class="w-full flex justify-center">
+                    <button id="saveSettings" class="w-fit bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                    Save Settings
+                    </button>
+                </section>
             </section>
-        </section>
+        </div>
     </div>
 
     <!-- Loading Modal -->
@@ -758,7 +759,121 @@
         </div>
     </div>
 
+
+    <!--mistral models-->
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black/50 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl shadow-lg max-h-[78%] mb-16 overflow-auto p-6 pb-16">
+            <div class="block md:grid md:grid-cols-5 gap-4">
+            <!-- Model Card -->
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mistral-7b</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-center p-4">
+                <img src="https://via.placeholder.com/100" alt="Model Placeholder" class="w-24 h-24">
+                </div>
+                <div class="text-center">
+                <p class="text-white font-bold">open-mixtral-8x7b</p>
+                </div>
+            </div>
+            </div>
+        </div>
+        <button id="modal-close" class="fixed left-1/2 bottom-28 mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-all duration-300">
+        Close
+        </button>
+    </div>
+
 </body>
 <script src="src/renderer/js/script.js"></script>
-<script src="src/renderer/js/packed_aichat.js"></script>
+<script src="src/renderer/js/packed_chatUtils.js"></script>
+<script src="src/renderer/js/packed_hfaichat.js"></script>
 </html>
