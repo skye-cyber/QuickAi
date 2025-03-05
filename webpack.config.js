@@ -9,7 +9,7 @@ module.exports = {
     utility: './src/renderer/js/exportUtilities.js',
     MistralChatsAdmin: './src/renderer/js/MistralChatsAdmin.js',
     chatUtils: './src/renderer/js/chatUtils.js',
-    //chatStore: './src/renderer/js/chatStore.js',
+    hfaudio: './src/renderer/js/hfaudio.js',
     //preference: './src/renderer/js/preference.js',
     //keyshortcuts:'./src/renderer/js/keyshortcuts.js',
     //fileHandler:'./src/renderer/js/fileHandler.js'

@@ -220,6 +220,20 @@
                                 </div>
                             </div>
 
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistralai/Mistral-7B-Instruct-v0.3">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="Mistral-7B-Instruct-v0.3 logo">
+                                        </div>
+                                        <div>
+                                        Mistral-7B-Instruct-v0.3
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">An instruct fine-tuned version of the Mistral-7B-v0.3.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="NousResearch/Hermes-3-Llama-3.1-8B">
                                 <div class="flex grow items-center justify-between gap-2">
                                     <div class="flex items-center gap-3">
@@ -500,7 +514,7 @@
                         <!-- Toggle button with aria-pressed to indicate state -->
                         <button id="previewBtn"
                                 class="flex h-9 min-w-8 items-center justify-center rounded-full border p-2 text-[13px] font-medium
-                                        border-red-500 bg-red-300 hover:bg-red-400 dark:border-red-400 dark:bg-red-700 dark:hover:bg-red-600
+                                        border-sky-900 bg-blue-300 hover:bg-blue-400 dark:border-red-400 dark:bg-red-700 dark:hover:bg-red-600
                                         text-gray-900 dark:text-white"
                                 aria-pressed="false"
                                 aria-label="Preview">
@@ -515,32 +529,82 @@
                         </button>
                         </div>
                     </div>
-                </div>
+                    <button id="microphone" class="mx-2">
+                        <svg id="microphoneSVG" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="stroke-blue-600 dark:stroke-cyan-400 hover:stroke-sky-800 dark:hover:stroke-sky-200 w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                        </svg>
+                    </button>
 
-            <!-- Variation 2 Improved: Triple Ripple with Gradient Border -->
-            <button id="sendBtn" class="absolute right-2 h-14 w-14 bottom-4 rounded-full transition ease-in-out duration-200 z-32 bg-white border border-gray-200 bg-gradient-to-br from-[#00246c] dark:from-[#a800fc] to-[#008dd3] dark:to-indigo-900 overflow-hidden" aria-label="Send message" title="Send message">
-            <div id="normalSend" class=" flex items-center justify-center h-full w-full">
-                <!-- Alternative Send Icon with a warm gradient -->
-                <svg class="w-8 h-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="planeGradient2" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#ff8a65" />
-                    <stop offset="100%" stop-color="#ff7043" />
-                    </linearGradient>
-                </defs>
-                <path fill="url(#planeGradient2)" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-            </div>
-            <div id="spinningSquares" class="hidden absolute inset-0 flex items-center justify-center">
-                <span class="ripple-single-1 ripple-single-1"></span>
-                <span class="ripple-single-2 ripple-single-2"></span>
-                <span class="ripple-single-3 ripple-single-3"></span>
-            </div>
-            </button>
+                    <!-- Triple Ripple with Gradient Border -->
+                    <button id="sendBtn" class="absolute right-2 h-14 w-14 bottom-4 rounded-full transition ease-in-out duration-200 z-32 bg-white border border-gray-200 bg-gradient-to-br from-[#00246c] dark:from-[#a800fc] to-[#008dd3] dark:to-indigo-900 overflow-hidden" aria-label="Send message" title="Send message">
+                    <div id="normalSend" class=" flex items-center justify-center h-full w-full">
+                        <!-- Alternative Send Icon with a warm gradient -->
+                        <svg class="w-8 h-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="planeGradient2" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#ff8a65" />
+                            <stop offset="100%" stop-color="#ff7043" />
+                            </linearGradient>
+                        </defs>
+                        <path fill="url(#planeGradient2)" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </div>
+                    <div id="spinningSquares" class="hidden absolute inset-0 flex items-center justify-center">
+                        <span class="ripple-single-1 ripple-single-1"></span>
+                        <span class="ripple-single-2 ripple-single-2"></span>
+                        <span class="ripple-single-3 ripple-single-3"></span>
+                    </div>
+                    </button>
+                </div>
 
             </section>
 
         </section>
+    </div>
+
+
+    <!--Recording modal-->
+    <div id="recordingModal" class="hidden fixed inset-0 z-50 bg-blue-400/20 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="relative px-4 w-full max-w-md">
+            <div class="bg-gray-800 rounded-lg shadow-lg">
+                <div class="p-6">
+                <h2 class="text-xl font-bold text-white mb-4">Recording</h2>
+
+                <div class="flex items-center justify-center">
+                    <span id="recordingTime" class="text-3xl text-white font-bold">00:00:00</span>
+                </div>
+
+                <div class="flex justify-center mt-6 space-x-4">
+                    <button id="pauseButton" class="hidden bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-full size-14">
+                        <!--pause svg disabled when not recording-->
+                        <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                        </svg>
+                    </button>
+                    <button id="startButton" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-full size-14">
+                        <!--start svg -->
+                        <svg class="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                        </svg>
+                    </button>
+
+                    <button id="finishButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full size-14 cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    </button>
+
+                    <button id="cancelButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full size-14">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    </button>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
     </div>
 
     <!--Attachment modal and file input -->
@@ -873,6 +937,7 @@
     </div>
 
 </body>
+<script src="src/renderer/js/packed_hfaudio.js"></script>
 <script src="src/renderer/js/script.js"></script>
 <script src="src/renderer/js/packed_chatUtils.js"></script>
 <script src="src/renderer/js/packed_hfaichat.js"></script>

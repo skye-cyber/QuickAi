@@ -198,32 +198,32 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 				}
 			});
 
-			function showError() {
-				setTimeout(() => {
-					errorContainer.classList.remove("hidden");
-					errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
-				}, 200); // 0.3 second delay
-				let ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check your Internet!" : error.message;
-				if (error.message === "[object Object]"){
-					ErrorMs = "This model is unreachabble: It might be overloaded!"
+				function showError() {
+					setTimeout(() => {
+						errorContainer.classList.remove("hidden");
+						errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
+					}, 200); // 0.3 second delay
+					let ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check your Internet!" : error.message;
+					if (error.message === "[object Object]"){
+						ErrorMs = "This model is unreachabble: It might be overloaded!"
+					}
+					errorArea.textContent = ErrorMs;
+					window.electron.popFromChat(); // Remove the last conversation entry
 				}
-				errorArea.textContent = ErrorMs;
-				window.electron.popFromChat(); // Remove the last conversation entry
-			}
 
-			async function HideErrorModal() {
-				// Slide modal to the left and fade out
-				setTimeout(() => {
-					errorContainer.classList.remove('left-1/2', '-translate-x-1/2');
-					errorContainer.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
-				}, 0);
+				async function HideErrorModal() {
+					// Slide modal to the left and fade out
+					setTimeout(() => {
+						errorContainer.classList.remove('left-1/2', '-translate-x-1/2');
+						errorContainer.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
+					}, 0);
 
-				// Reset transform after fully fading out and moving off-screen
-				setTimeout(() => {
-					errorContainer.classList.remove('opacity-100', '-translate-x-full');
-					errorContainer.classList.add('hidden', '-translate-x-1/2');
-				}, 0); // 1 second for reset
-			}
+					// Reset transform after fully fading out and moving off-screen
+					setTimeout(() => {
+						errorContainer.classList.remove('opacity-100', '-translate-x-full');
+						errorContainer.classList.add('hidden', '-translate-x-1/2');
+					}, 0); // 1 second for reset
+				}
 			// Remove existing event listeners before adding a new one
 			async function retryHandler(){
 				await HideErrorModal()
@@ -435,7 +435,6 @@ function HandleProcessingEventChanges(status){
 		// Add Cursor prohibited/disabled cursor class
 		sendBtn.classList.add('cursor-disable');
 	} else if (status === 'hide'){
-		console.log('hide...')
 		spinningSquares.classList.add('hidden')
 		normalSend.classList.remove('hidden')
 		//re-enable the send button
@@ -516,12 +515,12 @@ previewBtn.addEventListener('click', function() {
 
 	if (isActive!=="true") {
 		// When activated: switch to vibrant green theme
-		this.classList.remove('border-red-500', 'bg-red-300', 'hover:bg-red-400', 'dark:border-red-400', 'dark:bg-red-700', 'dark:hover:bg-red-600');
+		this.classList.remove('border-sky-900', 'bg-blue-300', 'hover:bg-blue-400', 'dark:border-red-400', 'dark:bg-red-700', 'dark:hover:bg-red-600');
 		this.classList.add('border-green-500', 'bg-green-300', 'hover:bg-green-400', 'dark:border-green-400', 'dark:bg-green-700', 'dark:hover:bg-green-600');
 	} else {
 		// When deactivated: revert to vibrant red theme
 		this.classList.remove('border-green-500', 'bg-green-300', 'hover:bg-green-400', 'dark:border-green-400', 'dark:bg-green-700', 'dark:hover:bg-green-600');
-		this.classList.add('border-red-500', 'bg-red-300', 'hover:bg-red-400', 'dark:border-red-400', 'dark:bg-red-700', 'dark:hover:bg-red-600');
+		this.classList.add('border-sky-900', 'bg-blue-300', 'hover:bg-blue-400', 'dark:border-red-400', 'dark:bg-red-700', 'dark:hover:bg-red-600');
 	}
 });
 

@@ -35,8 +35,8 @@ const MSmodels = [
 	"codestral-2501",
 	"codestral-mamba-2407",
 	"open-mistral-nemo",
-	"pixtral-12b-2409",
-	"pixtral-large-2411",
+	"pixtral-12b-2409", //MistraVision
+	"pixtral-large-2411", //MistraVision
 	"ministral-3b-2410",
 	"ministral-8b-2410",
 	"mistral-moderation-2411"
@@ -62,7 +62,8 @@ async function MistraChat() {
 	//start timer
 	_Timer.trackTime("start");
 
-	window.electron.processing(true);
+	window.HandleProcessingEventChanges('show')
+
 
 	const stream = await client.chat.stream({
 		model: "mistral-small-latest",
@@ -123,15 +124,11 @@ async function MistraChat() {
 	//stop timer
 	_Timer.trackTime("stop");
 
-	// Resent send button appearance
-	window.electron.processing(false);
+	// Reset send button appearance
 	window.HandleProcessingEventChanges()
 
-	if (Utilitycheck === false) {
-		// Sending a message to the main process if script does not exist already
-		utilityScriptExists() ? window.electron.send('toMain', { message: 'set-Utitility-Script' }) : "";
-		Utilitycheck = true;
-	}
+	// Sending a message to the main process if script does not exist already
+	utilityScriptExists();
 
 	// Render mathjax immediately
 	window.debounceRenderMathJax(aiMessageUId, 0, true);
@@ -206,14 +203,19 @@ function addLoadingAnimation(aiMessageDiv) {
 	`;
 }
 
+
 function utilityScriptExists(){
 	const scripts = document.getElementsByTagName('script');
+	let exists = false;
 	for (let script of scripts) {
 		if (script.src.includes('packed_utility.js')) {
 			console.log("Utility script already exits. Not adding"); // Logs the matching script element
-			return true
+			exists = true
+			return exists
 		}
-		return false
 	}
-
+	console.log("Utility missing. Adding");
+	// Sending a message to the main process if script does not exist already
+	window.electron.send('toMain', { message: 'set-Utitility-Script' })
+	return exists
 }

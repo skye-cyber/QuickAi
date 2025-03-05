@@ -456,6 +456,39 @@ contextBridge.exposeInMainWorld('electron', {
     HUGGINGHUB_API_KEY: async () =>{
         return process.env.HUGGINGHUB_API_KEY
     },
+    saveRecording:async  (blob) => {
+        try{
+            const randomFname = `hfaudio_${Math.random().toString(36).substring(1,12)}`;
+            const savePath = path.join(os.homedir(), `.quickai/.quickai.cache/${randomFname}.wav`)
+            // Extract the directory path from the file path
+            const dirPath = path.dirname(savePath);
+
+            // Create the directory if it doesn't exist
+            if (!fs.existsSync(dirPath)) {
+                fs.mkdirSync(dirPath, { recursive: true });
+                console.log(`Directory '${dirPath}' created.`);
+            }
+            // Convert Blob to ArrayBuffer
+            const arrayBuffer = await blob.arrayBuffer();
+
+            // Convert ArrayBuffer to Buffer
+            const buffer = Buffer.from(arrayBuffer);
+
+            // Write the Buffer to a file
+            fs.writeFileSync(savePath, buffer);
+            console.log(`File saved at ${savePath}`);
+            return savePath
+        }catch(err){
+            console.log(err)
+        }
+    },
+    readFileData: async (filePath) =>{
+        if(!fs.existsSync(filePath)){
+            return false
+        }
+        data = fs.readFileSync(filePath)
+        return data
+    },
 });
 
 

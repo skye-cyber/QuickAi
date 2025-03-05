@@ -45,7 +45,6 @@ function initChat(client) {
 	let check = false;
 	window.check = check;
 
-
 	async function classifyText(text) {
 		const isImageRequest = text.startsWith("/image");
 		const escapedText = window.escapeHTML(text);
