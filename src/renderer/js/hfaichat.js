@@ -18,6 +18,7 @@ Location or Name Selection: Depending on the locations and names parameters, it 
 Print and Return: It prints the locations and returns them.
 Would you like any further optimizations or have any specific preferences?
 `
+/*
 window.electron.getEnv().then(env => {
 	const encryptedOBJ = {
 		iv: env.IV,
@@ -35,6 +36,11 @@ window.electron.getEnv().then(env => {
 		console.error("Error:", error);
 	});
 });
+*/
+
+const client = new HfInference(hf_API_KEY);
+
+initChat(client);
 
 function initChat(client) {
 	const chatArea = document.getElementById("chatArea");
@@ -72,7 +78,6 @@ function initChat(client) {
 		}
 
 
-		console.log(Currentmodel)
 		if (VisioModels.indexOf(Currentmodel) > -1){
 			VisionChat(text=text, null, null, Currentmodel, provider[Currentmodel])
 
@@ -295,7 +300,7 @@ function initChat(client) {
 		const _Timer = new window.Timer;
 
 		//switch to vision model
-		modelSelect.value = Vmodel.split('/').slice(-1)[0]
+		modelSelect.value = Vmodel ? Vmodel.split('/').slice(-1)[0] : "meta-llama/Llama-3.2-11B-Vision-Instruct";
 
 		const fileContainerId = `FCont_${Math.random().toString(35).substring(2, 8)}`;
 		// Add user message to chat

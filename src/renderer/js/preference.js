@@ -49,6 +49,7 @@ prefEdit.addEventListener('click', function() {
     prefInput.value = prefContent.innerText;
     prefEdit.focus() //Focus text area for editing
     prefPrevSection.classList.add('hidden'); //Hide preference display block
+    prefInput.style.height = Math.min(prefInput.scrollHeight, 0.28 * window.innerHeight) + 'px';
 })
 
 //Add event listener for Delete

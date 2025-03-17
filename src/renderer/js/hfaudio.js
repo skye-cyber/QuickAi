@@ -359,7 +359,12 @@ function finishRecording() {
 
 // Function to cancel recording
 function cancelRecording() {
-	mediaRecorder.stop();
+	try{
+		mediaRecorder.stop();
+	}catch(err){
+		//
+	}
+
 	clearInterval(timerInterval);
 	recordingTime.textContent = '00:00:00';
 	pauseButton.classList.add('hidden');

@@ -24,10 +24,15 @@ function CloseFileModal() {
     // Clear file input and prompt
     fileInput.value = "";
     imagePrompt.value = "";
-    uploadedFilesContainer.innerHTML = "";
-    dropZoneText.textContent = "Drag and drop files here or click to select";
+    uploadedFilesContainer.innerHTML = `<span class="font-bold text-cyan-600 dark:text-teal-400">No files uploaded yet.</span>`;
+    //dropZoneText.textContent = "Drag and drop files here or click to select";
 }
 
+dropZoneModal.addEventListener('click', (event) =>{
+    if (event.target.id === "dropZoneModal"){
+        dropZoneModal.classList.add('hidden')
+    }
+})
 // Handle file selection
 fileInput.addEventListener('change', handleFileSelect);
 
@@ -37,10 +42,18 @@ dropZone.addEventListener('drop', handleFileDrop, false);
 
 // Handle click on drop zone to trigger file input
 dropZone.addEventListener('click', function(event) {
+    // Check if the clicked element or any of its parents is the modalTrigger
+    if (event.target.id === "modalTrigger" || event.target.closest("#modalTrigger")) {
+        // If it is, do nothing (prevent fileInput click)
+        return;
+    }
+
     // Prevent the default click behavior
     event.stopPropagation();
     event.preventDefault();
-    if (event.target.id === "dropZone") {
+
+    // Check if the clicked element is within the dropZone
+    if (event.target.closest("#dropZone")) {
         fileInput.click();
     }
 });
@@ -53,20 +66,29 @@ function handleFileSelect(event) {
 function handleDragOver(event) {
     event.stopPropagation();
     event.preventDefault();
-    event.dataTransfer.dropEffect = 'copy';
+
+    // Check if the dragged over element or its parent is the dropZone
+    if (event.target.closest("#dropZone")) {
+        event.dataTransfer.dropEffect = 'copy';
+    }
 }
 
 function handleFileDrop(event) {
     event.stopPropagation();
     event.preventDefault();
-    const files = event.dataTransfer.files;
-    handleFiles(files);
+
+    // Check if the dragged over element or its parent is the dropZone
+    if (event.target.closest("#dropZone")) {
+        const files = event.dataTransfer.files;
+        handleFiles(files);
+    }
 }
 
 function handleFiles(files) {
     const previewContainer = document.getElementById('uploadedFiles');
     let Uploaded = 0
     //Create a list to hold file urls
+    let clear = false
     let fileUrls = []
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -78,6 +100,12 @@ function handleFiles(files) {
 
         // Convert the file to a data URL if it's an image
         if (isImage) {
+            //Remove content from preview container
+            if (!clear){
+                uploadedFilesContainer.innerHTML = "";
+                clear = true;
+            }
+
             Uploaded += 1;
             // Create a list item for the file
             console.log('File uploaded:', file.name, file.type, file.size);
@@ -86,7 +114,7 @@ function handleFiles(files) {
             const previewItem = document.createElement('div');
             previewItem.className = 'flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg';
             previewItem.innerHTML = `
-                      <div class="flex items-center overflow-auto scrollbar-hide">
+                      <div class="flex items-center overflow-auto scrollbar-hide p-4 w-full">
                           <svg class="fill-current h-6 w-6 text-gray-500 mr-1" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                               <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h2v4a2 2 0 002 2h2a2 2 0 002-2v-4h2a2 2 0 002-2V4a2 2 0 00-2-2H9z"></path>
                           </svg>

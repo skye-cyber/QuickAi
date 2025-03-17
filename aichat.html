@@ -607,38 +607,60 @@
         </div>
     </div>
 
-    <!--Attachment modal and file input -->
-    <section>
-    <!-- Attachment modal -->
-        <div id="dropZoneModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-40 hidden z-40" title="Attach files" onclick="this.classList.add('hidden');">
-            <!-- Modal Content -->
-            <div id="dropZone" class="relative bg-white dark:bg-stone-800 p-6 rounded-lg shadow-lg w-full h-full md:mx-auto max-w-[70vw] max-h-[70vh] md:max-h-[80vh] md:max-w-md 2xl:max-w-lg cursor-pointer" onclick="event.stopPropagation()">
-                <button id="closeFileEModal" title="Close" class="absolute top-2 right-2 text-gray-400 dark:text-gray-500 hover:text-blue-300 dark:hover:text-gray-300" aria-label="Close">
-                    <svg class="fill-current h-6 w-6" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.65-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"></path>
-                    </svg>
-                </button>
-                <p id="dropZoneText" class="text-gray-500 dark:text-gray-300 mt-4 text-lg">Drag and drop files here or click to select</p>
-                <div id="dropZoneSVG" class="mt-6 flex items-center justify-center">
-                    <svg class="fill-current h-10 w-10 text-gray-300" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
-                        <path d="M14 2H6a2 2 0 00-2 2v6a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z"></path>
-                    </svg>
-                </div>
-                <div class="preview-container mt-3 overflow-y-auto scrollbar-hide max-h-[75%]">
-                    <div id="uploadedFiles" class="space-y-2"></div>
-                </div>
-                <section class="w-[90%] absolute bg-cyan-300 dark:bg-zinc-700 flex space-x-2 bottom-0 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <textarea type="text" aria-label="prompt input field" title="prompt field" id="imagePrompt" class="w-full pt-5 scrollbar-hide resize-none text-black dark:text-white max-h-[15vh] overflow-wrap rows-3 bg-cyan-100 dark:bg-zinc-700" oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';" cols="10" placeholder="Enter your prompt here" />
-                    </textarea>
-                    <div class="flex justify-end">
-                        <button id="submitImage" aria-label="submit button" title="submit" class="p-3 bg-blue-500 text-white rounded focus:outline-none focus:bg-blue-600 hover:bg-blue-600 w-fit">Submit<i class="fas fa-paper-plane"></i></button>
+    <div id="dropZoneModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-40 hidden z-40">
+        <section id="dropZoneContent" title="Attach files" class="relative p-3 bg-white dark:bg-stone-800 rounded-xl shadow-lg w-full h-full md:mx-auto max-w-[70vw] max-h-[70vh] md:max-h-[80vh] lg:md:max-w-[50vw] mb-16" >
+            <button id="closeFileEModal" title="Close" class="absolute top-3 right-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:rotate-90">
+                <svg class="fill-current h-5 w-5" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.65-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"></path>
+                </svg>
+            </button>
+            <h2 class="text-2xl font-semibold text-blue-700 dark:text-sky-300 mb-6">Upload File</h2>
+            <div id="dropZone" class="p-4 rounded-xl border-2 border-dashed border-blue-400 dark:border-cyan-400 w-full h-full md:mx-auto max-w-[calc(70vw-30px)] max-h-[calc(70vh-20vh)] md:max-h-[calc(80vh-20vh] cursor-pointer" onclick="event.stopPropagation()">
+                <div class="flex flex-col items-center justify-center h-full">
+                    <div id="dropZoneSVG" class="flex items-center justify-center">
+                        <svg class="fill-current h-12 w-12 text-blue-400 dark:text-blue-300" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+                            <path d="M14 2H6a2 2 0 00-2 2v6a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z"></path>
+                        </svg>
                     </div>
-                </section>
+                    <p id="dropZoneText" class="text-gray-600 dark:text-gray-300 text-lg mb-4">Drag & drop files here or <span class="text-cyan-400 dark:text-blue-400">click to select</span></p>
+                    <!-- Modal Trigger Button -->
+                    <button id="modalTrigger" onclick="document.getElementById('previewModal').classList.remove('hidden')" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-purple-600 hover:to-blue-500 text-white font-semibold py-2.5 px-6 rounded-full shadow-md transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        Preview Files
+                    </button>
+                </div>
+            </div>
+            <section class="w-[calc(70vw-30px)] lg:max-w-[calc(50vw-30px)] absolute bg-gradient-to-r from-purple-200 via-pink-200 to-indigo-200 dark:bg-gradient-to-r dark:from-purple-800 dark:via-pink-800 dark:to-indigo-800 flex space-x-2 bottom-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-2">
+                <textarea type="text" aria-label="prompt input field" title="prompt field" id="imagePrompt" class="w-full pt-2 scrollbar-hide resize-none text-black dark:text-white max-h-[10vh] overflow-wrap rows-2 bg-transparent focus:outline-none" oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';" placeholder="Enter your prompt here"></textarea>
+                <div class="flex items-center justify-end">
+                    <button id="submitImage" aria-label="submit button" title="submit" class="p-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg focus:outline-none hover:from-blue-600 hover:to-purple-700 w-fit">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            </section>
+        </section>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="previewModal" class="hidden fixed top-0 left-0 z-50 w-full h-full bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300 ease-in-out">
+        <div class="relative p-3 bg-white dark:bg-slate-800 rounded-xl shadow-2xl md:mx-auto min-w-[30vw] max-w-[calc(70vw-30px)] max-h-[calc(70vh-20vh)] md:max-h-[calc(80vh-20vh)] overflow-hidden transform transition-transform duration-300 ease-out scale-95" id="modalContent">
+            <h2 class="text-2xl font-semibold text-blue-600 dark:text-sky-400 mb-1">Preview Files</h2>
+            <div class="overflow-hidden">
+                <div id="uploadedFiles" class="pb-4 mb-2 rounde-lg dark:bg-[#002a3d] p-2 space-y-3 max-h-[calc(60vh-100px)] overflow-y-auto scrollbar-hide">
+                    <p class="font-bold mb-12 px-12 text-cyan-600 dark:text-teal-400">No files uploaded yet.</p>
+                </div>
+            </div>
+            <div class="absolute bottom-0 right-0.5 z-60 w-24 p-2 border-t border-gray-200 dark:border-[#4d7339] flex justify-end">
+                <button id="closeModal" onclick="document.getElementById('previewModal').classList.add('hidden')" class="bg-gradient-to-r from-red-500 to-pink-600 hover:from-pink-600 hover:to-red-500 text-white font-semibold py-2 px-5 rounded-full shadow-md transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-400">
+                    Close
+                </button>
             </div>
         </div>
-    </section>
-    <!-- File Input -->
+    </div>
+
     <input multiple class="absolute opacity-0" accept=".txt, .doc, .docx, .rtf, .md, .markdown, .epub, .mobi, .pdf, .png, .jpg, .jpeg, .svg, .gif, .bmp" type="file" id="fileInput" onclick="handleFileInputClick();"/>
 
     <!-- Conversation options -->
@@ -686,7 +708,7 @@
     </div>
 
     <!--Conversation Rename modal-->
-    <div id="renameModal" class="fixed inset-0 z-50 flex translate-y-full items-center justify-center bg-black bg-opacity-50 transform transition-transform duration-700 ease-in-out">
+    <div id="renameModal" class="fixed inset-0 z-50 flex translate-y-full items-center justify-center bg-black bg-opacity-40 transform transition-transform duration-700 ease-in-out">
         <div class="bg-white p-6 rounded-lg shadow-lg">
         <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 mb-4"></h3>
         <div class="mb-4">
@@ -701,12 +723,12 @@
     </div>
 
     <!-- Settings Modal Background -->
-    <div id="settingsModal" class="hidden fixed inset-2 z-50 flex items-center justify-center bg-black bg-opacity-60 dark:bg-opacity-80 dark:bg-gray-900 dark:bg-opacity-50" onclick="if (event.target.id === 'settingsModal') {this.classList.add('hidden');}">
+    <div id="settingsModal" class="hidden fixed inset-2 z-50 flex items-center justify-center bg-black bg-opacity-60 dark:bg-opacity-40 dark:bg-gray-900" onclick="if (event.target.id === 'settingsModal') {this.classList.add('hidden');}">
         <!-- Modal Content -->
-        <div class="relative bg-white dark:bg-zinc-900 dark:border-2 dark:border-black dark:shadow-md dark:shadow-black p-6 rounded-lg w-full mx-2 md:mx-auto max-w-md lg:max-w-lg xl:max-w-xl max-h-full">
+        <div class="relative bg-gradient-to-br from-yellow-100 to-pink-100 border-2 border-gray-200 dark:from-indigo-700 dark:to-[#00b000] dark:border-2 dark:border-black dark:shadow-lg dark:shadow-[#8435de] shadow-xl p-6 rounded-lg w-full mx-2 md:mx-auto max-w-md lg:max-w-xl xl:max-w-2xl max-h-full">
 
         <!-- Close Button -->
-            <button id="closeModal" class="absolute top-2 right-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400">
+            <button id="closeModal" onclick="document.getElementById('settingsModal').classList.add('hidden')" class="absolute top-2 right-2 text-gray-400 dark:text-[#00ffff] hover:text-gray-900 hover:rotate-45 duration-300 dark:hover:text-gray-400">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -716,7 +738,7 @@
             <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Settings</h2>
 
             <!--Scrollable content container-->
-            <section class="bg-white dark:bg-zinc-800 overflow-auto max-h-[80vh] shadow-inner shadow-slate-400 dark:shadow-sky-400 rounded-md p-2">
+            <section class="bg-white dark:bg-zinc-800 overflow-auto max-h-[80vh] shadow-inner shadow-[#005500] dark:shadow-[#0076ac] rounded-md p-2">
 
                 <section class="grid grid-cols-2 grid-rows-2 md:grid-cols-3 mb-4 space-y-1" arial-label="switch theme" title="switch theme">
                     <!-- Theme Switching Option -->
@@ -756,7 +778,7 @@
                         Enter Your &nbsp;<i> <span class="text-orange-500">wish</span></i> /<span class="text-pink-500"> infor</span>/<span class="text-purple-500"> preference</span>:
                     </label>
                     <section title="What would you like quickai to know about you? Tell me what you would want me to do for you and in what manner?" class="w-full rounded-lg border-2 border-blue-500 dark:border-blue-300 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50 dark:bg-gray-700">
-                        <textarea id="pref-input" class="scrollbar-hide resize-none overflow-wrap w-full text-rose-950 dark:text-green-600 pt-3 px-4 rounded-lg bg-gray-50 dark:bg-gray-700 ring-none outline-none" placeholder="What would you like quickai to do or know about you?..."></textarea>
+                        <textarea id="pref-input" class="scrollbar-hide resize-none overflow-wrap w-full text-rose-950 dark:text-white pt-3 px-4 rounded-lg bg-gray-50 dark:bg-gray-700 ring-none outline-none" placeholder="What would you like quickai to do or know about you?..." oninput="this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 28 * window.innerHeight / 100) + 'px'; this.scrollTop = this.scrollHeight;"></textarea>
                         <div class="flex justify-end">
                             <!-- Checkmark Circle Icon Button -->
                             <button id="pref-submit" class="bg-green-500 hover:bg-yellow-500 text-white p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-green-300">
@@ -770,11 +792,7 @@
                 </div>
 
                 <div id="pref-section" class="mb-6">
-                    <label class="block text-lg font-medium mb-2 text-gray-600 dark:text-gray-300 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 4 12 4c4.477 0 8.268 3.943 9.542 9-.145 1.326-.678 2.43-1.482 3.379l-.548-.548c.139-.441.208-.901.208-1.374 0-1.11-.89-2-2-2s-2 .89-2 2c0 .473.069.933.209 1.374l-.548.549c-.804-.879-1.91-1.482-3.166-1.482zm0 0C5.522 8.268 2.733 5.477 2.458 12C3.732 16.057 7.523 20 12 20s8.268-3.943 9.542-9-.145-1.326-.678-2.43-.208-.901-.208-1.374 0-1.11.89-2 2-2s2 .89 2 2c0 .473-.069.933-.209 1.374l-.548-.549C16.866 13.912 15.76 12 12 12z"></path>
-                        </svg>
+                    <label class="block text-lg font-medium mb-2 text-gray-600 dark:text-gray-300 flex items-center ml-2">
                         User &nbsp;<span class="text-sky-500">command</span> &nbsp;/ &nbsp;<span class="text-pink-900 font-semibold">Data</span>
                     </label>
                     <div id="pref-preview" class="relative p-6 bg-blue-200 dark:bg-stone-900 border-none border-blue-300 rounded-lg shadow-md shandow-gray-700">
