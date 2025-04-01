@@ -55,7 +55,7 @@
     "marked": "^15.0.3",
     "mathjax": "^3.2.2",
     "mathjax-electron": "^3.0.0",
-    "mistral": "^0.0.4",
+    "mistral": "^0.0.1",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
@@ -80,7 +80,7 @@
     "minimatch": "^10.0.1",
     "set-value": "^4.1.0",
     "shelljs": "^0.8.5",
-    "update": "^0.4.2",
+    "update": "^0.7.4",
     "webpack": "^5.97.1"
   },
   "files": [

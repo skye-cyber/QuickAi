@@ -184,10 +184,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function toggleDropdown() {
     modelDropdown.classList.toggle('hidden');
 }
+
 //Handle custom model selection
 // Function to select a mode
 function selectModel(value) {
-    const wasValid = (model.value !== 'Llama-3.2-11B-Vision-Instruct') ? true : false
     modelItems.forEach(item => {
         const isSelected = item.getAttribute('data-value') === value;
         item.classList.toggle('dark:bg-stone-900', isSelected);

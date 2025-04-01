@@ -1,7 +1,7 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain, Notification } = require('electron');
 const path = require('path');
-const crypto = require('crypto');
-const { Buffer } = require('buffer');
+//const crypto = require('crypto');
+//const { Buffer } = require('buffer');
 const dotenv = require('dotenv')
 let mainWindow;
 
@@ -59,59 +59,6 @@ ipcMain.handle('get-env', () => {
     };
 });
 
-ipcMain.handle('getKey', async (event, encryptedObject, password) => {
-    const { iv, encryptedData } = encryptedObject;
-
-    if (!iv) {
-        throw new Error("IV is missing or undefined");
-    }
-
-    try {
-        // Convert IV from a comma-separated string to a buffer
-        const ivBuffer = Buffer.from(iv.split(',').map(Number));
-
-        // Derive the key from the password using scrypt
-        const key = crypto.scryptSync(password, 'PhantomJoker15', 32);
-
-        // Create decipher
-        const decipher = crypto.createDecipheriv('aes-256-cbc', key, ivBuffer);
-
-        // Decrypt the data
-        let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
-
-        return decrypted;
-    } catch (error) {
-        console.error("Error in decrypting data:", error);
-        throw error;
-    }
-});
-
-ipcMain.handle('createKey', async (apiKey, password) => {
-        // Derive a 32-byte key from the password
-        const key = crypto.scryptSync(password, 'PhantomJoker15', 32);
-
-        // Generate a random IV (16 bytes for AES)
-        const iv = crypto.randomFillSync(new Uint8Array(16));
-
-        // Create the cipher
-        const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-
-        // Encrypt the API key
-        let encrypted = cipher.update(apiKey, 'utf8', 'hex');
-        encrypted += cipher.final('hex');
-
-        // Return the IV and encrypted data as a single object
-        return {
-            iv: iv.toString('hex'),
-                encryptedData: encrypted
-        };
-});
-
-ipcMain.handle('get-buffer-from-iv', (event, iv) => {
-    const ivBuffer = Buffer.from(iv.split(',').map(Number)); // Split string, convert to numbers, and make a buffer
-    return ivBuffer;
-});
 
 //Handle Documentation shortcut
 ipcMain.handle('show-documentation', () => {
@@ -196,7 +143,7 @@ function createWindow() {
     width: 400,
     height: 300,
     frame: false,
-    alwaysOnTop: true,
+    alwaysOnTop: false,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -282,3 +229,4 @@ app.on('activate', () => {
     createWindow(); // Recreate a window if none are open on macOS
   }
 });
+

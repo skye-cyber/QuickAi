@@ -1,17 +1,14 @@
 import { Mistral } from '@mistralai/mistralai';
 
 
-const chatArea = document.getElementById("chatArea");
-const userInput = document.getElementById("userInput");
-const sendBtn = document.getElementById("sendBtn");
-const modelSelect = document.getElementById('model');
 const AutoScroll = document.getElementById("AutoScroll");
 const MISTRAL_API_KEY = window.electron.MISTRAL_API_KEY();
-const MISTRAL_CODESTRAL_API_KEY = window.electron.MISTRAL_CODESTRAL_API_KEY();
+//const MISTRAL_CODESTRAL_API_KEY = window.electron.MISTRAL_CODESTRAL_API_KEY();
+//const modelSelect = document.getElementById('model');
+//console.log(MISTRAL_API_KEY)
+const Mistarlclient = new Mistral({ apiKey: MISTRAL_API_KEY });
 
-const client = new Mistral({ apiKey: MISTRAL_API_KEY });
-
-let Utilitycheck = false
+//let Utilitycheck = false
 
 const codestral = {
 	'https://codestral.mistral.ai/v1/fim/completions': 'Completion Endpoint',
@@ -30,156 +27,521 @@ const MSmodels = [
 	"mistral-large-2407",
 	"mistral-large-2411",
 	"mistral-saba-2502",
-	"mistral-embed",
+	"mistral-embed", //
 	"codestral-2405",
 	"codestral-2501",
 	"codestral-mamba-2407",
 	"open-mistral-nemo",
-	"pixtral-12b-2409", //MistraVision
-	"pixtral-large-2411", //MistraVision
+	"pixtral-12b-2409",            //MistraVision
+	"pixtral-large-2411",         //MistraVision
 	"ministral-3b-2410",
 	"ministral-8b-2410",
-	"mistral-moderation-2411"
+	"mistral-moderation-2411"   //
 ]
 
 
-async function MistraChat() {
-	const aiMessage = document.createElement("div");
+let userMessage = null;
+let aiMessage = null;
 
+async function MistraChat(text, modelName) {
+	try {
+		console.log("Reached Mistral chat", text)
+
+		aiMessage = document.createElement("div");
+		// Add user message to the chat interface
+		addUserMessage(text)
+		// Add loading animation
+		addLoadingAnimation(aiMessage);
+
+		const aiMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
+		aiMessage.classList.add("flex", "justify-start", "mb-12", "overflow-wrap");
+		chatArea.appendChild(aiMessage);
+		const foldId = `think-content-${Math.random().toString(33).substring(3, 9)}`;
+		const exportId = `export-${Math.random().toString(33).substring(3, 9)}`;
+
+
+		// Scroll to bottom
+		AutoScroll.checked ? scrollToBottom(chatArea) : null;
+
+		// Create Timer object
+		const _Timer = new window.Timer();
+
+		//start timer
+		_Timer.trackTime("start");
+
+		window.HandleProcessingEventChanges('show')
+
+		const stream = await Mistarlclient.chat.stream({
+			model: modelName,
+			messages: window.electron.getChat(),
+			max_tokens: 2000
+		});
+
+		let output = ""
+		//const stream = window.generateTextChunks();
+
+		let thinkContent = "";
+		let actualResponse = "";
+		let isThinking = false;
+		let fullResponse = "";
+		let hasfinishedThinking = false;
+
+		for await (const chunk of stream) {
+			const choice = chunk?.data?.choices?.[0];
+			if (!choice?.delta?.content) continue;
+
+			const deltaContent = choice.delta.content;
+			output += deltaContent;
+			fullResponse += deltaContent;
+
+			const hasThinkTag = output.includes("<think>");
+			const isDeepSeek = modelName === "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B";
+			const shouldStartThinking = !isThinking && (hasThinkTag || isDeepSeek);
+			const shouldStopThinking = isThinking && output.includes("</think>");
+
+			if (shouldStartThinking && !hasfinishedThinking) {
+				isThinking = true;
+				hasfinishedThinking = false;
+				output = output.replace("<think>", "");
+				thinkContent = output;
+			} else if (shouldStopThinking) {
+				isThinking = false;
+				hasfinishedThinking = true;
+				thinkContent += deltaContent.replace("</think>", "");
+				output = output.replace("</think>", "");
+			} else if (isThinking) {
+				thinkContent += deltaContent;
+			} else {
+				actualResponse += deltaContent;
+			}
+			//console.log("Setting html content...", actualResponse);
+
+			// Update innerHTML with marked output
+			aiMessage.innerHTML = `
+						<section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
+						${isThinking || thinkContent ? `
+							<div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl">
+							<div class="flex items-center justify-between">
+							<strong style="color: #007bff;">Thoughts:</strong>
+							<button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
+							<p class="flex">Fold
+							<svg class="mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="32" height="38" class="fold-icon">
+							<path class="fill-blue-400 dark:fill-yellow-400" d="M6 9h12l-6 6z"/>
+							<path fill="currentColor" d="M6 15h12l-6-6z"/>
+							</svg>
+							</p>
+							</button>
+							</div>
+							<div id="${foldId}" class="">
+							<p style="color: #333;">${window.marked(thinkContent)}</p>
+							</div>
+							</div>
+							` : ''}
+							${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
+							${actualResponse ? `
+								<div class="${aiMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
+								${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
+								<p style="color: #333;">${window.marked(actualResponse)}</p>
+								<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
+									<div class="group relative max-w-fit transition-all duration-300 hover:z-50">
+										<div
+											role="button"
+											id="${exportId}"
+											aria-expanded="false"
+											onclick="window.toggleExportOptions(this);"
+											aria-label="Export"
+											class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
+											style="border: 2px solid rgba(255,85,0,0); background-clip: padding-box, border-box; background-origin: border-box; background-image: linear-gradient(to bottom right, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.8)), linear-gradient(135deg, rgba(255,0,255,170) 0%, rgba(0,0,255,85) 50%, rgba(0,255,255,170) 100%);"
+										>
+											<div class="flex items-center space-x-2 px-4 py-1">
+											<div class="relative h-6 w-6">
+												<svg
+												class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-300 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
+												viewBox="0 0 24 24"
+												style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1))"
+												>
+												<path
+													d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+													class="origin-center transition-transform duration-300"
+												/>
+												</svg>
+											</div>
+											<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
+												Export
+											</span>
+											</div>
+
+											<!-- Gradient border overlay -->
+											<div class="absolute inset-0 -z-10 rounded-[12px] bg-gradient-to-br from-blue-400/20 via-purple-400/10 to-blue-400/20 opacity-60 dark:from-blue-400/15 dark:via-purple-400/10 dark:to-blue-400/15"></div>
+										</div>
+
+										<!-- Hover enhancement effect -->
+										<div class="absolute -inset-2 -z-10 rounded-xl bg-blue-500/10 blur-xl transition-opacity duration-300 group-hover:opacity-100 dark:bg-blue-400/15"></div>
+									</div>
+									<div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageUId}');">
+										<svg
+											class="w-5 md:w-6 h-5 md:h-6 mt-1 transition-transform duration-200 ease-in-out hover:scale-110 cursor-pointer"
+											viewBox="0 0 24 24"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<defs>
+												<linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+													<stop offset="0%" style="stop-color: #FF4081; stop-opacity: 100" />
+													<stop offset="100%" style="stop-color: #4a1dff; stop-opacity: 1" />
+												</linearGradient>
+											</defs>
+											<g clip-path="url(#clip0)">
+												<path
+													fill-rule="evenodd"
+													clip-rule="evenodd"
+													d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"
+													fill="url(#gradient1)"
+												/>
+											</g>
+										</svg>
+									</div>
+								</section>
+								</div>
+								<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+								<ul class="list-none p-0">
+								<li class="mb-2">
+								<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">Export to PDF</a>
+								</li>
+								<li class="mb-2">
+								<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">Export to JPG</a>
+								</li>
+								<li>
+								<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">Export to DOCX</a>
+								</li>
+								<li>
+								<a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageUId}')">Word Export Advance</a>
+								</li>
+								</ul>
+								</div>
+								</section>`: ""}
+
+			`;
+
+			AutoScroll.checked ? scrollToBottom(chatArea) : null;
+		}
+		//stop timer
+		_Timer.trackTime("stop");
+
+		// Reset send button appearance
+		window.HandleProcessingEventChanges("hide")
+
+		// Sending a message to the main process if script does not exist already
+		window.setutilityScriptisSet();
+
+		// Render mathjax immediately
+		window.debounceRenderMathJax(aiMessageUId, 0, true);
+		// Store conversation history
+		window.electron.addToChat({ role: "assistant", content: output });
+	} catch (err) {
+		window.handleRequestError(err, userMessage, aiMessage)
+	}
+}
+
+
+async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
+	const _Timer = new window.Timer;
+
+	console.log("Reached Mistral vision")
+
+	const fileContainerId = `FCont_${Math.random().toString(35).substring(2, 8)}`;
+
+	const VisionMessage = document.createElement("div");
+	aiMessage = VisionMessage
+	// Add user message to the chat interface
+	addUserMessage(text)
 	// Add loading animation
 	addLoadingAnimation(aiMessage);
 
-	const aiMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
-	aiMessage.classList.add("flex", "justify-start", "mb-12", "overflow-wrap");
-	chatArea.appendChild(aiMessage);
+	//Add Timestamp
+	text = `${text} [${window.electron.getDateTime()} UTC]`
+	//console.log(text)
+	// Determine the content based on fileDataUrl
+	let userContent;
+	if (fileDataUrl) {
+		//console.log("Image url present");
+		if (fileType == "image") {
+			const imageContent = fileDataUrl.map(_url => ({
+				type: "image_url",
+				image_url: {
+					url: _url,
+				}
+			}));
 
-	// Scroll to bottom
-	AutoScroll.checked ? scrollToBottom(chatArea) : null;
-
-	// Create Timer object
-	const _Timer = new window.Timer();
-
-	//start timer
-	_Timer.trackTime("start");
-
-	window.HandleProcessingEventChanges('show')
-
-
-	const stream = await client.chat.stream({
-		model: "mistral-small-latest",
-		messages: window.electron.getChat(),
-		max_tokens: 2000
-	});
-
-	let output = ""
-	for await (const chunk of stream) {
-		const choice = chunk?.data?.choices?.[0];
-		if (choice.delta.content) {
-			output += choice.delta.content;
-			aiMessage.innerHTML = `
-            <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
-				<div class="${aiMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
-					<p style="color: #333;">${window.marked(output)}</p>
-				</div>
-                <section class="options flex absolute bottom-2 left-0 space-x-4 cursor-pointer">
-                    <div class="p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
-                        <svg class="fill-black dark:fill-gray-700 text-gray-600 bg-[#5555ff] dark:bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
-                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                        </svg>
-                    </div>
-                    <div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageUId}');">
-                        <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"/></path>
-                        </svg>
-                    </div>
-                </section>
-                <div id="exportOptions" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
-                    <ul class="list-none p-0">
-                        <li class="mb-2">
-                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">Export to PDF</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">Export to JPG</a>
-                        </li>
-                        <li>
-                            <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">Export to DOCX</a>
-                        </li>
-                        <li>
-                            <a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageUId}')">Word Export Advance</a>
-                        </li>
-                    </ul>
-                </div>
-            </section>
-            `;
-			AutoScroll.checked ? scrollToBottom(chatArea) : null;
-			window.addCopyListeners(); // Assuming this function adds copy functionality to code blocks
-			// Debounce MathJax rendering to avoid freezing
-			window.debounceRenderMathJax(aiMessageUId);
-
-		} else {
-			console.log("No data in response");
+			userContent = [
+				{
+					type: "text",
+					text: text,
+				},
+				...imageContent // Spread the image content objects
+			];
 		}
+
+		else if (fileType == "document") {
+			const documentContent = fileDataUrl.map(_url => ({
+				type: "file_url",
+				image_url: {
+					url: _url,
+				}
+			}));
+
+			userContent = [
+				{
+					type: "text",
+					text: text,
+				},
+				...documentContent // Spread the document content objects
+			];
+		}
+	} else {
+		//console.log("Url not found");
+		userContent = [
+			{
+				type: "text",
+				text: text,
+			},
+		];
 	}
 
-	//stop timer
-	_Timer.trackTime("stop");
-
-	// Reset send button appearance
-	window.HandleProcessingEventChanges()
-
-	// Sending a message to the main process if script does not exist already
-	utilityScriptExists();
-
-	// Render mathjax immediately
-	window.debounceRenderMathJax(aiMessageUId, 0, true);
-	// Store conversation history
-	window.electron.addToChat({ role: "assistant", content: output });
-}
-
-async function MistraVision() {
-	const aiMessage = document.createElement("div");
-	const chatResponse = await client.chat.complete({
-		model: "pixtral-12b",
-		messages: [
-			{
-				role: "user",
-				content: [
-					{ type: "text", text: "What's in this image?" },
-					{
-						type: "image_url",
-						imageUrl: "https://tripfixers.com/wp-content/uploads/2019/11/eiffel-tower-with-snow.jpeg",
-					},
-				],
-			},
-		],
+	// Add user message to VisionHistory
+	window.electron.addToVisionChat({
+		role: "user",
+		content: userContent,
 	});
 
-	console.log("JSON:", chatResponse.choices[0].message.content);
+	const exportId = `export-${Math.random().toString(33).substring(3, 9)}`;
+	const VisionMessageUId = `msg_${Math.random().toString(30).substring(3, 9)}`;
+	VisionMessage.classList.add("flex", "justify-start", "mb-12", "overflow-wrap");
+	chatArea.appendChild(VisionMessage);
+	const foldId = `think-content-${Math.random().toString(33).substring(3, 9)}`;
+
+	// Add loading animation
+	VisionMessage.innerHTML = `
+		<div id="loader-parent">
+		<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" class="transform scale-75">
+		<circle cx="12" cy="24" r="4" class="fill-green-500">
+		<animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" />
+		<animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" />
+		</circle>
+		<circle cx="24" cy="24" r="4" class="fill-blue-500">
+		<animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" begin="-0.4s" />
+		<animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" begin="-0.4s" />
+		</circle>
+		<circle cx="36" cy="24" r="4" class="fill-yellow-500">
+		<animate attributeName="cy" values="24;10;24;38;24" keyTimes="0;0.2;0.5;0.8;1" dur="1s" repeatCount="indefinite" begin="-0.8s" />
+		<animate attributeName="fill-opacity" values="1;.2;1" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" begin="-0.8s" />
+		</circle>
+		</svg>
+		</div>
+		`;
+
+	try {
+		//console.log(window.electron.clearImages(window.electron.getVisionChat()),)
+		//const visionstream = window.generateTextChunks();
+		const visionstream = await Mistarlclient.chat.stream({
+			model: modelName,
+			messages: window.electron.clearImages(window.electron.getVisionChat()),
+			max_tokens: 2000,
+		});
+
+
+		// change send button appearance to processing status
+		window.HandleProcessingEventChanges('show')
+
+		//start timer
+		_Timer.trackTime("start");
+
+		let output = ""
+		//const stream = window.generateTextChunks();
+
+		let thinkContent = "";
+		let actualResponse = "";
+		let isThinking = false;
+		let fullResponse = "";
+		let hasfinishedThinking = false;
+
+		for await (const chunk of visionstream) {
+			const choice = chunk?.data?.choices?.[0];
+			if (!choice?.delta?.content) continue;
+			const deltaContent = choice?.delta?.content;
+			output += deltaContent;
+			fullResponse += deltaContent;
+
+			const hasThinkTag = output.includes("<think>");
+			const shouldStartThinking = !isThinking && hasThinkTag;
+			const shouldStopThinking = isThinking && output.includes("</think>");
+
+			if (shouldStartThinking && !hasfinishedThinking) {
+				isThinking = true;
+				hasfinishedThinking = false;
+				output = output.replace("<think>", "");
+				thinkContent = output;
+			} else if (shouldStopThinking) {
+				isThinking = false;
+				hasfinishedThinking = true;
+				thinkContent += deltaContent.replace("</think>", "");
+				output = output.replace("</think>", "");
+			} else if (isThinking) {
+				thinkContent += deltaContent;
+			} else {
+				actualResponse += deltaContent;
+			}
+			//console.log(actualResponse)
+			VisionMessage.innerHTML = `
+				<section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
+					${isThinking || thinkContent ? `
+					<div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl">
+						<div class="flex items-center justify-between">
+							<strong style="color: #007bff;">Thoughts:</strong>
+							<button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
+							<p class="flex">Fold
+							<svg class="mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="32" height="38" class="fold-icon">
+							<path class="fill-blue-400 dark:fill-yellow-400" d="M6 9h12l-6 6z"/>
+							<path fill="currentColor" d="M6 15h12l-6-6z"/>
+							</svg>
+							</p>
+							</button>
+						</div>
+						<div id="${foldId}" class="">
+							<p style="color: #333;">${window.marked(thinkContent)}</p>
+						</div>
+					</div>
+					` : ''}
+						${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
+						${actualResponse ? `<div class="${VisionMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
+							<p style="color: #333;">${window.marked(actualResponse)}</p>
+					<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
+						<div class="group relative max-w-fit transition-all duration-300 hover:z-50">
+							<div
+								role="button"
+								id="${exportId}"
+								aria-expanded="false"
+								onclick="window.toggleExportOptions(this);"
+								class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
+								style="border: 2px solid rgba(255,85,0,0); background-clip: padding-box, border-box; background-origin: border-box; background-image: linear-gradient(to bottom right, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.8)), linear-gradient(135deg, rgba(255,0,255,170) 0%, rgba(0,0,255,85) 50%, rgba(0,255,255,170) 100%);"
+							>
+								<div class="flex items-center space-x-2 px-4 py-1">
+								<div class="relative h-6 w-6">
+									<svg
+									class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-300 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
+									viewBox="0 0 24 24"
+									style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1))"
+									>
+									<path
+										d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+										class="origin-center transition-transform duration-300"
+									/>
+									</svg>
+								</div>
+								<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
+									Export
+								</span>
+								</div>
+
+								<!-- Gradient border overlay -->
+								<div class="absolute inset-0 -z-10 rounded-[12px] bg-gradient-to-br from-blue-400/20 via-purple-400/10 to-blue-400/20 opacity-60 dark:from-blue-400/15 dark:via-purple-400/10 dark:to-blue-400/15"></div>
+							</div>
+
+						<!-- Hover enhancement effect -->
+						<div class="absolute -inset-2 -z-10 rounded-xl bg-blue-500/10 blur-xl transition-opacity duration-300 group-hover:opacity-100 dark:bg-blue-400/15"></div>
+					</div>
+					<div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${VisionMessageUId}');">
+						<svg
+							class="w-5 md:w-6 h-5 md:h-6 mt-1 transition-transform duration-200 ease-in-out hover:scale-110 cursor-pointer"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<defs>
+								<linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+									<stop offset="0%" style="stop-color: #FF4081; stop-opacity: 100" />
+									<stop offset="100%" style="stop-color: #4a1dff; stop-opacity: 1" />
+								</linearGradient>
+							</defs>
+							<g clip-path="url(#clip0)">
+								<path
+									fill-rule="evenodd"
+									clip-rule="evenodd"
+									d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"
+									fill="url(#gradient1)"
+								/>
+							</g>
+						</svg>
+					</div>
+				</section>
+
+				<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+
+				<ul class="list-none p-0">
+				<li class="mb-2">
+				<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${VisionMessageUId}')">1. Export to PDF</a>
+				</li>
+				<li class="mb-2">
+				<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${VisionMessageUId}')">2. Export to JPG</a>
+				</li>
+				<li>
+				<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${VisionMessageUId}')">3. Export to DOCX</a>
+				</li>
+				<li>
+				<a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${VisionMessageUId}')">4. Word Export Advance</a>
+				</li>
+				</ul>
+				</div>
+				</section>`:""}
+				`;
+
+			AutoScroll.checked ? scrollToBottom(chatArea) : null;
+			window.addCopyListeners();
+			// Debounce MathJax rendering to avoid freezing
+			window.debounceRenderMathJax(VisionMessageUId);
+
+			AutoScroll.checked ? scrollToBottom(chatArea) : null;
+		}
+
+		//stop timer
+		_Timer.trackTime("stop");
+
+		// Reset send button appearance
+		window.HandleProcessingEventChanges('hide')
+
+		window.setutilityScriptisSet()
+
+		// Render mathjax immediately
+		window.debounceRenderMathJax(VisionMessageUId, 0, true);
+		window.electron.addToVisionChat({ role: "assistant", content: [{ type: "text", text: output }] });
+		//console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
+
+	} catch (error) {
+		window.handleRequestError(error, userMessage, VisionMessage, ["VS", fileType, fileContainerId])
+	}
 }
 
-function MistraController() {
-	//
-}
 
 function addUserMessage(text) {
-	// Add Timestamp to user prompt
-	text = `${text} [${window.electron.getDateTime()} UTC]`
-	window.electron.addToChat({ role: "user", content: text });
-
+	console.log("Date time + text:", text)
 	const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
 	const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
-	const userMessage = document.createElement("div");
+	userMessage = document.createElement("div");
 
 	userMessage.innerHTML = `
 	<div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
-	<p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${(escapedText)}</p>
+	<p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.escapeHTML(text)}</p>
 	<button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80 " onclick="CopyAll('.${userMessageId}', this)">
 	Copy
 	</button>
 	</div>
 	`;
+	userMessage.classList.add("flex", "justify-end", "mb-4", "overflow-wrap");
+	chatArea.appendChild(userMessage);
 
-	window.implementUserCopy()
+	// Add Timestamp to user prompt
+	text = `${text} [${window.electron.getDateTime()} UTC]`
+	window.electron.addToChat({ role: "user", content: text });
 }
 
 function addLoadingAnimation(aiMessageDiv) {
@@ -201,21 +563,17 @@ function addLoadingAnimation(aiMessageDiv) {
 	</svg>
 	</div>
 	`;
+	window.implementUserCopy()
 }
 
 
-function utilityScriptExists(){
-	const scripts = document.getElementsByTagName('script');
-	let exists = false;
-	for (let script of scripts) {
-		if (script.src.includes('packed_utility.js')) {
-			console.log("Utility script already exits. Not adding"); // Logs the matching script element
-			exists = true
-			return exists
-		}
+function routeToMistral(text, modelName) {
+	console.log("Reached Target: mistralRoute, model:", modelName)
+	if (["pixtral-12b-2409", "pixtral-large-2411"].includes(modelName)) {
+		return MistraVision(text, null, null, modelName)
 	}
-	console.log("Utility missing. Adding");
-	// Sending a message to the main process if script does not exist already
-	window.electron.send('toMain', { message: 'set-Utitility-Script' })
-	return exists
+	MistraChat(text, modelName)
 }
+
+window.routeToMistral = routeToMistral;
+window.MistraVision = MistraVision;

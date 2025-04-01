@@ -201,25 +201,25 @@ class ConversationManager {
             userText = content.slice(-1) === ']' ? content.substring(0, content.length - 22) : content
         }
         const messageHtml = `
-        <div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
-            <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapeHTML(userText)}</p>
-            <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
-            Copy
-            </button>
-        </div>
-        `;
+            <div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
+                <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.escapeHTML(userText)}</p>
+                <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
+                Copy
+                </button>
+            </div>
+            `;
 
         // Create files container if they exist
         if (fileDataUrl) {
             const fileContainerId = `FCont_${Math.random().toString(35).substring(2, 8)}`;
             const fileHtml = `
-      <div id="${fileContainerId}" class="flex justify-end">
-        <article class="flex flex-rows-1 md:flex-rows-3 bg-cyan-100 w-fit p-1 rounded-lg">
-        ${fileDataUrl && fileType === "image" ? fileDataUrl.map(url => `<img src="${url}" alt="Uploaded Image" class="rounded-md w-14 h-14 my-auto mx-1" />`).join('') : fileType === "document" ? fileDataUrl.map(url => `<div class="inline-flex items-center"><svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16V4a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2zm1-1h4v10h-4V4z"/></svg><span>${url}</span></div>`).join('') : ""}
-        </article>
-      </div>
-      `;
+            <div id="${fileContainerId}" class="flex justify-end">
+                <article class="flex flex-rows-1 md:flex-rows-3 bg-cyan-100 w-fit p-1 rounded-lg">
+                ${fileDataUrl && fileType === "image" ? fileDataUrl.map(url => `<img src="${url}" alt="Uploaded Image" class="rounded-md w-14 h-14 my-auto mx-1" />`).join('') : fileType === "document" ? fileDataUrl.map(url => `<div class="inline-flex items-center"><svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16V4a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2zm1-1h4v10h-4V4z"/></svg><span>${url}</span></div>`).join('') : ""}
+                </article>
+            </div>
+            `;
             const filesContainer = document.createElement("div");
             filesContainer.className = "flex justify-end";
             filesContainer.innerHTML = fileHtml;
@@ -238,13 +238,15 @@ class ConversationManager {
         const aiMessage = document.createElement('div');
         aiMessage.classList.add('flex', 'justify-start', 'mb-12', 'overflow-wrap');
         chatArea.appendChild(aiMessage);
+        const exportId = `export-${Math.random().toString(33).substring(3, 9)}`;
 
         let actualResponse = "";
         let thinkContent = "";
 
-        // Check whether it is an R1 response ie if it has thinking tags.
-        let R1 = (content.indexOf("</think>") && content.indexOf("</think>") != -1) ? true : false;
-        if (R1) {
+        // Check whether it is a thinking model response ie if it has thinking tags.
+        const hasThinkTag = content.includes("<think>");
+
+        if (hasThinkTag) {
             const start = (content.indexOf('<think>') !== -1) ? 7 : 0
             thinkContent = content.slice(start, content.indexOf('</think>'));
             actualResponse = content.slice(content.indexOf('</think>') + 8);
@@ -253,124 +255,205 @@ class ConversationManager {
         }
 
         aiMessage.innerHTML = `
-    <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
-        ${thinkContent ? `
-        <div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 lg:max-w-6xl">
-            <div class="flex items-center justify-between">
-                <strong style="color: #007bff;">Thoughts:</strong>
-                <button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentNode.parentNode.children[1].id)">
-                    <p class="flex">Fold
-                        <svg class="mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="32" height="38" class="fold-icon">
-                            <path class="fill-blue-400 dark:fill-yellow-400" d="M6 9h12l-6 6z"/>
-                            <path fill="currentColor" d="M6 15h12l-6-6z"/>
-                        </svg>
-                        </p>
-                </button>
-            </div>
-            <div id="${foldId}" class="hidden">
-                <p style="color: #333;">${marked(thinkContent)}</p>
-            </div>
-        </div>
-        ` : ''}
-        ${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
-        ${actualResponse ? `
-        <div class="${aiMessageId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
-            ${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
-            <p style="color: #333;">${marked(actualResponse)}</p>
-        </div>
-        <section class="options flex absolute bottom-2 left-0 space-x-4 cursor-pointer">
-            <div class="p-1 border-none" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
-                <svg class="fill-black dark:fill-gray-700 text-gray-600 bg-[#5555ff] dark:bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                </svg>
-            </div>
-            <div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageId}');">
-                <svg class="w-5 md:w-6 h-5 md:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path class="fill-black dark:fill-pink-300" fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"/></path>
-                </svg>
-            </div>
-        </section>
-        <div id="exportOptions" class="hidden block absolute bottom-10 left-0 bg-[#fdfdbd] dark:bg-[#002e43] p-2 rounded shadow-lg z-50 transition-300>
-            <ul class="list-none p-0">
-                <li class="mb-2">
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageId}')">Export to PDF</a>
-                </li>
-                <li class="mb-2">
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageId}')">Export to JPG</a>
-                </li>
-                <li>
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageId}')">Export to DOCX</a>
-                </li>
-                <li>
-                    <a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageId}')">Word Export Advance</a>
-                </li>
-            </ul>
-        </div>
-    </section>`: ""}
-    `;
+                <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
+					${hasThinkTag || thinkContent ? `
+						<div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl">
+						<div class="flex items-center justify-between">
+						<strong style="color: #007bff;">Thoughts:</strong>
+						<button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
+						<p class="flex">Fold
+						<svg class="mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="32" height="38" class="fold-icon">
+						<path class="fill-blue-400 dark:fill-yellow-400" d="M6 9h12l-6 6z"/>
+						<path fill="currentColor" d="M6 15h12l-6-6z"/>
+						</svg>
+						</p>
+						</button>
+						</div>
+						<div id="${foldId}" class="">
+						<p style="color: #333;">${window.marked(thinkContent)}</p>
+						</div>
+						</div>
+						` : ''}
+						${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
+						${actualResponse ? `
+							<div class="${aiMessageId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
+							${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
+							<p style="color: #333;">${window.marked(actualResponse)}</p>
+							<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
+								<div class="group relative max-w-fit transition-all duration-300 hover:z-50">
+									<div
+										role="button"
+										id="${exportId}"
+										aria-expanded="false"
+										onclick="window.toggleExportOptions(this);"
+										aria-label="Export"
+										class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
+										style="border: 2px solid rgba(255,85,0,0); background-clip: padding-box, border-box; background-origin: border-box; background-image: linear-gradient(to bottom right, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.8)), linear-gradient(135deg, rgba(255,0,255,170) 0%, rgba(0,0,255,85) 50%, rgba(0,255,255,170) 100%);"
+									>
+										<div class="flex items-center space-x-2 px-4 py-1">
+										<div class="relative h-6 w-6">
+											<svg
+											class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-300 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
+											viewBox="0 0 24 24"
+											style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1))"
+											>
+											<path
+												d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+												class="origin-center transition-transform duration-300"
+											/>
+											</svg>
+										</div>
+										<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
+											Export
+										</span>
+										</div>
+
+										<!-- Gradient border overlay -->
+										<div class="absolute inset-0 -z-10 rounded-[12px] bg-gradient-to-br from-blue-400/20 via-purple-400/10 to-blue-400/20 opacity-60 dark:from-blue-400/15 dark:via-purple-400/10 dark:to-blue-400/15"></div>
+									</div>
+
+									<!-- Hover enhancement effect -->
+									<div class="absolute -inset-2 -z-10 rounded-xl bg-blue-500/10 blur-xl transition-opacity duration-300 group-hover:opacity-100 dark:bg-blue-400/15"></div>
+								</div>
+								<div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageId}');">
+									<svg
+										class="w-5 md:w-6 h-5 md:h-6 mt-1 transition-transform duration-200 ease-in-out hover:scale-110 cursor-pointer"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<defs>
+											<linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+												<stop offset="0%" style="stop-color: #FF4081; stop-opacity: 100" />
+												<stop offset="100%" style="stop-color: #4a1dff; stop-opacity: 1" />
+											</linearGradient>
+										</defs>
+										<g clip-path="url(#clip0)">
+											<path
+												fill-rule="evenodd"
+												clip-rule="evenodd"
+												d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"
+												fill="url(#gradient1)"
+											/>
+										</g>
+									</svg>
+								</div>
+							</section>
+							</div>
+							<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+							<ul class="list-none p-0">
+							<li class="mb-2">
+							<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageId}')">Export to PDF</a>
+							</li>
+							<li class="mb-2">
+							<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageId}')">Export to JPG</a>
+							</li>
+							<li>
+							<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageId}')">Export to DOCX</a>
+							</li>
+							<li>
+							<a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline" onclick="">Word Export Advance</a>
+							</li>
+							</ul>
+							</div>
+							</section>`: ""}
+                `;
     }
 
     // Render vision-based assistant message
     renderVisionAssistantMessage(content) {
         const visionMessageId = `msg_${Math.random().toString(30).substring(3, 9)}`;
         const visionMessage = document.createElement('div');
+        const exportId = `export-${Math.random().toString(33).substring(3, 9)}`;
+
         visionMessage.classList.add('flex', 'justify-start', 'mb-12', 'overflow-wrap');
         chatArea.appendChild(visionMessage);
-
+        const textContent = content[0].text
         //const fileType = this.getFileType(content);
         //const fileDataUrl = this.getFileUrl(content);
         visionMessage.innerHTML = `
-        <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-          <div class="${visionMessageId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${marked(content[0].text)}</p>
-          </div>
-          <section class="options flex absolute bottom-2 left-0 space-x-4 cursor-pointer">
-            <div class="p-1" id="exportButton" onclick="toggleExportOptions(this);" title="Export">
-              <svg class="fill-black dark:fill-gray-700 text-gray-600 bg-[#5555ff] dark:bg-white w-6 h-6 rounded-full" viewBox="0 0 24 24">
-                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-              </svg>
-            </div>
-            <div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${visionMessageId}');">
-              <svg id="copy-svg-${visionMessageId}"
-                class="w-5 md:w-6 h-5 md:h-6 cursor-pointer"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <!-- path content remains the same -->
-                <path
-                  class="fill-black dark:fill-pink-300 transition duration-300 ease-in-out fill-opacity-40 hover:fill-opacity-100"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"
-                />
-                <!-- Circle for visual feedback -->
-                <circle class="h-2 w-2 absolute -top-2 -left-2 bg-blue-500 opacity-0 fill-opacity-0" r="1" />
-              </svg>
-            </div>
-          </section>
-          <div id="exportOptions" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+                <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
+					<div class="${visionMessageId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${window.marked(textContent)}
+					</div>
+					<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
+						<div class="group relative max-w-fit transition-all duration-300 hover:z-50">
+							<div
+								role="button"
+								id="${exportId}"
+								aria-expanded="false"
+								onclick="window.toggleExportOptions(this);"
+								class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
+								style="border: 2px solid rgba(255,85,0,0); background-clip: padding-box, border-box; background-origin: border-box; background-image: linear-gradient(to bottom right, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.8)), linear-gradient(135deg, rgba(255,0,255,170) 0%, rgba(0,0,255,85) 50%, rgba(0,255,255,170) 100%);"
+							>
+								<div class="flex items-center space-x-2 px-4 py-1">
+								<div class="relative h-6 w-6">
+									<svg
+									class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-300 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
+									viewBox="0 0 24 24"
+									style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1))"
+									>
+									<path
+										d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+										class="origin-center transition-transform duration-300"
+									/>
+									</svg>
+								</div>
+								<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
+									Export
+								</span>
+								</div>
 
-            <ul class="list-none p-0">
-                <li class="mb-2">
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${visionMessageId}')">Export to PDF</a>
-                </li>
-                <li class="mb-2">
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${visionMessageId}')">Export to JPG</a>
-                </li>
-                <li>
-                    <a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${visionMessageId}')">Export to DOCX</a>
-                </li>
-                <li>
-                    <a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${visionMessageId}')">Word Export Advance</a>
-                </li>
-            </ul>
-          </div>
-          </section>`;
-        /*
-        ${(fileDataUrl && fileType) ? `<div class="mt-2">${fileType === "image_url" ? `<img src="${fileDataUrl}" alt="Uploaded Image" class="rounded-md my-auto" />` : `<svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2-2H14a2 2 0 0 0 2 2V6a2 2 0 0 0-2-2zM14 2H10a2 2 0 0 1 2v10a2 2 0 0 1 2 2V14z"/>
-            </svg>`}</div>` : ""}
-      </section>
-        */
+								<!-- Gradient border overlay -->
+								<div class="absolute inset-0 -z-10 rounded-[12px] bg-gradient-to-br from-blue-400/20 via-purple-400/10 to-blue-400/20 opacity-60 dark:from-blue-400/15 dark:via-purple-400/10 dark:to-blue-400/15"></div>
+							</div>
+
+							<!-- Hover enhancement effect -->
+							<div class="absolute -inset-2 -z-10 rounded-xl bg-blue-500/10 blur-xl transition-opacity duration-300 group-hover:opacity-100 dark:bg-blue-400/15"></div>
+						</div>
+						<div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${visionMessageId}');">
+							<svg
+								class="w-5 md:w-6 h-5 md:h-6 mt-1 transition-transform duration-200 ease-in-out hover:scale-110 cursor-pointer"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<defs>
+									<linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+										<stop offset="0%" style="stop-color: #FF4081; stop-opacity: 100" />
+										<stop offset="100%" style="stop-color: #4a1dff; stop-opacity: 1" />
+									</linearGradient>
+								</defs>
+								<g clip-path="url(#clip0)">
+									<path
+										fill-rule="evenodd"
+										clip-rule="evenodd"
+										d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z"
+										fill="url(#gradient1)"
+									/>
+								</g>
+							</svg>
+						</div>
+					</section>
+
+					<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+
+					<ul class="list-none p-0">
+					<li class="mb-2">
+					<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${visionMessageId}')">1. Export to PDF</a>
+					</li>
+					<li class="mb-2">
+					<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${visionMessageId}')">2. Export to JPG</a>
+					</li>
+					<li>
+					<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${visionMessageId}')">3. Export to DOCX</a>
+					</li>
+					<li>
+					<a href="" class="text-blue-500 dark:text-blue-400 decoration-underline cursor-not-allowed" onclick="">4. Word Export Advance</a>
+					</li>
+					</ul>
+					</div>
+					</section>
+					`;
     }
 }
 const conversationManager = new ConversationManager(storagePath);

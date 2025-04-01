@@ -141,33 +141,17 @@ function getParents(event, levels = 3) {
 }
 
 
-function toggleExportOptions(button, _current = false, pass = false,) {
-    const menu = button.parentNode.nextElementSibling;
-    const handleClickOutside = (event) => {
-        if (menu && !menu.contains(event.target)) {
-            menu.classList.toggle('hidden');
-            removeMenuClickListener();
-        }
-    };
+function toggleExportOptions(button) {
+    const exportBtid = button.id;
+    const exportMenu = document.getElementById(`exportOptions-${exportBtid}`)
+    //console.log(exportMenu)
 
-    const removeMenuClickListener = () => {
-        menu.removeEventListener('click', handleClickOutside);
-        document.removeEventListener('click', handleClickOutside);
-    };
-
-    if (_current === true) {// Toggle provided element
-        button.classList.toggle('hidden');
-    } else {// toggle next sibling for provided element parentNode
-        const exportOptions = button.parentNode.nextElementSibling;
-        if (exportOptions) {
-            exportOptions.classList.toggle('hidden');
-        }
-        if (pass===false){
-            //addMenuClickListener();
-        }
+    // toggle next sibling for provided element parentNode
+    if (exportMenu) {
+        exportMenu.classList.toggle('hidden');
     }
-}
 
+}
 
 window.toggleExportOptions = toggleExportOptions;
 

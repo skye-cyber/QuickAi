@@ -459,7 +459,7 @@ class Timer {
 				//return null;
 			}
 			this.startTime = performance.now();
-			console.log('Timer started.');
+			console.log('Timer started at:', this.startTime);
 		}
 		// Calculate the elapsed time
 		else if (action === 'stop') {
@@ -469,14 +469,15 @@ class Timer {
 			}
 			const endTime = performance.now();
 			const timeTaken = endTime - this.startTime;
-			console.log(`Time taken: ${timeTaken} milliseconds`);
-			delete this.startTime; // Clean up
+			console.log(`Time taken: ${timeTaken} milliseconds.`);
+			console.log('Stop time:', endTime)
+			this.startTime = null; // Clean up
 
 			// Ensure window.Notify is defined before calling it
 			if (typeof window.Notify === 'function') {
 				const seconds = Math.floor(timeTaken / 1000) % 60;
 				const milliseconds = Math.floor(timeTaken % 1000);
-				window.Notify(null, `${seconds} seconds and ${milliseconds} milliseconds`);
+				window.Notify(null, `${seconds} seconds and ${milliseconds} ms`);
 				// Call app systewide notify
 				window.electron.send('Notify', { message: timeTaken });
 			} else {
@@ -508,7 +509,7 @@ previewBtn.addEventListener('click', function() {
 
 	// Toggle the state
 	this.setAttribute('aria-pressed', (isActive === 'false') ? "true" : "false");
-	console.log(this.getAttribute('aria-pressed'))
+	//console.log(this.getAttribute('aria-pressed'))
 
 	//update system instructions
 	window.electron.updateSysInit()
@@ -524,6 +525,21 @@ previewBtn.addEventListener('click', function() {
 	}
 });
 
+function setutilityScriptisSet() {
+	const scripts = document.getElementsByTagName('script');
+	let exists = false;
+	for (let script of scripts) {
+		if (script.src.includes('packed_utility.js')) {
+			console.log("Utility script already exits. Not adding"); // Logs the matching script element
+			exists = true
+			return exists
+		}
+	}
+	console.log("Utility missing. Adding");
+	// Sending a message to the main process if script does not exist already
+	window.electron.send('toMain', { message: 'set-Utitility-Script' })
+	return exists
+}
 
 //avail marked to the other scripts
 window.Timer = Timer
@@ -532,10 +548,11 @@ window.CopyAll = CopyAll
 window.copyBMan = copyBMan
 window.escapeHTML = escapeHTML
 window.showCopyModal = showCopyModal
+window.showDeletionStatus = showCopyModal
 window.addCopyListeners = addCopyListeners
 window.implementUserCopy = implementUserCopy
-window.showDeletionStatus = showCopyModal
 window.handleRequestError = handleRequestError
+window.setutilityScriptisSet = setutilityScriptisSet
 window.debounceRenderMathJax = debounceRenderMathJax
 window.removeFirstConversationPairs = removeFirstConversationPairs
 window.HandleProcessingEventChanges = HandleProcessingEventChanges;
