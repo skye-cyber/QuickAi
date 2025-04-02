@@ -42,8 +42,10 @@ jobs:
     - name: Ensure build directory exists
       run: mkdir -p dist || { echo "Failed to create dist directory"; exit 1; }
 
-    - name: Set platform for build
+    - name: Set platform for win32 to (win, windows)
       run: echo "PLATFORM=${{ matrix.platform == 'win32' && 'win' || matrix.platform }}" >> $GITHUB_ENV
+    - name: Set platform for darwin to (macos,mac)
+      run: echo "PLATFORM=${{ matrix.platform == 'darwin' && 'macos' || matrix.platform }}" >> $GITHUB_ENV
 
     - name: Build for ${{ env.PLATFORM }}
       run: |
