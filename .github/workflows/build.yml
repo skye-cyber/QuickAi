@@ -36,8 +36,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential
 
-    - name: Install dmg-license
-      run: npm install dmg-license --save-dev
     - name: Install dependencies
       run: npm install --no-cache --verbose --force --no-audit
 
@@ -51,6 +49,7 @@ jobs:
         elif [ "${{ matrix.platform }}" == "win32" ]; then
           npm run dist -- --win
         elif [ "${{ matrix.platform }}" == "darwin" ]; then
+          npm install dmg-license --save-dev
           npm run dist -- --mac
         else
           echo "Unsupported platform: ${{ matrix.platform }}"
