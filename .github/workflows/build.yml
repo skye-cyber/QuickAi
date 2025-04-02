@@ -152,4 +152,4 @@ jobs:
         git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
         git push
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_PUSH }}
