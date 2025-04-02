@@ -67,10 +67,10 @@ jobs:
         fi
       shell: bash  # Use bash for Linux and macOS
 
-    - name: Get version from package.json
-      id: get_version
-      run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV || { echo "Failed to get version from package.json"; exit 1; }
-      shell: bash  # Ensure this runs in bash
+    #- name: Get version from package.json
+    #  id: get_version
+    #  run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV || { echo "Failed to get version from package.json"; exit 1; }
+      #shell: bash  # Ensure this runs in bash
       
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
