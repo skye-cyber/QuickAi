@@ -55,6 +55,8 @@ jobs:
           echo "Unsupported platform: ${{ matrix.os }}"
           exit 1
         fi
+      env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Pass the token as an environment variable
       shell: bash  # Use bash for Linux and macOS
 
     - name: Check if build directory exists
