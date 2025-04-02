@@ -106,6 +106,8 @@ jobs:
         if [ "${{ runner.os }}" == "Linux" ]; then
         ls dist
         fi
+      shell: bash
+      
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
