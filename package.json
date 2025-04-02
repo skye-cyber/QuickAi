@@ -102,6 +102,7 @@
       "target": [
         "dmg"
       ],
+      "identity": null,
       "icon": "src/assets/QuickAi.icns"
     },
     "win": {

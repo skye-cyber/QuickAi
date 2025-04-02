@@ -2,10 +2,12 @@ import { Mistral } from '@mistralai/mistralai';
 
 
 const AutoScroll = document.getElementById("AutoScroll");
-const MISTRAL_API_KEY = window.electron.MISTRAL_API_KEY();
+
+const MISTRAL_API_KEY =	await window.electron.MISTRAL_API_KEY();
+
 //const MISTRAL_CODESTRAL_API_KEY = window.electron.MISTRAL_CODESTRAL_API_KEY();
 //const modelSelect = document.getElementById('model');
-//console.log(MISTRAL_API_KEY)
+
 const Mistarlclient = new Mistral({ apiKey: MISTRAL_API_KEY });
 
 //let Utilitycheck = false
@@ -38,7 +40,6 @@ const MSmodels = [
 	"ministral-8b-2410",
 	"mistral-moderation-2411"   //
 ]
-
 
 let userMessage = null;
 let aiMessage = null;
@@ -230,6 +231,8 @@ async function MistraChat(text, modelName) {
 
 		// Reset send button appearance
 		window.HandleProcessingEventChanges("hide")
+
+		//window.addCopyListeners();
 
 		// Sending a message to the main process if script does not exist already
 		window.setutilityScriptisSet();
@@ -496,7 +499,9 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 				`;
 
 			AutoScroll.checked ? scrollToBottom(chatArea) : null;
-			window.addCopyListeners();
+
+			//window.addCopyListeners();
+
 			// Debounce MathJax rendering to avoid freezing
 			window.debounceRenderMathJax(VisionMessageUId);
 
@@ -523,7 +528,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 
 
 function addUserMessage(text) {
-	console.log("Date time + text:", text)
+	//console.log("Date time + text:", text)
 	const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
 	const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
 	userMessage = document.createElement("div");

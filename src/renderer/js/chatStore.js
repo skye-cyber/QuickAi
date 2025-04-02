@@ -112,7 +112,7 @@ class ConversationManager {
 
         window.implementUserCopy();
         window.copyBMan();
-        window.addCopyListeners();
+        //window.addCopyListeners();
 
         if (check === false) {
             // Sending a message to the main process

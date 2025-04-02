@@ -115,7 +115,7 @@ async function routeToHf(text) {
 
 				const stream = client.chatCompletionStream(options);
 				//const stream = window.generateTextChunks(null, true);
-				console.log("Stream set")
+				//console.log("Stream set")
 				let output = "";
 
 				// change send button appearance to processing status
@@ -131,11 +131,9 @@ async function routeToHf(text) {
 
 				for await (const chunk of stream) {
 					const choice = chunk?.choices?.[0];
-					console.log(chunk)
 					if (!choice?.delta?.content) continue;
 
 					const deltaContent = choice.delta.content;
-					console.log(deltaContent)
 					output += deltaContent;
 					fullResponse += deltaContent;
 
@@ -271,7 +269,7 @@ async function routeToHf(text) {
 			//stop timer
 			_Timer.trackTime("stop");
 
-			window.addCopyListeners();
+			//window.addCopyListeners();
 
 			// Debounce MathJax rendering to avoid freezing
 			window.debounceRenderMathJax(aiMessageUId);
@@ -279,16 +277,16 @@ async function routeToHf(text) {
 			// Resent send button appearance
 			window.HandleProcessingEventChanges('hide')
 
-				if (check === false) {
-					// Sending a message to the main process
-					window.electron.send('toMain', { message: 'set-Utitility-Script' });
-					check = true;
-				}
+			if (check === false) {
+				// Sending a message to the main process
+				window.electron.send('toMain', { message: 'set-Utitility-Script' });
+				check = true;
+			}
 
 			// Render mathjax immediately
 			window.debounceRenderMathJax(aiMessageUId, 0, true);
 			// Store conversation history
-			//window.electron.addToChat({ role: "assistant", content: fullResponse });
+			window.electron.addToChat({ role: "assistant", content: fullResponse });
 
 		} catch (error) {
 			window.handleRequestError(error, userMessage, aiMessage);
@@ -415,7 +413,6 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 		_Timer.trackTime("start");
 		for await (const chunk of visionstream) {
 			const choice = chunk?.choices?.[0];
-			console.log(chunk)
 			if (choice?.delta?.content) {
 				visionMs += choice.delta.content;
 				VisionMessage.innerHTML = `
@@ -503,7 +500,9 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 					`;
 
 				AutoScroll.checked ? scrollToBottom(chatArea) : null;
-				window.addCopyListeners();
+
+				//window.addCopyListeners();
+
 				// Debounce MathJax rendering to avoid freezing
 				window.debounceRenderMathJax(VisionMessageUId);
 			}
