@@ -40,6 +40,9 @@ jobs:
     - name: Install dependencies
       run: npm install --no-cache --verbose --force --no-audit 
 
+    - name: Clean dist directory
+      run: rm -rf dist/*  # Remove all content in the dist directory
+
     - name: Ensure build directory exists
       run: mkdir -p dist
         
