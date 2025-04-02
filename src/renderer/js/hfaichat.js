@@ -69,7 +69,7 @@ async function routeToHf(text) {
 			// Add Timestamp
 			text = `${text} [${window.electron.getDateTime()} UTC]`
 			// Add timestamped  user prompt to history
-			//window.electron.addToChat({ role: "user", content: text });
+			window.electron.addToChat({ role: "user", content: text });
 
 			const aiMessage = document.createElement("div");
 			aiMessage.innerHTML = `

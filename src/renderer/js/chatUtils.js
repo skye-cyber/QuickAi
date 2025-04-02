@@ -192,38 +192,38 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 				event.stopPropagation();
 				HideErrorModal();
 				HideLoaderUserAiMs(true);
-				if (VS_url[1]) {
+				if (VS_url && VS_url[1]) {
 					const fileContainer = document.getElementById(VS_url[2])
 					fileContainer.remove();
 				}
 			});
 
-				function showError() {
-					setTimeout(() => {
-						errorContainer.classList.remove("hidden");
-						errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
-					}, 200); // 0.3 second delay
-					let ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check your Internet!" : error.message;
-					if (error.message === "[object Object]"){
-						ErrorMs = "This model is unreachabble: It might be overloaded!"
-					}
-					errorArea.textContent = ErrorMs;
-					window.electron.popFromChat(); // Remove the last conversation entry
+			function showError() {
+				setTimeout(() => {
+					errorContainer.classList.remove("hidden");
+					errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
+				}, 200); // 0.3 second delay
+				let ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check your Internet!" : error.message;
+				if (error.message === "[object Object]"){
+					ErrorMs = "This model is unreachabble: It might be overloaded!"
 				}
+				errorArea.textContent = ErrorMs;
+				window.electron.popFromChat(); // Remove the last conversation entry
+			}
 
-				async function HideErrorModal() {
-					// Slide modal to the left and fade out
-					setTimeout(() => {
-						errorContainer.classList.remove('left-1/2', '-translate-x-1/2');
-						errorContainer.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
-					}, 0);
+			async function HideErrorModal() {
+				// Slide modal to the left and fade out
+				setTimeout(() => {
+					errorContainer.classList.remove('left-1/2', '-translate-x-1/2');
+					errorContainer.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
+				}, 0);
 
-					// Reset transform after fully fading out and moving off-screen
-					setTimeout(() => {
-						errorContainer.classList.remove('opacity-100', '-translate-x-full');
-						errorContainer.classList.add('hidden', '-translate-x-1/2');
-					}, 0); // 1 second for reset
-				}
+				// Reset transform after fully fading out and moving off-screen
+				setTimeout(() => {
+					errorContainer.classList.remove('opacity-100', '-translate-x-full');
+					errorContainer.classList.add('hidden', '-translate-x-1/2');
+				}, 0); // 1 second for reset
+			}
 			// Remove existing event listeners before adding a new one
 			async function retryHandler(){
 				await HideErrorModal()
@@ -256,13 +256,14 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 
 					text = text.slice(-1)===']' ? text.slice(0, text.length - 22) : text;
 					fileDataUrl = fileDataUrl.length !== 0 ? fileDataUrl : null;
-					VisionChat(text, VS_url[1], fileDataUrl);
+					window.VisionChat(text, VS_url[1], fileDataUrl);
 				} else {
 
 					// Strip date && time from user message
 					lastMessage = lastMessage[0].content.slice(-1)===']' ? lastMessage[0].content.slice(0, lastMessage[0].content.length - 22) : lastMessage[0].content;
+
 					// Retry action
-					classifyText(lastMessage.trim());
+					window.requestRouter(lastMessage.trim());
 				}
 
 				if (aiMessage) aiMessage.remove();

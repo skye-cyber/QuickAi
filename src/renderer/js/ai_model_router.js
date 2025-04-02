@@ -94,3 +94,5 @@ function requestRouter(text) {
         console.warn("⚠️Unrecognized dataClass from the selected model!")
     }
 }
+
+window.requestRouter = requestRouter;
