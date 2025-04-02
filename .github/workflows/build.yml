@@ -82,9 +82,3 @@ jobs:
           dist/*.AppImage
           dist/*.dmg
         if-no-files-found: error
-
-    - name: Build for Windows
-      if: runner.os == 'Windows'
-      run: |
-        npm run dist -- --win
-      shell: pwsh  # Use PowerShell for Windows
