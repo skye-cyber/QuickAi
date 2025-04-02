@@ -40,14 +40,19 @@ jobs:
     - name: Install dependencies
       run: npm install --no-cache --verbose --force --no-audit 
 
-    - name: Get current version from package.json
-      id: get_version
+    - name: Get current version from package.json (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
       run: |
-        if [ "${{ matrix.os }}" == "windows-latest" ]; then
-          echo "CURRENT_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
-        else
-          echo "CURRENT_VERSION=$(node -p 'require("./package.json").version')'" >> $GITHUB_ENV
-        fi
+        $version = node -p "require('./package.json').version"
+        echo "CURRENT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Get current version from package.json (Unix)
+      if: matrix.os != 'windows-latest'
+      shell: bash
+      run: |
+        version=$(node -p 'require("./package.json").version')
+        echo "CURRENT_VERSION=$version" >> $GITHUB_ENV
 
     - name: Check for previous version
       id: check_version
