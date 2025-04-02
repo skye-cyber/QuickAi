@@ -74,9 +74,10 @@ jobs:
       with:
         name: electron-app-${{ env.VERSION }}-${{ matrix.os }}
         path: |
-          dist/QuickAi_${{ env.VERSION }}_amd64.deb
-          dist/QuickAi_${{ env.VERSION }}_amd64.exe
-          dist/QuickAi_${{ env.VERSION }}_amd64.AppImage
+          dist/*.deb
+          dist/*.exe
+          dist/*.AppImage
+          dist/*.dmg
         if-no-files-found: error
 
     - name: Build for Windows
