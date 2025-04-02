@@ -143,3 +143,12 @@ jobs:
     - name: Save current version
       run: echo "${{ env.CURRENT_VERSION }}" > last_version.txt
       shell: bash
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
