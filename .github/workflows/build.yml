@@ -111,7 +111,7 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: electron-app-${{ env.CURRENT_VERSION }}-${{ runner.os }}
+        name: QuickAi-${{ env.CURRENT_VERSION }}-${{ runner.os }}-${{ runner.arch }}
         path: |
           dist/*.deb
           dist/*.exe
