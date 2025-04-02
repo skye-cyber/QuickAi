@@ -55,6 +55,7 @@ jobs:
           echo "Unsupported platform: ${{ matrix.os }}"
           exit 1
         fi
+      shell: bash  # Use bash for Linux and macOS
 
     - name: Check if build directory exists
       run: |
@@ -62,6 +63,7 @@ jobs:
           echo "Error: dist directory not found."
           exit 1
         fi
+      shell: bash  # Use bash for Linux and macOS
 
     - name: Get version from package.json
       id: get_version
@@ -76,3 +78,9 @@ jobs:
           dist/QuickAi_${{ env.VERSION }}_amd64.exe
           dist/QuickAi_${{ env.VERSION }}_amd64.AppImage
         if-no-files-found: error
+
+    - name: Build for Windows
+      if: runner.os == 'Windows'
+      run: |
+        npm run dist -- --win
+      shell: pwsh  # Use PowerShell for Windows
