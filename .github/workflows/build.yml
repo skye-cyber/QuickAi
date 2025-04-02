@@ -34,52 +34,46 @@ jobs:
     - name: Install build tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential
-        
+        sudo apt-get install -y build-essential || { echo "Failed to install build tools"; exit 1; }
+
     - name: Install dependencies
-      run: npm install --no-cache --verbose --force --no-audit
-
-    - name: List node_modules contents
-      run: ls -la node_modules/http-proxy-agent
-
-    - name: Install http-proxy-agent and agent-base again
-      run: npm install http-proxy-agent@latest agent-base@latest
-
-    - name: List node_modules contents again
-      run: ls -la node_modules/http-proxy-agent
-      
-    - name: Print Node.js version
-      run: node -v
-
-    - name: Print npm version
-      run: npm -v
-
-    - name: List installed packages
-      run: npm ls --depth=0
+      run: npm install --no-cache --verbose --force --no-audit || { echo "Failed to install dependencies"; exit 1; }
 
     - name: Ensure build directory exists
-      run: mkdir -p dist
+      run: mkdir -p dist || { echo "Failed to create dist directory"; exit 1; }
 
-    - name: Build for ${{ matrix.platform }}
-      run: npm run dist -- --linux --win --mac
-      if: matrix.platform == 'all'
-      env:
-        CI: true
+    - name: Set platform for win32 to (win, windows)
+      run: echo "PLATFORM=${{ matrix.platform == 'win32' && 'win' || matrix.platform }}" >> $GITHUB_ENV
+    - name: Set platform for darwin to (macos,mac)
+      run: echo "PLATFORM=${{ matrix.platform == 'darwin' && 'macos' || matrix.platform }}" >> $GITHUB_ENV
 
-    - name: Build for ${{ matrix.platform }}
-      run: npm run dist -- --${{ matrix.platform }}
+    - name: Build for ${{ env.PLATFORM }}
+      run: |
+        npm run dist -- --${{ env.PLATFORM }}
+        if [ $? -ne 0 ]; then
+          echo "Build failed for platform: ${{ env.PLATFORM }}"
+          exit 1
+        fi
       env:
         CI: true
         
     - name: Check if build directory exists
       run: |
         if [ ! -d "dist" ]; then
-        echo "Error: dist directory not found."
-        exit 1
+          echo "Error: dist directory not found."
+          exit 1
         fi
+
+    - name: Get version from package.json
+      id: get_version
+      run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV || { echo "Failed to get version from package.json"; exit 1; }
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: electron-app-${{ matrix.platform }}
-        path: dist
-
+        name: electron-app-${{ env.VERSION }}-${{ env.PLATFORM }}
+        path: |
+          dist/QuickAi_${{ env.VERSION }}_amd64.deb
+          dist/QuickAi_${{ env.VERSION }}_amd64.exe
+          dist/QuickAi_${{ env.VERSION }}_amd64.AppImage
+        if-no-files-found: error
