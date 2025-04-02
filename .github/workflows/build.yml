@@ -151,7 +151,7 @@ jobs:
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add last_version.txt
+        git add last_version.txt package-lock.json
         git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
         git pull --rebase
         git push
