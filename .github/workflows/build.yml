@@ -38,21 +38,17 @@ jobs:
         sudo apt-get install -y build-essential
 
     - name: Install dependencies
-      run: npm install --no-cache --verbose --force --no-audit 
+      run: npm install --no-cache --verbose --force --no-audit
 
-    - name: Get current version from package.json (Windows)
-      if: matrix.os == 'windows-latest'
-      shell: pwsh
+    - name: Get current version from package.json
+      id: get_version
       run: |
-        $version = node -p "require('./package.json').version"
-        echo "CURRENT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-    - name: Get current version from package.json (Unix)
-      if: matrix.os != 'windows-latest'
+        if [ "${{ runner.os }}" == "Windows" ]; then
+          echo "CURRENT_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+        else
+          echo "CURRENT_VERSION=$(node -p 'require("./package.json").version')'" >> $GITHUB_ENV
+        fi
       shell: bash
-      run: |
-        version=$(node -p 'require("./package.json").version')
-        echo "CURRENT_VERSION=$version" >> $GITHUB_ENV
 
     - name: Check for previous version
       id: check_version
@@ -68,29 +64,31 @@ jobs:
         else
           echo "No previous version found. Proceeding with build."
         fi
+      shell: bash
 
     - name: Clean dist directory
-      run: rm -rf dist/*  # Remove all content in the dist directory
+      run: rm -rf dist/*
       shell: bash
 
     - name: Ensure build directory exists
       run: mkdir -p dist
-        
+      shell: bash
+
     - name: Build for specific platform
       run: |
-        if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+        if [ "${{ runner.os }}" == "Linux" ]; then
           npm run dist -- --linux
-        elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+        elif [ "${{ runner.os }}" == "macOS" ]; then
           npm run dist -- --mac
-        elif [ "${{ matrix.os }}" == "windows-latest" ]; then
+        elif [ "${{ runner.os }}" == "Windows" ]; then
           npm run dist -- --win
         else
-          echo "Unsupported platform: ${{ matrix.os }}"
+          echo "Unsupported platform: ${{ runner.os }}"
           exit 1
         fi
       env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Pass the token as an environment variable
-      shell: bash  # Use bash for Linux and macOS
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      shell: bash
 
     - name: Check if build directory exists
       run: |
@@ -98,19 +96,19 @@ jobs:
           echo "Error: dist directory not found."
           exit 1
         fi
-      shell: bash  # Use bash for Linux and macOS
-      
+      shell: bash
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: electron-app-${{ env.VERSION }}-${{ matrix.os }}
+        name: electron-app-${{ env.CURRENT_VERSION }}-${{ runner.os }}
         path: |
           dist/*.deb
           dist/*.exe
           dist/*.AppImage
           dist/*.dmg
         if-no-files-found: error
-        
+
     - name: Save current version
       run: echo "${{ env.CURRENT_VERSION }}" > last_version.txt
-      
+      shell: bash
