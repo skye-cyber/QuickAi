@@ -23,7 +23,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20.18.1'
-        npm-version: '10.9.2'
+        # npm-version: '10.9.2'
 
     - name: Cache node modules
       uses: actions/cache@v4
@@ -38,7 +38,7 @@ jobs:
         sudo apt-get install -y build-essential
 
     - name: Install dependencies
-      run: npm install --no-cache --verbose --force --no-audit
+      run: npm install --no-cache --verbose --force --no-audit --production
 
     - name: Get current version from package.json
       id: get_version
@@ -98,6 +98,11 @@ jobs:
         fi
       shell: bash
 
+    - name: show dist contet
+      run: |
+        if [ "${{ runner.os }}" == "Linux" ]; then
+        ls dist
+        fi
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
