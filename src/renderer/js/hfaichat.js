@@ -1,12 +1,16 @@
 import { HfInference } from "@huggingface/inference";
 
-let h_faceKey = null; // Define h_faceKey globally
+let hf_API_KEY = null; // Define h_faceKey globally
 
-const hf_API_KEY = await window.electron.HUGGINGHUB_API_KEY()
+async function loadApiKey() {
+	const key = await window.api.getKeys('huggingface');
+	hf_API_KEY = key.huggingfaceKey; // Assign to global variable
+}
+
+await loadApiKey();
 
 const client = new HfInference(hf_API_KEY);
 
-//initChat(client);
 
 const chatArea = document.getElementById("chatArea");
 const modelSelect = document.getElementById('model');
@@ -115,7 +119,7 @@ async function routeToHf(text) {
 
 				const stream = client.chatCompletionStream(options);
 				//const stream = window.generateTextChunks(null, true);
-				//console.log("Stream set")
+				console.log("Stream set")
 				let output = "";
 
 				// change send button appearance to processing status

@@ -161,9 +161,6 @@ return CSystem_init
 }
 
 contextBridge.exposeInMainWorld('electron', {
-    getEnv: () => ipcRenderer.invoke('get-env'),
-    getBufferFromIV: (iv) => ipcRenderer.invoke('get-buffer-from-iv', iv),
-    get_key: (encryptedObject, password) => ipcRenderer.invoke('getKey', encryptedObject, password),
     getDownloadsPath: () => {
         const downloadsPath = path.join(os.homedir(), 'Downloads');
         return downloadsPath;
@@ -489,6 +486,13 @@ contextBridge.exposeInMainWorld('electron', {
         data = fs.readFileSync(filePath)
         return data
     },
+});
+
+
+//Exporse Api keys
+contextBridge.exposeInMainWorld('api', {
+    saveKeys: async (keys) => ipcRenderer.invoke('save-keys', keys),
+    getKeys: async (key=null) => ipcRenderer.invoke('get-keys', key),
 });
 
 

@@ -45,6 +45,8 @@ jobs:
 
     - name: Install electron builder
       run: npm install electron-builder --save
+    - name: install native dependencies(keytar)
+      run: npx electron-builder install-app-deps
       
     - name: Get current version from package.json
       id: get_version

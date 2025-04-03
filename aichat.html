@@ -1204,6 +1204,15 @@
                 </div>
 
                 <!-- Additional Settings Options -->
+                <div class="flex justify-center w-full my-4">
+                <button onclick="showApiManModal()" class="px-6 py-3 rounded-lg bg-blue-500 dark:bg-black border border-gray-300 dark:border-gray-600 hover:bg-gray-300 dark:hover:bg-gray-900 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400">
+                        <span class="bg-gradient-to-r from-[#ffff7f] via-[#550000] to-[#0000ff] text-transparent bg-clip-text font-bold">
+                        Manage API Key
+                        </span>
+                    </button>
+                </div>
+
+
                 <div class="mb-4">
                 <label class="block text-gray-700 dark:text-gray-300 mb-2">Language:</label>
                 <select class="form-select w-fit font-bold bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500">
@@ -1232,6 +1241,186 @@
         </div>
     </div>
 
+
+    <!-- API KEY Modal -->
+    <div id="apiKeyModal" class="fixed inset-0 bg-blue-900/40 dark:bg-zinc-900/80 flex items-center justify-center z-30 hidden">
+            <div id="apiKeyModalContent" class="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-2xl w-96 fade-in">
+                <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-gray-100">
+                    Enter Your API Keys
+                </h2>
+                <div class="mt-4 space-y-4">
+                    <div class="space-y-2">
+                        <label for="mistralKey" class="block text-gray-700 dark:text-gray-300">Mistral API Key</label>
+                        <div class="relative">
+                            <input id="mistralKey" type="password" class="w-full p-2 border border-orange-400 dark:border-blue-300 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
+                            <button type="button" class="absolute inset-y-0 right-2 flex items-center text-gray-500 dark:text-gray-400" onclick="toggleVisibility('mistralKey')">
+                                👁
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="huggingfaceKey" class="block text-gray-700 dark:text-gray-300">Hugging Face API Key</label>
+                        <div class="relative">
+                            <input id="huggingfaceKey" type="password" class="w-full p-2 border border-pink-400 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
+                            <button type="button" class="absolute inset-y-0 right-2 flex items-center text-gray-500 dark:text-gray-400" onclick="toggleVisibility('huggingfaceKey')">
+                                👁
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6 space-x-3">
+                    <button class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md hover:bg-gray-400 dark:hover:bg-gray-600 transition" onclick="closeApiQueryModal()">
+                        Cancel
+                    </button>
+                    <button id="saveKeysBt" class="px-4 py-2 bg-blue-600 text-white rounded-md dark:hover:bg-blue-700 hover:bg-green-600 transition" onclick="saveKeys()">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Key management modal-->
+    <div id="apiKeyManPage" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 translate-y-full transition-all duration-700">
+        <div class="relative w-fit max-w-3xl mx-auto bg-white dark:bg-stone-800 p-6 rounded-lg shadow-lg aimate-fadeIn overflow-hidden">
+            <!-- Close Button -->
+            <button id="closeModalManPage" class="absolute top-2 right-2 text-black dark:text-blue-400 hover:text-gray-900 hover:rotate-45 duration-300 dark:hover:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-semibold text-gray-800 dark:text-white text-center mb-4">Manage API Keys</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300">Mistral API Key</label>
+                    <div class="relative">
+                        <input id="mistralKeyMan" type="password" value="***************" class="w-full p-2 border rounded-md dark:bg-stone-600 dark:border-gray-400 dark:text-gray-100">
+                        <button type="button" class="absolute inset-y-0 right-2 flex items-center text-gray-500 dark:text-gray-400" onclick="toggleVisibility('mistralKeyMan')">
+                            👁
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300">Hugging Face API Key</label>
+                    <div class="relative">
+                        <input id="huggingfaceKeyMan" type="password" value="***************" class="w-full p-2 border rounded-md dark:bg-zinc-600 dark:border-gray-400 dark:text-gray-100">
+                        <button type="button" class="absolute inset-y-0 right-2 flex items-center text-gray-500 dark:text-gray-400" onclick="toggleVisibility('huggingfaceKeyMan')">
+                            👁
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6 space-x-3">
+                <button class="px-4 py-2 dark:text-white text-gray-900 bg-gray-300 dark:bg-gray-500 rounded-md hover:bg-gray-400 dark:hover:bg-gray-600 transition cursor-not-allowed pointer-events-none" onclick="resetKeys()">
+                    Reset
+                </button>
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition" onclick="saveKeys('update')">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Warning Modal: No API Key Set -->
+    <div id="warningModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 pointer-events-none transition-all duration-700 hidden">
+        <div id="warningModalContent" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-96 transform translate-y-full transition-all duration-300 animate-exit">
+
+            <!-- Warning Title -->
+            <h2 class="text-xl font-semibold text-center text-red-500 dark:text-red-400 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2a1 1 0 0 1 .894.553l9 18A1 1 0 0 1 21 22H3a1 1 0 0 1-.894-1.447l9-18A1 1 0 0 1 12 2zm-1 8a1 1 0 0 0 2 0v4a1 1 0 0 0-2 0v-4zm1 8a1.25 1.25 0 1 0 0-2.5A1.25 1.25 0 0 0 12 18z" clip-rule="evenodd"/>
+                </svg>
+            <span class="font-bold text-red-500">Warning:</span> <span class="text-orange-400 font-normal">API Key Not Set</span>
+            </h2>
+
+            <!-- Warning Message -->
+            <p class="mt-4 text-center text-gray-800 dark:text-gray-200">
+                It looks like you haven't set up your API keys. To proceed, please enter your keys.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="mt-6 flex justify-between space-x-4">
+                <button class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition"
+                    onclick="closeWarningModal(); showApiQueryModal();">
+                    Close
+                </button>
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                    onclick="closeWarningModal(); showApiQueryModal();">
+                    Set API Keys
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ApiNotSetModal Modal: atleast one API must be set -->
+    <div id="ApiNotSetModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+        <div id="ApiNotSetContent" class="relative bg-white dark:bg-gray-800 p-6 xl:p-8 rounded-lg shadow-lg flex flex-col items-center animate-exit md:min-w-md lg:min-w-lg xl:min-w-2xl">
+            <!-- Close Button -->
+            <button id="closeModalApiWarn" onclick="closeApiNotSetWarning(); showApiQueryModal();" class="absolute top-2 right-2 text-gray-600 dark:text-gray-300 hover:text-red-500 duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hover:rotate-45 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Warning Icon -->
+            <div class="flex items-center justify-center w-16 h-16 bg-yellow-500 dark:bg-yellow-500 rounded-full shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2a1 1 0 0 1 .894.553l9 18A1 1 0 0 1 21 22H3a1 1 0 0 1-.894-1.447l9-18A1 1 0 0 1 12 2zm-1 8a1 1 0 0 0 2 0v4a1 1 0 0 0-2 0v-4zm1 8a1.25 1.25 0 1 0 0-2.5A1.25 1.25 0 0 0 12 18z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+
+            <!-- Warning Message -->
+            <p id="warningMSG" class="mt-4 text-gray-700 dark:text-gray-200 text-center font-medium">
+                Please set at least one API key:
+            </p>
+            <div class="flex gap-2 mt-2">
+                <span class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-md">HF--Huggingface</span>
+                <span class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-md">Mistral</span>
+            </div>
+            <p class="mt-2 text-gray-700 dark:text-gray-200 text-center">
+                or <span class="font-semibold text-blue-500 dark:text-blue-400">both</span>.
+            </p>
+
+        </div>
+    </div>
+
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 pointer-events-none transition-opacity duration-500 hidden">
+        <div id="successModalContent" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-96 transform scale-95 transition-transform duration-300">
+
+            <!-- Success Icon & Title -->
+            <h2 class="text-xl font-semibold text-center text-green-500 dark:text-green-400 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500 dark:text-green-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 15.172l7.071-7.071a1 1 0 011.415 1.414l-8.486 8.485a1 1 0 01-1.414 0L4.929 13.9a1 1 0 011.415-1.414L10 15.172z" clip-rule="evenodd"/>
+                </svg>
+                Success!
+            </h2>
+
+            <!-- Success Message -->
+            <p id="success-message" class="mt-4 text-center text-gray-800 dark:text-gray-200">
+                Operation Successful
+            </p>
+            <p id="restartBt" class="hidden text-center text-black dark:text-gray-200">Need to <span class="text-green-400 font-semibold">Restart</span> the app for changes to take effect!</p>
+            <!-- Action Buttons -->
+            <div class="hidden mt-6 flex justify-between space-x-4">
+                <button class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition cursor-not-allowed"
+                    onclick="closeSuccessModal();">
+                    Close
+                </button>
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-orange-400 hover:text-slate-900 transition"
+                    onclick="closeSuccessModal(); onSuccessAction();">
+                    Ok
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 <script src="src/renderer/js/packed_hfaudio.js"></script>
 <script src="src/renderer/js/script.js"></script>
@@ -1240,4 +1429,5 @@
 <script src="src/renderer/js/ai_model_router.js"></script>
 <script src="src/renderer/js/packed_MistralChatsAdmin.js"></script>
 <script src="src/renderer/js/simulator.js"></script>
+<script src="src/renderer/js/apiUtils.js"></script>
 </html>

@@ -3,7 +3,14 @@ import { Mistral } from '@mistralai/mistralai';
 
 const AutoScroll = document.getElementById("AutoScroll");
 
-const MISTRAL_API_KEY =	await window.electron.MISTRAL_API_KEY();
+let MISTRAL_API_KEY = null
+
+async function loadApiKey() {
+	const key = await window.api.getKeys('mistral');
+	MISTRAL_API_KEY = key.mistralKey; // Assign to global variable
+}
+
+await loadApiKey()
 
 //const MISTRAL_CODESTRAL_API_KEY = window.electron.MISTRAL_CODESTRAL_API_KEY();
 //const modelSelect = document.getElementById('model');
@@ -46,11 +53,12 @@ let aiMessage = null;
 
 async function MistraChat(text, modelName) {
 	try {
-		console.log("Reached Mistral chat", text)
+		console.log("Reached Mistral chat", MISTRAL_API_KEY)
 
 		aiMessage = document.createElement("div");
 		// Add user message to the chat interface
 		addUserMessage(text)
+
 		// Add loading animation
 		addLoadingAnimation(aiMessage);
 

@@ -47,9 +47,23 @@ module.exports = {
         'heartpulse': 'heartpulse 1s infinite',
         'spin': 'spin 2s linear infinite',
         'spin-200': 'spin 0.5s linear infinite',
+        'fadeIn': 'fadeIn 2s cubic-bezier(0.25, 1, 0.5, 1)'
       },
 
       keyframes: {
+        fadeIn: {
+          '0%': { opacity: 0, transform: 'translateY(-300px)' },
+          '10%': { opacity: 0.1 },
+          '20%': { opacity: 0.2 },
+          '30%': { opacity: 0.3 },
+          '40%': { opacity: 0.4 },
+          '50%': { opacity: 0.5, transform: 'translateY(-150px)' },
+          '60%': { opacity: 0.6 },
+          '70%': { opacity: 0.7 },
+          '80%': { opacity: 0.8 },
+          '90%': { opacity: 0.9 },
+          '100%': { opacity: 1, transform: 'translateY(0)' }
+        },
         bounce: {
           '0%': { opacity: 1 },
           '50%': { opacity: 0.5 },
