@@ -176,6 +176,7 @@ jobs:
           git pull --rebase -X ours
           git push
         fi
+      shell: bash
       env:
         GITHUB_TOKEN: ${{ secrets.GH_PUSH }}
 
