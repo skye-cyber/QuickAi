@@ -92,7 +92,7 @@ jobs:
     - name: Build for specific platform
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          npm run dist -- --linux
+          npm run dist -- --linux --force
         elif [ "${{ runner.os }}" == "macOS" ]; then
           npm run dist -- --mac
         elif [ "${{ runner.os }}" == "Windows" ]; then
