@@ -91,7 +91,8 @@
     "README.md",
     "package.json",
     "assets/documentation.html",
-    "src/**/*"
+    "src/**/*",
+    "!node_modules/keytar/LICENSE.md"
   ],
   "build": {
     "appId": "com.quickai.app",

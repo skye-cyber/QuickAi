@@ -45,7 +45,7 @@ renderer.code = function(code) {
 		${validLanguage}
 		</p>
 		<!-- Copy button -->
-		<button id="${copyButtonId}" onclick='handleCodeCopy(this);' class="copy-button flex justify-end rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 text-sm text-white cursor-pointer">
+		<button id="${copyButtonId}" onclick='window.handleCodeCopy(this);' class="copy-button flex justify-end rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 text-sm text-white cursor-pointer">
 		<svg class="mt-1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy mr-1">
 		<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
 		<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -565,7 +565,7 @@ window.CopyAll = CopyAll
 window.copyBMan = copyBMan
 window.escapeHTML = escapeHTML
 window.showCopyModal = showCopyModal
-//window.handleCodeCopy = handleCodeCopy;
+window.handleCodeCopy = handleCodeCopy;
 window.showDeletionStatus = showCopyModal
 //window.addCopyListeners = addCopyListeners
 window.implementUserCopy = implementUserCopy
