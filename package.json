@@ -100,7 +100,7 @@
       "cache": true
     },
     "asar": true,
-    "asarUnpack": "**/node_modules/keytar/LICENSE.md",
+    "asarUnpack": "**/node_modules/keytar/**",
     "mac": {
       "target": [
         "dmg"
