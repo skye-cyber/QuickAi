@@ -99,7 +99,9 @@
     "electronDownload": {
       "cache": true
     },
-    "asar": true,
+    "asar": {
+      "unpack": "**/node_modules/keytar/LICENSE.md"
+      },
     "mac": {
       "target": [
         "dmg"
