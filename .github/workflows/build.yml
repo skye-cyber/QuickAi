@@ -82,6 +82,13 @@ jobs:
       run: mkdir -p dist
       shell: bash
 
+    - name: Remove conflicting LICENSE.md
+      run: |
+        if [ -f "dist/resources/app.asar.unpacked/node_modules/keytar/LICENSE.md" ]; then
+          rm dist/resources/app.asar.unpacked/node_modules/keytar/LICENSE.md
+        fi
+      shell: bash
+  
     - name: Build for specific platform
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
@@ -155,7 +162,7 @@ jobs:
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add last_version.txt package-lock.json
         git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
-        git pull --rebase
+        git pull --rebase -X ours
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GH_PUSH }}
