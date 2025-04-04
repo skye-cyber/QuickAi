@@ -2,66 +2,130 @@
 
 ## About
 
-QuickAi is a powerful and versatile AI application designed to assist with a variety of tasks. It leverages advanced machine models to provide accurate and efficient solutions. Whether you are building a new application or integrating AI capabilities into an existing project, QuickAi is here to help.
+QuickAi is a versatile AI application that integrates advanced machine learning models from Hugging Face and Mistral to assist with tasks such as Natural Language Processing (NLP), Image Recognition, Image Generation, Data Analysis, and Machine Learning. Users can choose to utilize either or both models based on their requirements.
 
-## Capabilities
+## Features
 
-- **Natural Language Processing (NLP):** Understand and generate human-like text.
-- **Image Recognition:** Identify and classify objects within images.
-- **Image Generation:** Can Generate Images of your liking.
-- **Data Analysis:** Process and analyze large datasets to extract meaningful insights.
-- **Machine Learning:** Can help you Train and deploy custom machine learning models.
-- **API Integration:** Easily integrate with other services and platforms.
+- **Dual Model Support:** QuickAi supports models from both Hugging Face and Mistral. Users can select their preferred model for each task, tailoring the application to their needs.
+
+- **API Key Management:** To use QuickAi, users must provide API keys for the selected models. The application utilizes `keytar` to securely store and manage these keys in the system's keychain.
+
+- **User Interface Themes:** QuickAi offers both Light and Dark modes. Users can switch between themes from the settings panel to suit their preferences.
+
+- **Customizable Settings:** Within the settings panel, users can enable features like auto-scrolling of AI outputs and set custom instructions to personalize the AI's responses.
+
+- **Model Switching:** Users have the flexibility to switch between different models for tasks like image generation. For instance, QuickAi supports the FLUX.1 model from Hugging Face. [FLUX.1 on Hugging Face](https://huggingface.co/black-forest-labs/FLUX.1-dev)
 
 ## Repository
-You can find the source code for QuickAi at the following URL:
-- [https://github.com/skye-cyber/QuickAi.git](https://github.com/skye-cyber/QuickAi.git)
-- Then ``bin`` branch hosts some prebuild releases for various platforms.
+
+The source code for QuickAi is hosted on GitHub:
+
+- [QuickAi GitHub Repository](https://github.com/skye-cyber/QuickAi.git)
+
+The `bin` branch contains pre-built releases for various platforms.
 
 ## Getting Started
 
-### Cloning the Repository
+### Prerequisites
 
-To get started with QuickAi, first clone the repository to your local machine:
+Ensure your development environment includes the following:
 
-```bash
-git clone https://github.com/skye-cyber/QuickAi.git
-cd QuickAi
-```
-### Building the App
-To build the application, run the following command:
+- **Node.js:** Version 20.18 or higher
+- **npm:** Version 10.9.0 or higher
+- **Python:** Version 3.8 (required for certain optional features)
+- **RAM:** Minimum of 2GB
+- **Storage:** Minimum of 4GB
+
+### Installation
+
+1. **Clone the Repository:**
+
+   ```bash
+   git clone https://github.com/skye-cyber/QuickAi.git
+   cd QuickAi
+   ```
+
+2. **Install Dependencies:**
+
+   For Node.js dependencies:
+
+   ```bash
+   npm install
+   ```
+
+   <!--
+   For Python dependencies (if applicable):
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+   -->
+
+### Building the Application
+
+To build the application for your platform, execute:
 
 ```bash
 npm run dist
 ```
 
-### Running the App Without Building
-To run the application directly without building it, use the following command:
+This command packages QuickAi for your operating system, creating an executable in the `dist` directory.
+
+### Running the Application Without Building
+
+To run QuickAi directly without building, use:
 
 ```bash
 npm start
 ```
 
-## Interface
-### Light mode
-![light-preview](./src/common/light-preview.png)
-### Dark Mode
-![dark-preview](./src/common/dark-preview.png)
-### Image Generation
-![image-preview](./src/common/image-preview.png)
-### Settings
-![modal-light](./src/common/modal-light.png)
+This command starts the application in development mode.
 
-## Operational Parameters
-# System Requirements:
-- Node.js v20.18 or higher
-- npm v10.9.0 or higher
-- Python 3.8 (for some optional features)
-- RAM atleast 2GB
-- Storage atleast 4GB
+## Usage
+
+Upon launching QuickAi, you will be prompted to enter your API keys for Hugging Face and Mistral models. You can choose to use one or both models based on your preferences. The application will securely store these keys using `keytar`.
+
+After entering your API keys, you can utilize QuickAi's features:
+
+- **Natural Language Processing:** Use the `nlpProcessor` module to analyze and generate text with your chosen model.
+- **Image Recognition:** Utilize the `imageRecognizer` module to process and classify images.
+- **Image Generation:** Access the `imageGenerator` module to create images based on descriptions using the selected model.
+- **Data Analysis:** Leverage the `dataAnalyzer` module for processing datasets.
+<!-- **Machine Learning:** Employ the `mlTrainer` module to train and deploy models.-->
+
+Refer to the [QuickAi Documentation](https://github.com/skye-cyber/QuickAi.git) for detailed usage instructions and examples.
+
+## Interface
+
+QuickAi offers both Light and Dark modes for user interface customization. Below are previews of each mode:
+
+### Light Mode
+
+![Light Mode Preview](./src/common/light-preview.png)
+
+### Dark Mode
+
+![Dark Mode Preview](./src/common/dark-preview.png)
+
+---
+
+### File Upload
+
+![File Upload Preview](./src/common/file-selet-modal.png)
+
+### Image Generation
+
+![Image Generation Preview](./src/common/image-preview.png)
 
 ## Contribution
-We welcome contributions from the community! If you have ideas for improvements or new features, feel free to open an issue or submit a pull request.
+
+We welcome contributions from the community! To contribute:
+
+1. **Fork the Repository:** Create your own fork of the QuickAi repository.
+2. **Create a Branch:** Develop your feature or fix in a separate branch.
+3. **Submit a Pull Request:** Once your changes are ready, submit a pull request for review.
+
+Please ensure that your code adheres to existing coding standards and includes appropriate tests.
 
 ## License
 This program is free software: you can redistribute it and/or modify
@@ -80,7 +144,8 @@ This program is free software: you can redistribute it and/or modify
   See the LICENSE file for more details. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
-If you have any questions or need further assistance, please contact us at:
+
+For questions or further assistance, please contact:
 
 - **Email:** [swskye17@gmail.com](mailto:swskye17@gmail.com)
 - **GitHub:** [skye-cyber](https://github.com/skye-cyber)

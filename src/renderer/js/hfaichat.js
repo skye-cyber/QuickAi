@@ -574,29 +574,112 @@ class ImageGenerator {
 		this.chatArea = chatArea;
 	}
 
+	async errorHandler(text, error) {
+		try {
+			console.log(text)
+			this._Timer.trackTime("interrupt");
+			const errorContainer = document.getElementById('errorContainer');
+			const errorArea = document.getElementById('errorArea');
+			const closeModal = document.getElementById('closeEModal');
+			let retry = document.getElementById('retryBt');
+
+			// Remove loader
+			this.removeLoader();
+
+			// Clone the retry button to remove any previous event listeners
+			const clonedRetry = retry.cloneNode(true);
+			retry.replaceWith(clonedRetry);
+			retry = document.getElementById('retryBt');
+
+			// Re-attach the click event listener using an arrow function to maintain 'this'
+			retry.addEventListener('click', async () => {
+				this.removeLoader();
+				await this.createImage(text);
+			});
+
+			// Close modal event listener with proper cleanup
+			closeModal.addEventListener('click', (event) => {
+				event.stopPropagation();
+				this.hideErrorModal();
+				this.removeLoader();
+				// Check if VS_url is defined and has valid elements before removing the container
+				if (typeof VS_url !== "undefined" && VS_url && VS_url[1]) {
+					const fileContainer = document.getElementById(VS_url[2]);
+					if (fileContainer) fileContainer.remove();
+				}
+			});
+
+			// Show error message
+			setTimeout(() => {
+				errorContainer.classList.remove("hidden");
+				errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
+			}, 200);
+
+			let errorMsg = error.message === "Failed to fetch"
+			? "Connection Error: Check your Internet!"
+			: error.message;
+			if (error.message === "[object Object]") {
+				errorMsg = "This model is unreachable: It might be overloaded!";
+			}
+			errorArea.textContent = errorMsg;
+		} catch (err) {
+			console.error('Error handling request error:', err);
+		}
+	}
+
+	hideErrorModal() {
+		const errorContainer = document.getElementById('errorContainer');
+		// Slide the modal left and fade out
+		setTimeout(() => {
+			errorContainer.classList.remove('left-1/2', '-translate-x-1/2');
+			errorContainer.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
+		}, 0);
+		// Reset transform after modal is off-screen
+		setTimeout(() => {
+			errorContainer.classList.remove('opacity-100', '-translate-x-full');
+			errorContainer.classList.add('hidden', '-translate-x-1/2');
+		}, 1000);
+	}
+
+	removeLoader() {
+		const loader = document.getElementById(this.loaderId);
+		if (loader) {
+			loader.remove();
+		}
+	}
+
 	async generateImage(data, useFlux = false) {
 		const url = useFlux
-			? "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev"
-			: "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large";
-
+		? "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev"
+		: "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large";
 		try {
 			const response = await fetch(url, {
 				headers: {
-					Authorization: `Bearer ${h_faceKey}`,
+					Authorization: `Bearer ${hf_API_KEY}`,
 					"Content-Type": "application/json",
 				},
 				method: "POST",
 				body: JSON.stringify(data),
 			});
-			const blob = await response.blob();
-			return URL.createObjectURL(blob);
+
+			if (response.ok===true){
+				const blob = await response.blob();
+				if (blob) {
+					console.log(blob)
+					return URL.createObjectURL(blob);
+				}
+				return null
+			}else{
+				this.errorHandler(data.inputs, new Error(`Failed with status:${response.status}`));
+			}
 		} catch (error) {
 			console.error("Image generation error:", error);
-			return null;
+			this.errorHandler(data.inputs, error);
 		}
 	}
 
 	createLoadingMessage(imageId) {
+		this.loaderId = imageId || null;
 		const loadingMessage = document.createElement("div");
 		loadingMessage.innerHTML = `
 		<div id="${imageId}" class="w-fit dark:text-gray-100 rounded-lg font-normal bg-gray-50 dark:bg-zinc-900 max-w-3xl mb-[7%] lg:mb-[5%]">
@@ -624,53 +707,99 @@ class ImageGenerator {
 	}
 
 	async createImage(text) {
-		const imageData = { inputs: text.replace("/image", "").trim() };
-		const imageId = `image_${Math.random().toString(36).substring(2, 7)}`;
-		const loadingMessage = this.createLoadingMessage(imageId);
-		let secondsElapsed = 0;
-		const timerInterval = setInterval(() => {
-			secondsElapsed++;
-			loadingMessage.querySelector('span').textContent = `${secondsElapsed}s`;
-		}, 1000);
+		try {
+			// Initialize timer
+			this._Timer = new Timer();
+			this._Timer.trackTime("start");
+			console.log("Timer started");
 
-		const useFlux = document.getElementById('CModel').checked;
-		const imageUrl = await this.generateImage(imageData, useFlux);
-		clearInterval(timerInterval);
+			const imageData = { inputs: text.replace("/image", "").trim() };
+			const imageId = `image_${Math.random().toString(36).substring(2, 7)}`;
+			const loadingMessage = this.createLoadingMessage(imageId);
+			let secondsElapsed = 0;
 
-		if (imageUrl) {
-			if (imageUrl && /^https?:\/\//.test(imageUrl)) {
-				fetch(imageUrl, { method: "HEAD" })
+			const timerInterval = setInterval(() => {
+				secondsElapsed++;
+				loadingMessage.querySelector('span').textContent = `${secondsElapsed}s`;
+			}, 1000);
+
+			const useFlux = document.getElementById('CModel').checked;
+			const imageUrl = await this.generateImage(imageData, useFlux);
+			clearInterval(timerInterval);
+
+			if (imageUrl) {
+				// Validate that the URL points to an image
+				if (/^https?:\/\//.test(imageUrl)) {
+					fetch(imageUrl, { method: "HEAD" })
 					.then(response => {
 						if (!response.headers.get("Content-Type")?.startsWith("image/")) {
 							throw new Error("Invalid image type");
 						}
-
 						loadingMessage.innerHTML = "";
 						loadingMessage.appendChild(this.createImageElement(imageUrl));
 					})
 					.catch(console.error);
+				}
+			} else {
+				loadingMessage.innerHTML = `
+				<div id="${imageId}" class="w-fit bg-red-400 text-gray-950 dark:bg-rose-500 rounded-lg p-2 font-normal shadow-lg dark:shadow-red-500 max-w-3xl mb-[5%]">
+				<span class="text-sm text-gray-950 dark:text-black">Could not Process request!</span>
+				</div>`;
 			}
-		} else {
-			loadingMessage.innerHTML = `
-			<div id="${imageId}" class="w-fit bg-red-400 text-gray-950 dark:bg-rose-500 rounded-lg p-2 font-normal shadow-lg dark:shadow-red-500 max-w-3xl mb-[5%]">
-			<span class="text-sm text-gray-950 dark:text-black">Could not Process request!⚠️</span>
-			</div>`;
+			this._Timer.trackTime("stop");
+		} catch (err) {
+			console.error('Error handling request error:', err);
+			this.errorHandler(text, err);
 		}
 	}
 
 	createImageElement(imageUrl) {
-		return `
-		<div class="relative mb-[5%]">
-		<img src="${imageUrl}" class="rounded-lg shadow-lg mt-4 max-w-xs cursor-pointer" onclick="this.requestFullscreen()"/>
-		<button class="absolute flex items-center text-white rounded-bl-md bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 font-semibold py-2 px-4 focus:outline-none shadow-md w-fit h-fit bottom-0 left-0 opacity-60 hover:opacity-100">
-		<a href="${imageUrl}" download="generated_image.png" class="flex items-center text-white no-underline">
-		<span>Download</span>
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ml-2">
-		<path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z" fill="currentColor"></path>
-		</svg>
-		</a>
-		</button>
-		</div>`;
+		const container = document.createElement("div");
+		container.className = "relative mb-[5%]";
+
+		const img = document.createElement("img");
+		img.src = imageUrl;
+		img.className = "rounded-lg shadow-lg mt-4 max-w-xs cursor-pointer";
+		img.onclick = () => img.requestFullscreen();
+		container.appendChild(img);
+
+		const button = document.createElement("button");
+		button.className =
+		"absolute flex items-center text-white rounded-bl-md bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 font-semibold py-2 px-4 focus:outline-none shadow-md w-fit h-fit bottom-0 left-0 opacity-60 hover:opacity-100";
+
+		const anchor = document.createElement("a");
+		anchor.href = imageUrl;
+		anchor.download = "generated_image.png";
+		anchor.className = "flex items-center text-white no-underline";
+
+		// Restore the <span> element with "Download" text
+		const span = document.createElement("span");
+		span.textContent = "Download";
+		anchor.appendChild(span);
+
+		const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		svg.setAttribute("width", "24");
+		svg.setAttribute("height", "24");
+		svg.setAttribute("viewBox", "0 0 24 24");
+		svg.setAttribute("fill", "none");
+		svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+		svg.classList.add("ml-2");
+
+		const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		path.setAttribute("fill-rule", "evenodd");
+		path.setAttribute("clip-rule", "evenodd");
+		path.setAttribute(
+			"d",
+			"M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z"
+		);
+		path.setAttribute("fill", "currentColor");
+
+		svg.appendChild(path);
+		anchor.appendChild(svg);
+		button.appendChild(anchor);
+		container.appendChild(button);
+
+		return container;
 	}
 }
 
