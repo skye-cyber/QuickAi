@@ -164,9 +164,18 @@ jobs:
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add last_version.txt package-lock.json
-        git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
-        git pull --rebase -X ours
-        git push
+
+    - name: Check for changes
+      run: |
+        if [ -z "$(git status --porcelain)" ]; then
+          echo "No changes detected."
+        else
+          echo "Changes detected. Proceeding with commit."
+          git add last_version.txt package-lock.json
+          git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
+          git pull --rebase -X ours
+          git push
+        fi
       env:
         GITHUB_TOKEN: ${{ secrets.GH_PUSH }}
+
