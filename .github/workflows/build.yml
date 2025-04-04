@@ -84,9 +84,12 @@ jobs:
 
     - name: Remove conflicting LICENSE.md
       run: |
-        if [ -f "dist/resources/app.asar.unpacked/node_modules/keytar/LICENSE.md" ]; then
-          ls dist/resources/app.asar.unpacked/node_modules/keytar/LICENSE.md
-          rm dist/resources/app.asar.unpacked/node_modules/keytar/LICENSE.md
+        LICENSE_PATH=$(pwd)/dist/resources/app.asar.unpacked/node_modules/keytar/LICENSE.md
+        if [ -f "$LICENSE_PATH" ]; then
+          echo "Removing conflicting LICENSE.md at $LICENSE_PATH"
+          rm -f "$LICENSE_PATH"
+        else
+          echo "LICENSE.md not found at $LICENSE_PATH"
         fi
       shell: bash
   
