@@ -171,7 +171,7 @@ jobs:
           echo "No changes detected."
         else
           echo "Changes detected. Proceeding with commit."
-          git add last_version.txt package-lock.json
+          git add last_version.txt package-lock.json package.json
           git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
           git pull --rebase -X ours
           git push
