@@ -91,9 +91,8 @@
     "README.md",
     "package.json",
     "assets/documentation.html",
-    "src/**/*",
-    "!node_modules/keytar/LICENSE.md"
-  ],
+    "src/**/*"
+    ],
   "build": {
     "appId": "com.quickai.app",
     "productName": "QuickAi",
@@ -101,6 +100,10 @@
       "cache": true
     },
     "asar": true,
+      "files": [
+        "**/*",
+        "!node_modules/keytar/LICENSE.md"
+      ],
     "asarUnpack": "**/node_modules/keytar/**",
     "mac": {
       "target": [
