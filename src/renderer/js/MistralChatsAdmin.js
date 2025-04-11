@@ -28,24 +28,30 @@ const MSmodels = [
 	"open-mistral-7b",
 	"open-mixtral-8x7b",
 	"open-mixtral-8x22b",
+	"mistral-small-latest", //vision && document capabilities
 	"mistral-small-2402",
 	"mistral-small-2409",
 	"mistral-small-2501",
 	"mistral-medium",
+	"mistral-large-latest",
 	"mistral-large-2402",
 	"mistral-large-2407",
 	"mistral-large-2411",
 	"mistral-saba-2502",
-	"mistral-embed", //
-	"codestral-2405",
-	"codestral-2501",
-	"codestral-mamba-2407",
+	"mistral-embed", //embending
+	"codestral-latest",//coding
+	"codestral-2405", //coding
+	"codestral-2501", //coding
+	"codestral-mamba-2407", //coding
 	"open-mistral-nemo",
-	"pixtral-12b-2409",            //MistraVision
+	"pixtral-12b-latest", //MistraVision
+	"pixtral-12b-2409", //MistraVision
+	"pixtral-large-latest", //MistraVision
 	"pixtral-large-2411",         //MistraVision
 	"ministral-3b-2410",
 	"ministral-8b-2410",
-	"mistral-moderation-2411"   //
+	"mistral-moderation-2411",   //moderation
+	"mistral-moderation-latest", //moderation
 ]
 
 let userMessage = null;
@@ -582,7 +588,7 @@ function addLoadingAnimation(aiMessageDiv) {
 
 function routeToMistral(text, modelName) {
 	console.log("Reached Target: mistralRoute, model:", modelName)
-	if (["pixtral-12b-2409", "pixtral-large-2411"].includes(modelName)) {
+	if (["pixtral-12b-2409", "pixtral-large-2411", "mistral-small-latest"].includes(modelName)) {
 		return MistraVision(text, null, null, modelName)
 	}
 	MistraChat(text, modelName)
