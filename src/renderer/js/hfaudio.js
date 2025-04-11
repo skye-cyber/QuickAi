@@ -1,4 +1,5 @@
 import { HfInference } from "@huggingface/inference";
+import SetAudioAnim from './animations/WaveFormAnim.js';
 
 const hf_API_KEY = await window.electron.HUGGINGHUB_API_KEY()
 
@@ -256,31 +257,24 @@ let timerInterval;
 let elapsedTime = 0; // To track the elapsed time when paused
 let isPaused = false;
 let canSave = true;
+let stream = null;
+
 
 // Function to start recording
 async function startRecording(task=null) {
 	try {
 		if (task === "release"){
-			await releaseMediaDevice();
-			finishButton.classList.add('cursor-not-allowed')
-			return
+
 		}
 		microphoneSVG.classList.add('animate-pulse')
 
 		finishButton.classList.remove('cursor-not-allowed')
 
-		// To release the media device
-		async function releaseMediaDevice() {
-			try{
-				// Stop all tracks in the MediaStream
-				stream.getTracks().forEach(track => track.stop());
-				console.log("Media device released.");
-			}catch(error){
-				//
-			}
-		}
+		stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		//Start Animation
+		SetAudioAnim(stream);
+
 		mediaRecorder = new MediaRecorder(stream);
 
 		mediaRecorder.ondataavailable = event => {
@@ -298,7 +292,7 @@ async function startRecording(task=null) {
 			console.log(savePath)
 
 			// Release microphone
-			await releaseMediaDevice();
+			await ReleaseMediaDevice();
 
 			// call main
 			main(savePath)
@@ -316,6 +310,22 @@ async function startRecording(task=null) {
 		console.error('Error accessing microphone:', err);
 	}
 }
+
+async function ReleaseMediaDevice(){
+	finishButton.classList.add('cursor-not-allowed')
+	try{
+		if (!stream) {
+			console.error("Stream is undefined. Cannot stop tracks.");
+			return; // Exit the function if stream is undefined
+		}
+		// Stop all tracks in the MediaStream
+		stream.getTracks().forEach(track => track.stop());
+		console.log("Media device released.");
+	}catch(error){
+		console.log(error);
+	}
+}
+
 
 // Function to pause/resume recording
 function pauseRecording() {
@@ -343,7 +353,7 @@ function ResumeRecording() {
 	console.log("Resumed", isPaused)
 }
 // Function to stop recording
-function finishRecording() {
+async function finishRecording() {
 	mediaRecorder.stop();
 	clearInterval(timerInterval);
 	recordingTime.textContent = '00:00:00';
@@ -353,16 +363,16 @@ function finishRecording() {
 	canSave = true;
 	console.log("Finished Recording")
 	hideModal();
-	startRecording('release')
+	await ReleaseMediaDevice()
 	microphoneSVG.classList.remove('animate-pulse')
 }
 
 // Function to cancel recording
-function cancelRecording() {
+async function cancelRecording() {
 	try{
 		mediaRecorder.stop();
 	}catch(err){
-		//
+		console.log(err)
 	}
 
 	clearInterval(timerInterval);
@@ -374,7 +384,7 @@ function cancelRecording() {
 	canSave = false;
 	console.log("Recording Cancelled")
 	hideModal();
-	startRecording('release')
+	await ReleaseMediaDevice()
 	microphoneSVG.classList.remove('animate-pulse')
 }
 

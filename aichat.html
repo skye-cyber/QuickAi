@@ -23,7 +23,11 @@
 
 </head>
 <!-- Main Container -->
-<body id="main" class="h-[100vh] w-[100vw] max-h-[100vh] max-w-[100vw] px-3 py-4 mt-0 bg-white bg-opacity-90 rounded-b-none shadow-lg shadow-inner dark:bg-neutral-900  rounded-t-none overflow-hidden">
+<body id="main" class="h-[100vh] w-[100vw] max-h-[100vh] max-w-[100vw] px-3 py-4 mt-0 bg-white bg-opacity-90 rounded-b-none shadow-lg shadow-inner dark:bg-neutral-900 rounded-t-none overflow-hidden">
+
+<main class="relative z-5">
+    <canvas class="absolute z-0 bg-white bg-opacity-0" id="body-canvas"></canvas>
+
     <!--Notification Modal Background -->
     <div id="quickaiNotify" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 opacity-0 pointer-events-none transition-all duration-500 ease-in-out">
         <!-- Modal Content -->
@@ -113,11 +117,13 @@
                     <option data-class="mistral" value="mistral-small-2409">mistral-small-2409</option>
                     <option data-class="mistral" value="mistral-small-2501">mistral-small-2501</option>
                     <option data-class="mistral" value="mistral-medium">mistral-medium</option>
+                    <option data-class="mistral" value="mistral-large-latest">mistral-large-latest</option>
                     <option data-class="mistral" value="mistral-large-2402">mistral-large-2402</option>
                     <option data-class="mistral" value="mistral-large-2407">mistral-large-2407</option>
                     <option data-class="mistral" value="mistral-large-2411">mistral-large-2411</option>
                     <option data-class="mistral" value="mistral-saba-2502">mistral-saba-2502</option>
                     <option data-class="mistral" value="mistral-embed">mistral-embed</option>
+                    <option data-class="mistral" value="codestral-latest">codestral-latest</option>
                     <option data-class="mistral" value="codestral-2405">codestral-2405</option>
                     <option data-class="mistral" value="codestral-2501">codestral-2501</option>
                     <option data-class="mistral" value="codestral-mamba-2407">codestral-mamba-2407</option>
@@ -417,6 +423,9 @@
                             </div>
 
                             <!--Mistral Models Seperator-->
+                            <div role="separator" aria-orientation="horizontal" class="mx-4 p-2 my-1 flex justify-center">
+                                <div class="flex-1 rounded-md p-1 h-px bg-gradient-to-r from-[#00fab7] via-[#0080bc] to-[#00fe00]"></div>
+                            </div>
                             <div role="separator" aria-orientation="horizontal" class="mx-5 my-1 flex items-center justify-center">
                                 <div class="flex-1 h-px bg-gradient-to-r from-[#ffaa00] to-[#00ff00]"></div>
                                 <div class="px-8">
@@ -429,6 +438,20 @@
 
                             <div class="mx-5 my-2 text-sm text-center font-mono text-[#5e01ff] font-semibold">
                                 <p>Mistral models</p>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistral-large-latest">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="mistral-large-latest logo">
+                                        </div>
+                                        <div>
+                                        mistral-large-latest <sup class="text-green-400 font-bold">Recommended</sup>
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">The latest iteration of the large LLM.</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistral-small-2402">
@@ -469,20 +492,6 @@
                                         <div>
                                         open-mixtral-8x7b
                                         <div class="text-gray-500 dark:text-gray-400 text-xs">For enhanced performance in diverse NLP applications.</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistral-small-latest">
-                                <div class="flex grow items-center justify-between gap-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="mistral-small-latest logo">
-                                        </div>
-                                        <div>
-                                        mistral-small-latest
-                                        <div class="text-gray-500 dark:text-gray-400 text-xs">Latest version of mistral small</div>
                                         </div>
                                     </div>
                                 </div>
@@ -614,6 +623,77 @@
                                 </div>
                             </div>
 
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistral-saba-2502">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="mistral-saba-2502 logo">
+                                        </div>
+                                        <div>
+                                        mistral-saba-2502
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">A specialized model focused on specific language tasks, leveraging advanced techniques for improved contextual understanding and response generation.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistral-large-2411">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="mistral-large-2411 logo">
+                                        </div>
+                                        <div>
+                                        mistral-large-2411
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">An iteration of the large model, designed to deliver state-of-the-art performance across various natural language processing benchmarks.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistral-small-2409">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="mistral-small-2409 logo">
+                                        </div>
+                                        <div>
+                                        mistral-small-2409
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">An updated small model variant that improves upon its predecessor with enhanced training techniques for better performance in lightweight applications.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                             <!--Mistarl Coding models Seperator-->
+                            <div role="separator" aria-orientation="horizontal" class="mx-5 my-1 flex items-center justify-center">
+                                <div class="flex-1 h-px bg-gradient-to-r from-[#ffaa00] to-[#00ff00]"></div>
+                                <div class="px-8">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-[#00aaff]" fill="b" viewBox="0 0 24 24" class="w-12 h-12 text-purple-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm12-8v2a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1 h-px bg-gradient-to-r from-[#6aff59] to-[#a7ff19]"></div>
+                            </div>
+
+                            <div class="mx-5 my-2 text-sm text-center font-mono text-[#0094d9] font-semibold">
+                                <p>Mistral Coding models</p>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="codestral-latest">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="codestral-2501 logo">
+                                        </div>
+                                        <div>
+                                        codestral-latest <sup class="text-green-400 font-bold"><i class="text-sky-500">@</i>Recommended</sup>
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">Latest coding-focused model.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="codestral-mamba-2407">
                                 <div class="flex grow items-center justify-between gap-2">
                                     <div class="flex items-center gap-3">
@@ -642,43 +722,15 @@
                                 </div>
                             </div>
 
-                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistral-saba-2502">
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="codestral-2502">
                                 <div class="flex grow items-center justify-between gap-2">
                                     <div class="flex items-center gap-3">
                                         <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="mistral-saba-2502 logo">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="codestral-2505 logo">
                                         </div>
                                         <div>
-                                        mistral-saba-2502
-                                        <div class="text-gray-500 dark:text-gray-400 text-xs">A specialized model focused on specific language tasks, leveraging advanced techniques for improved contextual understanding and response generation.</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistral-large-2411">
-                                <div class="flex grow items-center justify-between gap-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="mistral-large-2411 logo">
-                                        </div>
-                                        <div>
-                                        mistral-large-2411
-                                        <div class="text-gray-500 dark:text-gray-400 text-xs">The latest iteration of the large model, designed to deliver state-of-the-art performance across various natural language processing benchmarks.</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistral-small-2409">
-                                <div class="flex grow items-center justify-between gap-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
-                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="mistral-small-2409 logo">
-                                        </div>
-                                        <div>
-                                        mistral-small-2409
-                                        <div class="text-gray-500 dark:text-gray-400 text-xs">An updated small model variant that improves upon its predecessor with enhanced training techniques for better performance in lightweight applications.</div>
+                                        codestral-2505
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">An advanced coding-focused model that builds on previous iterations, offering improved performance in programming-related tasks and queries.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -697,6 +749,20 @@
 
                             <div class="mx-5 my-2 text-sm text-center font-mono text-[#0094d9] font-semibold">
                                 <p>Mistral Vision models</p>
+                            </div>
+
+                            <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff]" tabindex="-1" data-value="mistral-small-latest">
+                                <div class="flex grow items-center justify-between gap-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 dark:bg-zinc-700">
+                                            <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="src/assets/mistral-logo.png" alt="mistral-small-latest logo">
+                                        </div>
+                                        <div>
+                                        mistral-small-latest
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs">The latest iteration of the small model, designed to deliver state-of-the-art performance across various natural language processing benchmarks.</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!--Mistarl Vision-->
@@ -830,6 +896,7 @@
 
     <!-- Chat Area -->
     <section id="chatArea" class="bg-gray-50 dark:bg-stone-900 h-[75vh] p-2 shadow-inner shadow-gray-400 dark:shadow-none md:p-4 rounded-lg  dark:shadow-gray-950 overflow-y-auto overflow-x-hidden space-y-4">
+
         <!-- Quick query options -->
         <section id='suggestions' class="mx-auto">
             <div class="justify-center mt-[var(--screen-optical-compact-offset-amount)] flex h-full flex-shrink flex-col items-center overflow-hidden text-token-text-primary" style="opacity: 1; will-change: auto;">
@@ -957,44 +1024,47 @@
 
     <!--Recording modal-->
     <div id="recordingModal" class="hidden fixed inset-0 z-50 bg-blue-400/20 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen">
-            <div class="relative px-4 w-full max-w-md">
-            <div class="bg-white dark:bg-slate-950 rounded-lg shadow-lg">
-                <div class="p-6">
-                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6 border-b-2 border-gray-300 dark:border-sky-400 pb-2 italic">Recorder</h2>
-                <div class="flex items-center justify-center">
-                    <span id="recordingTime" class="text-3xl text-blue-500 dark:text-white font-bold">00:00:00</span>
-                </div>
+        <div class="relative flex items-center justify-center min-h-screen">
+            <canvas class="absolute md:max-w-md lg:max-w-lg xl:max-w-xl md:max-h-md lg:max-h-lg xl:max-h-xl z-1 bg-white dark:bg-slate-950 rounded-lg shadow-lg" id="canvas"></canvas>
+            <section class="absolute z-10">
+                <div class="relative px-4 w-full max-w-md">
+                <div class="bg-opacity-0">
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6 border-b-2 border-gray-300 dark:border-sky-400 pb-2 italic">Recorder</h2>
+                    <div class="p-6">
+                    <div class="flex items-center justify-center">
+                        <span id="recordingTime" class="text-3xl text-blue-500 dark:text-white font-bold">00:00:00</span>
+                    </div>
 
-                <div class="flex justify-center mt-6 space-x-4">
-                    <button id="pauseButton" class="hidden bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-full size-14">
-                        <!--pause svg disabled when not recording-->
-                        <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                    <div class="flex justify-center mt-6 space-x-4">
+                        <button id="pauseButton" class="hidden bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-full size-14">
+                            <!--pause svg disabled when not recording-->
+                            <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+                            </svg>
+                        </button>
+                        <button id="startButton" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-full size-14">
+                            <!--start svg -->
+                            <svg class="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                            </svg>
+                        </button>
+
+                        <button id="finishButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full size-14 cursor-not-allowed">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                    </button>
-                    <button id="startButton" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-full size-14">
-                        <!--start svg -->
-                        <svg class="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                        </button>
+
+                        <button id="cancelButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full size-14">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                    </button>
-
-                    <button id="finishButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full size-14 cursor-not-allowed">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    </button>
-
-                    <button id="cancelButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full size-14">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    </button>
+                        </button>
+                    </div>
+                    </div>
                 </div>
                 </div>
-            </div>
-            </div>
+            </section>
         </div>
     </div>
 
@@ -1421,6 +1491,7 @@
         </div>
     </div>
 
+</main>
 </body>
 <script src="src/renderer/js/packed_hfaudio.js"></script>
 <script src="src/renderer/js/script.js"></script>
@@ -1430,4 +1501,5 @@
 <script src="src/renderer/js/packed_MistralChatsAdmin.js"></script>
 <script src="src/renderer/js/simulator.js"></script>
 <script src="src/renderer/js/apiUtils.js"></script>
+<script src="src/renderer/js/animations/DotSphereAnim.js"></script>
 </html>

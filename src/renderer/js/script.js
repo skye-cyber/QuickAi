@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (target) { // If a button was clicked
             const queryKey = target.id; // Get the ID of the button
             if (queryMap[queryKey]) {
-                userInput.value = queryMap[queryKey]; // Set input area value based on queryMap
+                userInput.textContent = queryMap[queryKey]; // Set input area value based on queryMap
                 userInput.focus(); // Focus on input area
             } else {
                 console.warn(`No query found for key: ${queryKey}`);
@@ -214,9 +214,10 @@ document.addEventListener('click', function(event) {
 
 // Event listener for selecting a mode
 modelItems.forEach(item => {
+    const visionModels = ["pixtral-12b-2409", "pixtral-large-2411", "mistral-small-latest", "Llama-3.2-11B-Vision-Instruct"]
     item.addEventListener('click', function() {
         const value = this.getAttribute('data-value');
-        if ((model.value === 'Llama-3.2-11B-Vision-Instruct' && value !== model.value) || (model.value !== 'Llama-3.2-11B-Vision-Instruct' && value === 'Llama-3.2-11B-Vision-Instruct')){
+        if (visionModels.includes(model.value) && !visionModels.includes(value)){
             document.dispatchEvent(modelChange);
             ClearChatArea();
         }
