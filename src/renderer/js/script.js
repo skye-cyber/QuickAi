@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function addScripts(packed_script) {
         const script = document.createElement('script');
-        script.src = `src/renderer/js/${packed_script}.js`;
+        script.src = `js/${packed_script}.js`;
         script.async = true; // Optional: load the script asynchronously
         document.body.appendChild(script);
         console.log(`Added ${packed_script} script`);

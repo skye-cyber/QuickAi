@@ -355,14 +355,14 @@ contextBridge.exposeInMainWorld('electron', {
     addUtilityScript: () => {
         //console.log("Executing")
         const script = document.createElement('script');
-        script.src = 'src/renderer/js/packed_utility.js';
+        script.src = 'js/packed_utility.js';
         script.async = true; // Optional: load the script asynchronously
         document.body.appendChild(script);
     },
     addCodeThemeSheet: (theme) =>{
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = `src/renderer/css/${theme}-code-theme.css`;
+        link.href = `css/${theme}-code-theme.css`;
         link.id = `${theme}-theme`;
 
         // Remove existing theme stylesheets

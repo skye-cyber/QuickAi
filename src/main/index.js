@@ -145,7 +145,7 @@ function createWindow() {
     }
   });
 
-  loadingWindow.loadFile(path.join(__dirname, '../../loading.html'));
+  loadingWindow.loadFile(path.join(__dirname, '../renderer/loading.html'));
   loadingWindow.show(); // Show the loading window immediately
 
   // Create the main window
@@ -153,17 +153,17 @@ function createWindow() {
     width: 800,
     height: 600,
     icon: path.join(process.resourcesPath, 'assets/QuickAi.png'), // Path to your icon file
-                                 show: false,
-                                 webPreferences: {
-                                   preload: path.join(__dirname, 'preload.js'), // Use the preload script
-                                 nodeIntegration: false, // Enable Node.js integration in the renderer process
-                                 contextIsolation: true,
-                                 sandbox: false, // Disable sandboxing
-                                 }
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'), // Use the preload script
+      nodeIntegration: false, // Enable Node.js integration in the renderer process
+      contextIsolation: true,
+      sandbox: false, // Disable sandboxing
+    }
   });
 
   // Load the main application when it is ready
-  mainWindow.loadFile(path.join(__dirname, '../../aichat.html')); // Load your HTML file
+  mainWindow.loadFile(path.join(__dirname, '../renderer/index.html')); // Load your HTML file
 
   // Show the main window and close the loading window when the main window is ready to show**
   mainWindow.once('ready-to-show', () => {
