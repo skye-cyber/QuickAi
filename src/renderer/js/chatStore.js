@@ -157,7 +157,7 @@ class ConversationManager {
             const fileMessages = content.filter(item => item.type === "image_url");
 
             // Extract all URLs from the image_url properties
-            return fileMessages.map(fileMessage => fileMessage.image_url.url);
+            return fileMessages.map(fileMessage => fileMessage.imageUrl.url);
         } catch (error) {
             console.error("Error extracting file URL:", error);
             return [];

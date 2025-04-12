@@ -84,11 +84,13 @@
         <div class="flex justify-between">
             <section class="flex justify-start">
                 <!-- Toggle Button -->
-                <button id="togglePane" title="View Chats" class="p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500" onclick="document.getElementById('conversationPane').classList.toggle('-translate-x-full')">
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
-                    </svg>
-                </button>
+                <section class="relative mr-14">
+                    <button id="togglePane" title="View Chats" class="absolute z-5 p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500" onclick="document.getElementById('conversationPane').classList.toggle('-translate-x-full')">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                        </svg>
+                    </button>
+                </section>
                 <select id="model" class="hidden">
                     <!--Chat & coding models-->
                     <option data-class="hf" value="Qwen/Qwen2.5-72B-Instruct">Basic mode</option>

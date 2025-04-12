@@ -276,7 +276,7 @@ contextBridge.exposeInMainWorld('electron', {
     popFromVisionChat: () => {
         ChatconversationHistory.pop();
     },
-    clearImages: (history) => {
+    clearAllImages: (history) => {
         // Convert history to array and process each message
         return history.map(item => {
             // Extract text content only and filter out image content
@@ -292,6 +292,38 @@ contextBridge.exposeInMainWorld('electron', {
                 content: cleanedContent
             };
         });
+    },
+    clearImages: (history) => {
+        // Clean all messages by removing non-text content
+        const cleanedHistory = history.map(item => {
+            const cleanedContent = item.content
+            .filter(val => val.type === "text")
+            .map(textContent => ({
+                ...textContent,
+                // Remove extra whitespace from text
+                text: textContent.text.trim()
+            }));
+            return {
+                ...item,
+                content: cleanedContent
+            };
+        });
+
+        // Access the original last message before cleaning
+        const lastMessage = history[history.length - 1];
+
+        // Assuming messages have a property (for example: role) that distinguishes user messages,
+        // and if the user message contains any image data
+        if (
+            lastMessage &&
+            lastMessage.role === "user" &&  // adjust property if your structure differs
+            lastMessage.content.some(val => ["image_url", "file_url"].includes(val.type))
+        ) {
+            // Replace the cleaned version of the last message with the original last message
+            cleanedHistory[cleanedHistory.length - 1] = lastMessage;
+        }
+
+        return cleanedHistory;
     },
     CreateNew: (conversation, model) => {
         if (model == "text"){

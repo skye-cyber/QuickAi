@@ -271,12 +271,13 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 	const VisionMessage = document.createElement("div");
 	aiMessage = VisionMessage
 	// Add user message to the chat interface
-	addUserMessage(text)
+	addUserMessage(text, fileType, fileDataUrl, fileContainerId)
 	// Add loading animation
 	addLoadingAnimation(aiMessage);
 
 	//Add Timestamp
 	text = `${text} [${window.electron.getDateTime()} UTC]`
+
 	//console.log(text)
 	// Determine the content based on fileDataUrl
 	let userContent;
@@ -285,7 +286,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 		if (fileType == "image") {
 			const imageContent = fileDataUrl.map(_url => ({
 				type: "image_url",
-				image_url: {
+				imageUrl: {
 					url: _url,
 				}
 			}));
@@ -302,7 +303,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 		else if (fileType == "document") {
 			const documentContent = fileDataUrl.map(_url => ({
 				type: "file_url",
-				image_url: {
+				documentUrl: {
 					url: _url,
 				}
 			}));
@@ -324,6 +325,8 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 			},
 		];
 	}
+
+	console.log(userContent)
 
 	// Add user message to VisionHistory
 	window.electron.addToVisionChat({
@@ -366,6 +369,9 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 			max_tokens: 2000,
 		});
 
+
+		//console.log("Final VisionHistory:", JSON.stringify(window.electron.getVisionChat(), null, 2));
+		//console.log("Final VisionHistory:", JSON.stringify(window.electron.clearImages(window.electron.getVisionChat(), null, 2)));
 
 		// change send button appearance to processing status
 		window.HandleProcessingEventChanges('show')
@@ -533,7 +539,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 		// Render mathjax immediately
 		window.debounceRenderMathJax(VisionMessageUId, 0, true);
 		window.electron.addToVisionChat({ role: "assistant", content: [{ type: "text", text: output }] });
-		//console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
+		console.log("Final VisionHistory:", JSON.stringify(window.electron.getVisionChat(), null, 2));
 
 	} catch (error) {
 		window.handleRequestError(error, userMessage, VisionMessage, ["VS", fileType, fileContainerId])
@@ -541,7 +547,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 }
 
 
-function addUserMessage(text) {
+function addUserMessage(text, fileType, fileDataUrl, fileContainerId) {
 	//console.log("Date time + text:", text)
 	const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
 	const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
@@ -555,7 +561,25 @@ function addUserMessage(text) {
 	</button>
 	</div>
 	`;
+
+	// Create files container if they exist
+	if (fileDataUrl) {
+		const fileHtml = `
+		<div id="${fileContainerId}" class="flex justify-end">
+		<article class="flex flex-rows-1 md:flex-rows-3 bg-cyan-100 w-fit p-1 rounded-lg">
+		${fileDataUrl && fileType === "image" ? fileDataUrl.map(url => `<img src="${url}" alt="Uploaded Image" class="rounded-md w-14 h-14 my-auto mx-1" />`).join('') : fileType === "document" ? fileDataUrl.map(url => `<div class="inline-flex items-center"><svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+		<path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16V4a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2zm1-1h4v10h-4V4z"/></svg><span>${url}</span></div>`).join('') : ""}
+		</article>
+		</div>
+		`;
+		const filesContainer = document.createElement("div");
+		filesContainer.className = "flex justify-end";
+		filesContainer.innerHTML = fileHtml;
+		chatArea.appendChild(filesContainer);
+	}
+
 	userMessage.classList.add("flex", "justify-end", "mb-4", "overflow-wrap");
+	chatArea.appendChild(userMessage);
 	chatArea.appendChild(userMessage);
 
 	// Add Timestamp to user prompt

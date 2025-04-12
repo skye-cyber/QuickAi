@@ -3,6 +3,7 @@ const sendBtn = document.getElementById("sendBtn");
 const modelSelection = document.getElementById('model');
 
 const AllVisionModels = [
+    "mistral-small-latest",
     "pixtral-12b-2409",
     "pixtral-large-2411",
     "Qwen/Qwen2-VL-7B-Instruct",
@@ -63,7 +64,7 @@ document.addEventListener('imageLoaded', function(event) {
     //switch to vision model
     switchToVision()
 
-    if (["pixtral-12b-2409", "pixtral-large-2411"].includes(modelName)) {
+    if (["pixtral-12b-2409", "pixtral-large-2411", "mistral-small-latest"].includes(modelName)) {
         window.MistraVision(text, fileType, fileDataUrl, modelName);
     } else {
         window.VisionChat(text, fileType, fileDataUrl, null);

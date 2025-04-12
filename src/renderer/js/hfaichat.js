@@ -322,7 +322,7 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 		if (fileType == "image") {
 			const imageContent = fileDataUrl.map(_url => ({
 				type: "image_url",
-				image_url: {
+				imageUrl: {
 					url: _url,
 				}
 			}));
@@ -339,7 +339,7 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 		else if (fileType == "document") {
 			const documentContent = fileDataUrl.map(_url => ({
 				type: "file_url",
-				image_url: {
+				fileUrl: {
 					url: _url,
 				}
 			}));
