@@ -54,7 +54,7 @@ renderer.code = function(code) {
 		</button>
 		</section>
 		<div class="p-2 border border-gray-300 dark:border-none w-full bg-white dark:bg-[#14121e] rounded-md rounded-t-none overflow-auto scrollbar-hide">
-		<code class="p-2 hljs ${validLanguage} block whitespace-pre bg-white dark:bg-[#14121e]">${highlighted}</code>
+		<code class="p-2 hljs ${validLanguage} block whitespace-pre bg-white dark:bg-[#14121e] font-mono">${highlighted}</code>
 		</div>
 		</div>
 		`;
