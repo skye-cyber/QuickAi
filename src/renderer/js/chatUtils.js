@@ -433,6 +433,7 @@ function escapeHTML(unsafe) {
 	}
 	return unsafe
 	.replace(/&/g, "&amp;")
+	.replace(/\n/g, "<br>")
 	.replace(/</g, "&lt;")
 	.replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;")
