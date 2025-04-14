@@ -1,10 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain, Notification } = require('electron');
 const path = require('path');
-//const crypto = require('crypto');
-//const { Buffer } = require('buffer');
-
-//const dotenv = require('dotenv')
-
+const fs = require('fs');
 const keytar = require('keytar');
 
 let mainWindow;
@@ -148,11 +144,19 @@ function createWindow() {
   loadingWindow.loadFile(path.join(__dirname, '../renderer/loading.html'));
   loadingWindow.show(); // Show the loading window immediately
 
+  let iconPath = path.join(process.resourcesPath, 'assets', 'QuickAi.png');
+
+  // Fallback to a generic icon or skip setting it
+  if (!fs.existsSync(iconPath)) {
+    console.warn('Icon not found, fallback triggered');
+    iconPath = undefined;
+  }
+
   // Create the main window
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: path.join(process.resourcesPath, 'assets/QuickAi.png'), // Path to your icon file
+    icon: iconPath, // Path to your icon file
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'), // Use the preload script
@@ -178,7 +182,13 @@ function createWindow() {
 // Set the app user model ID
 app.setAppUserModelId('com.quickai.app');
 
-app.on('ready', () => {
+app.on('ready', async () => {
+  try {
+    await prepDirectories(); // if it's an async function
+  } catch (err) {
+    console.error('Error creating directories:', err);
+  }
+
   // Create and set the menu
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
@@ -252,3 +262,25 @@ ipcMain.handle('get-keys', async (event, keyType) => {
     return { mistralKey, huggingfaceKey };
   }
 });
+
+
+async function prepDirectories() {
+  try{
+    const baseDir = path.join(app.getPath('home'), '.quickai');
+
+    // Create the base .quickai directory if it doesn't exist
+    fs.mkdirSync(baseDir, { recursive: true });
+    console.log(`Ensured base directory: ${baseDir}`);
+
+    // Define subdirectories to be created inside .quickai
+    const subdirs = ['.quickai.config', '.quickai.store', '.quickai.cache'];
+
+    subdirs.forEach(sub => {
+      const fullPath = path.join(baseDir, sub);
+      fs.mkdirSync(fullPath, { recursive: true });
+      console.log(`Ensured subdirectory: ${fullPath}`);
+  });
+  }catch(error){
+    console.log(error)
+  }
+}

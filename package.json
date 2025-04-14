@@ -86,8 +86,8 @@
   },
   "files": [
     "README.md",
+    "LICENSE",
     "package.json",
-    "assets/documentation.html",
     "src/**/*",
     "public/**/*"
   ],
@@ -98,51 +98,105 @@
       "cache": true
     },
     "asar": true,
-    "files": [
-      "**/*",
-      "!node_modules/keytar/LICENSE.md"
-    ],
+    "files": ["**/*"],
     "asarUnpack": "**/node_modules/keytar/**",
+
+    "extraResources": [
+      {
+        "from": "src/assets/",
+        "to": "assets/"
+      },
+      {
+        "from": "node_modules/keytar",
+        "to": "app.asar.unpacked/node_modules/keytar"
+      }
+    ],
+
     "mac": {
+      "icon": "src/assets/QuickAi.icns",
+      "category": "public.app-category.productivity",
       "target": [
-        "dmg"
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
       ],
-      "identity": null,
-      "icon": "src/assets/QuickAi.icns"
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist",
+      "provisioningProfile": "embedded.provisionprofile"
     },
+
+    "dmg":{
+      "artifactName": "${productName}-${version}-${arch}.dmg"
+      },
+
     "win": {
+      "icon": "src/assets/QuickAi.ico",
       "target": [
-        "nsis"
-      ],
-      "icon": "src/assets/QuickAi.ico"
+        {
+          "target": "nsis",
+          "arch": ["x64", "ia32", "arm64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64", "arm64"]
+        }
+      ]
     },
+
     "nsis": {
       "oneClick": false,
       "perMachine": true,
       "allowElevation": true,
-      "allowToChangeInstallationDirectory": true
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "allowToChangeInstallationDirectory": true,
+      "license": "LICENSE"
     },
+
+    "portable": {
+      "artifactName": "${productName}-portable-${version}-${arch}.${ext}"
+    },
+
     "linux": {
       "target": [
-        "AppImage",
-        "deb"
+        {
+          "target": "AppImage",
+          "arch": ["x64", "armv7l", "arm64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "snap"
+        }
       ],
       "category": "Utility",
       "icon": "src/assets/QuickAi.png",
-      "extraResources": [
-        {
-          "from": "src/assets/",
-          "to": "assets/"
-        },
-        {
-          "from": "src/assets/QuickAi.png",
-          "to": "/usr/share/icons/quickai.png"
-        },
-        {
-          "from": "node_modules/keytar",
-          "to": "app.asar.unpacked/node_modules/keytar"
-        }
-      ]
+      "maintainer": "Skye <swskye17@gmail.com>",
+      "synopsis": "QuickAi Desktop",
+      "description": "Your AI assistant on all platforms"
+    },
+
+    "appImage": {
+      "artifactName": "${productName}-${version}-${arch}.AppImage"
+    },
+
+    "deb": {
+      "priority": "optional",
+      "depends": ["libappindicator1", "libnotify-bin", "libsecret-1-dev"],
+      "artifactName": "${productName}_${version}_${arch}.deb"
+    },
+
+    "snap": {
+      "summary": "QuickAi Snap Package",
+      "grade": "stable",
+      "confinement": "classic",
+      "plugs": ["network", "home", "audio-playback"]
     }
+
   }
 }
