@@ -11,6 +11,23 @@
         display: none;  /* Hide scrollbar for Chrome, Safari, and Edge */
     }
 }
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('../fonts/JetBrains/webfonts/JetBrainsMono-Regular.woff2') format('woff2'),
+    url('../fonts/JetBrainsMono-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('../fonts/JetBrains/webfonts/JetBrainsMono-Regular.woff2') format('woff2'),
+    url('../fonts/JetBrains/webfonts/JetBrainsMono-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
 /* global.css or within a Tailwind plugin */
 @layer utilities {
     h1, h2, h3, h4, h5, h6  {
@@ -211,105 +228,3 @@ height: 2.4em; /* Adjust this value to match the height of an empty row */
 .ripple-single-3 {
     animation-delay: 1.2s;
 }
-
-
-/* Light code theme*/
-
-/* Dark code theme*/
-.hljs {
-    background-color: #282c34;
-    color: #abb2bf;
-    padding: 15px;
-    border-radius: 8px;
-    line-height: 1.5;
-    font-family: 'Fira Code', monospace;
-}
-
-.hljs-keyword {
-    color: #c678dd;
-    font-weight: bold;
-}
-
-.hljs-built_in {
-    color: #e06c74;
-}
-
-.hljs-string {
-    color: #98c379;
-}
-
-.hljs-number {
-    color: #d19a66;
-}
-
-.hljs-comment {
-    color: #5c6370;
-    font-style: italic;
-}
-
-.hljs-function {
-    color: #61afef;
-}
-
-.hljs-params {
-    color: #abb2bf;
-}
-
-.hljs-variable {
-    color: #d19a66;
-}
-
-.hljs-class {
-    color: #e5c07b;
-}
-
-.hljs-title {
-    color: #61afef;
-}
-
-.hljs-attribute {
-    color: #d19a66;
-}
-
-.hljs-symbol {
-    color: #61afef;
-}
-
-.hljs-bullet {
-    color: #abb2bf;
-}
-
-.hljs-meta {
-    color: #5c6370;
-}
-
-.hljs-link {
-    color: #61afef;
-    text-decoration: underline;
-}
-
-.hljs-doctag {
-    color: #c678dd;
-    font-weight: bold;
-}
-
-.hljs-tag {
-    color: #e06c74;
-}
-
-.hljs-name {
-    color: #61afef;
-}
-
-.hljs-attr {
-    color: #d19a66;
-}
-
-.hljs-attr {
-    color: #00aaff;
-}
-
-.hljs-literal {
-    color: #d19a66;
-}
-
