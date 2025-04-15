@@ -228,7 +228,26 @@ modelItems.forEach(item => {
 
 // Initial selection based on the select element's default value
 selectModel(model.value);
+
+const animationToggle = document.getElementById('animation-toggle');
+
+//Set animation on innitially
+animationToggle.checked=true;
+
+const animationTogglePeer = document.getElementById('animation-toggle-peer');
+const bodyCanvas = document.getElementById('body-canvas');
+animationTogglePeer.addEventListener('click', ()=>{
+    if (animationToggle.checked !== true){
+        bodyCanvas.classList.remove('hidden');
+        window.electron.addScript('DotSphereAnim.js');
+        //window.electron.AnimationReadyDispatch();
+    }else{
+        bodyCanvas.classList.add('hidden');
+        window.electron.removeScript('DotSphereAnim.js');
+    }
+})
 });
+
 
 // Function to show the modal
 function Notify(_color=null, time=null, text="") {

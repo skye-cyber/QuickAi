@@ -363,6 +363,33 @@ contextBridge.exposeInMainWorld('electron', {
         script.async = true; // Optional: load the script asynchronously
         document.body.appendChild(script);
     },
+    addScript: (script_name) => {
+        //console.log("Executing")
+        const script = document.createElement('script');
+        script.src = `js/${script_name}`;
+        script.async = true; // Optional: load the script asynchronously
+        console.log(`Toggle Animation: ON`);
+        document.body.appendChild(script);
+    },
+    AnimationReadyDispatch: ()=>{
+        // Dispatch a custom event 'animationReady' on the element
+        const event = new CustomEvent('animationReady');
+        element.dispatchEvent(event);
+    },
+    removeScript: (script_name) => {
+        const scripts = document.getElementsByTagName('script');
+
+        // Convert HTMLCollection to an array to use forEach
+        Array.from(scripts).forEach(script => {
+            //console.log('Script element:', script);
+            //console.log('Script src:', script.src);
+
+            if (script.src && script.src.endsWith(`js/${script_name}`)) {
+                console.log(`Toggle Animation: OFF`);
+                //script.parentNode.removeChild(script);
+            }
+        });
+    },
     addCodeThemeSheet: (theme) =>{
         const link = document.createElement('link');
         link.rel = 'stylesheet';

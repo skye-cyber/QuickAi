@@ -5,6 +5,18 @@ const keytar = require('keytar');
 
 let mainWindow;
 
+const isDev = !app.isPackaged;
+const iconPath = isDev
+? path.join(__dirname, '../assets/QuickAi.png') // for dev
+: path.join(process.resourcesPath, 'assets/QuickAi.png'); // for prod;
+
+// Fallback to a generic icon or skip setting it
+if (!fs.existsSync(iconPath)) {
+  console.warn('Icon not found, fallback triggered');
+  iconPath = undefined;
+}
+
+
 // Handle notify events
 ipcMain.on('Notify', (event, data) => {
   console.log('Received time data from renderer:', data.message);
@@ -143,14 +155,6 @@ function createWindow() {
 
   loadingWindow.loadFile(path.join(__dirname, '../renderer/loading.html'));
   loadingWindow.show(); // Show the loading window immediately
-
-  let iconPath = path.join(process.resourcesPath, 'assets', 'QuickAi.png');
-
-  // Fallback to a generic icon or skip setting it
-  if (!fs.existsSync(iconPath)) {
-    console.warn('Icon not found, fallback triggered');
-    iconPath = undefined;
-  }
 
   // Create the main window
   mainWindow = new BrowserWindow({
