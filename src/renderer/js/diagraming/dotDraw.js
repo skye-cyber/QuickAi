@@ -1,8 +1,20 @@
 const cytoscape = require('cytoscape');
 const graphlibDot = require('graphlib-dot');
+//import graphlib from 'graphlib';
 
 const diagViewContent = document.getElementById('modal-content');
-const dotCodes = [`
+
+// 1) Define two stylesheets:
+const lightStyle = [
+    { selector: 'node', style: { 'background-color': 'data(fillColor)', 'color': '#000', 'content': 'data(label)' } },
+    { selector: 'edge', style: { 'line-color': '#888', 'curve-style': 'bezier' } }
+];
+const darkStyle = [
+    { selector: 'node', style: { 'background-color': 'data(fillColor)', 'color': '#fff', 'content': 'data(label)' } },
+    { selector: 'edge', style: { 'line-color': '#ccc', 'curve-style': 'bezier' } }
+];
+
+const dotCodes = [`\`\`\`dot\n
 digraph G {
     A -> B;
     B -> C;
@@ -10,15 +22,17 @@ digraph G {
     D [shape=box, label="Node D"];
     A -> D;
 }
-`,
-    `digraph G {
+\`\`\``,
+    `\`\`\`dot\n
+digraph G {
     A -> B;
     B -> C;
     C -> A;
     D [shape=box, label="Node D"];
     A -> D;
-}`,
-    `
+}\`\`\``,
+    `\`\`\`dot\n
+//Complex
 digraph ClassDiagram {
     node [shape=record, style=filled, fillcolor=lightgrey];
 
@@ -37,7 +51,7 @@ digraph ClassDiagram {
     WeatherForecast -> ActivityScheduler [label="provides data"];
     CropRecommendation -> ActivityScheduler [label="informs"];
 }
-`,
+\`\`\``,
     `\`\`\`dot\n
 //sample diagram3
 digraph G {
@@ -59,28 +73,111 @@ digraph G {
 }
 \`\`\``
 ];
-const sample = `Sure, Mwikya! To set the animation duration for all animations in a section using TailwindCSS, you can use\n
-\`\`\`dot\n
-//sample diagram
-digraph G {
-    A -> B;
-    B -> C;
-    C -> A;
-    D [shape=box, label="Node D"];
-    A -> D;
+const sample = `
+\`\`\`json-diag
+//sample test
+{
+    "elements": [
+        {
+            "data": {
+                "id": "User",
+                "label": "👤 User",
+                "shape": "square"
+            }
+        },
+        {
+            "data": {
+                "id": "FarmData",
+                "label": "🌾 Farm Data",
+                "type": "entity"
+            }
+        },
+        {
+            "data": {
+                "id": "AIModel",
+                "label": "🤖 AI Model",
+                "type": "service"
+            }
+        },
+        {
+            "data": {
+                "id": "SoilReport",
+                "label": "🧪 Soil Report",
+                "type": "report"
+            }
+        },
+        {
+            "data": {
+                "id": "WeatherAPI",
+                "label": "☁️ Weather API",
+                "type": "external"
+            }
+        },
+        {
+            "data": {
+                "id": "Recommendation",
+                "label": "✅ Crop Recommendation",
+                "type": "result"
+            }
+        },
+        {
+            "data": {
+                "id": "e1",
+                "source": "User",
+                "target": "FarmData",
+                "label": "inputs"
+            }
+        },
+        {
+            "data": {
+                "id": "e2",
+                "source": "FarmData",
+                "target": "AIModel",
+                "label": "feeds"
+            }
+        },
+        {
+            "data": {
+                "id": "e3",
+                "source": "SoilReport",
+                "target": "AIModel",
+                "label": "analyzed by"
+            }
+        },
+        {
+            "data": {
+                "id": "e4",
+                "source": "WeatherAPI",
+                "target": "AIModel",
+                "label": "enriched with"
+            }
+        },
+        {
+            "data": {
+                "id": "e5",
+                "source": "AIModel",
+                "target": "Recommendation",
+                "label": "produces"
+            }
+        }
+    ],
+    "meta": {
+        "layout": "breadthfirst",
+        "orientation": "LR"
+    }
 }
-\`\`\`
-`
+\`\`\``
 
-dotCodes.forEach(dot => {
-    dotHandler(dot)
-});
+
+
+dotHandler(sample)
+
 
 function extractDotCodesWithNames(aiResponse) {
     try {
         const dotBlocks = [];
 
-        const dotCodeRegex = /```dot\s+([\s\S]*?)```/gi;
+        const dotCodeRegex = /```json-diag\s+([\s\S]*?)```/gi;
         let match;
 
         while ((match = dotCodeRegex.exec(aiResponse)) !== null) {
@@ -140,96 +237,134 @@ async function renderDiagramViz(dotCode, Cname, desc = null) {
         });
 }
 
-// Assuming you have cytoscape and a DOT parser (e.g., graphlib-dot or your own DOT to JSON converter)
-async function renderDiagramCytoscape(dotCode, Cname, desc = null) {
+async function renderDiagramCytoscape(graphJson, Cname, desc = '') {
+    let graph;
     try {
-        // Step 1: Convert DOT to Cytoscape-friendly JSON format
-        const graphData = parseDotToCytoscape(dotCode); // You must define or import this parser
-
-        // Step 2: Create container section
-        const section = document.createElement('section');
-        section.className = `block p-2 border border-blue-400 rounded-md bg-white dark:bg-zinc-900`;
-
-        // Title
-        const namesec = document.createElement('p');
-        namesec.className = `bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400`;
-        namesec.textContent = `Name: ${Cname}`;
-        section.appendChild(namesec);
-
-        // Description (if any)
-        if (desc) {
-            const descEl = document.createElement('p');
-            descEl.className = `text-sm text-gray-500 dark:text-gray-300 italic mb-2`;
-            descEl.textContent = desc;
-            section.appendChild(descEl);
-        }
-
-        // Graph container
-        const graphContainer = document.createElement('div');
-        graphContainer.className = `h-[400px] w-full rounded-lg bg-gray-50 dark:bg-zinc-800`;
-        graphContainer.style.position = "relative";
-        section.appendChild(graphContainer);
-
-        // Append section to the viewer
-        diagViewContent.appendChild(section);
-
-        // Step 3: Render using Cytoscape
-        cytoscape({
-            container: graphContainer,
-            elements: graphData.elements,
-            layout: { name: 'cose' }, // or any other: 'grid', 'circle', etc.
-            style: [
-                {
-                    selector: 'node',
-                    style: {
-                        'background-color': '#1d4ed8',
-                        'label': 'data(label)', // Display label
-                        'shape': 'data(shape)', // Map the shape attribute from DOT to Cytoscape's shape
-                        'color': 'white',
-                        'text-valign': 'center',
-                        'text-halign': 'center',
-                        'font-size': 12,
-                    }
-                },
-                {
-                    selector: 'edge',
-                    style: {
-                        'width': 2,
-                        'line-color': '#999',
-                        'target-arrow-color': '#999',
-                        'target-arrow-shape': 'triangle',
-                        'curve-style': 'bezier',
-                    }
-                }
-            ]
-        });
-
-    } catch (error) {
-        console.error("Error rendering Cytoscape diagram:", error);
+        graph = JSON.parse(graphJson);
+    } catch (err) {
+        console.error("renderDiagramCytoscape: invalid JSON:", err);
+        return;
     }
+
+    console.log(JSON.stringify(graph.elements.nodes))
+    // 🔁 Convert input format to Cytoscape-compatible format
+    // Assuming 'graph' has the correct structure now
+    const elements = graph.elements.map(element => ({
+        data: element.data // Access the 'data' part of each element (node or edge)
+    }));
+
+
+    // DOM structure
+    const section = document.createElement('section');
+    section.className = 'block p-2 border border-blue-400 rounded-md bg-white dark:bg-zinc-900';
+
+    const title = document.createElement('p');
+    title.className = 'bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400';
+    title.textContent = `Name: ${Cname}`;
+    section.appendChild(title);
+
+    if (desc) {
+        const d = document.createElement('p');
+        d.className = 'text-sm text-gray-500 dark:text-gray-300 italic mb-2';
+        d.textContent = desc;
+        section.appendChild(d);
+    }
+
+    const graphContainer = document.createElement('div');
+    graphContainer.id = `cy-${Cname}`;
+    graphContainer.className = 'h-[400px] w-full rounded-lg bg-gray-50 dark:bg-zinc-800';
+    section.appendChild(graphContainer);
+    diagViewContent.appendChild(section);
+
+    // Cytoscape setup
+    const cy = cytoscape({
+        container: graphContainer,
+        elements,
+        style: [
+            {
+                selector: 'node',
+                style: {
+                    'label': 'data(label)',
+                    'text-valign': 'center',
+                    'color': '#222',
+                    'text-wrap': 'wrap',
+                    'text-max-width': 100,
+                    'font-size': 12,
+                    'background-color': 'data(backgroundColor)',
+                    'shape': 'data(shape)'
+                }
+            },
+            {
+                selector: 'edge',
+                style: {
+                    'width': 2,
+                    'line-color': '#ccc',
+                    'target-arrow-color': '#ccc',
+                    'target-arrow-shape': 'triangle',
+                    'curve-style': 'bezier',
+                    'label': 'data(label)',
+                    'font-size': 10,
+                    'text-rotation': 'autorotate',
+                    'text-margin-x': 0,
+                    'text-margin-y': -10,
+                }
+            }
+        ],
+        layout: { name: 'breadthfirst', orientation: 'horizontal', padding: 10 }
+    });
+
+    // Optional theme toggle:
+    /*
+     *    document.getElementById('toggleTheme').addEventListener('click', () => {
+     *        const isDark = document.documentElement.classList.toggle('dark');
+     *        cy.style(isDark ? darkStyle : lightStyle).update();
+});
+*/
 }
 
 
+// 2) Main parser: builds nodes & edges arrays, plus captures graph-wide attrs
+// 1) DOT → Cytoscape converter via graphlib‑dot
 function parseDotToCytoscape(dotCode) {
+    // Parse into a graphlib.Graph
     const g = graphlibDot.read(dotCode);
-    const nodes = g.nodes().map(id => {
+
+    // Collect graph‑level attributes (e.g. rankdir, bgcolor, etc.)
+    const graphAttributes = g.graph() || {};
+
+    // Convert nodes
+    const elements = g.nodes().map(id => {
+        const attrs = g.node(id) || {};
         return {
             data: {
-                id: id,
-                label: g.node(id).label || id
+                id,
+                label: attrs.label || id,
+                shape: attrs.shape || 'ellipse',
+                color: attrs.color || '#999999',
+                'border-color': attrs.color || '#000000',
+                width: (parseFloat(attrs.width) || 1) * 50,
+                height: (parseFloat(attrs.height) || 1) * 50,
+                'font-size': parseFloat(attrs.fontsize) || 12,
+                'font-color': attrs.fontcolor || '#000000'
             }
         };
     });
 
-    const edges = g.edges().map(edge => {
-        return {
+    // Convert edges
+    g.edges().forEach(e => {
+        const attrs = g.edge(e) || {};
+        elements.push({
             data: {
-                source: edge.v,
-                target: edge.w,
-                label: g.edge(edge).label || ''
+                source: e.v,
+                target: e.w,
+                label: attrs.label || '',
+                'line-color': attrs.color || '#888888',
+                width: parseFloat(attrs.penwidth) || 2,
+                'target-arrow-shape': attrs.arrowhead || 'triangle',
+                'line-style': attrs.style || 'solid'
             }
-        };
+        });
     });
 
-    return { elements: [...nodes, ...edges] };
+    return { elements, graphAttributes };
 }
