@@ -358,17 +358,20 @@ contextBridge.exposeInMainWorld('electron', {
     },
     addUtilityScript: () => {
         //console.log("Executing")
-        const script = document.createElement('script');
-        script.src = 'js/packed_utility.js';
-        script.async = true; // Optional: load the script asynchronously
-        document.body.appendChild(script);
+        scripts = ['js/packed_utility.js']
+        scripts.forEach(script=>{
+            const scriptElement = document.createElement('script');
+            scriptElement.src = script;
+            scriptElement.async = true; // Optional: load the script asynchronously
+            document.body.appendChild(script);
+        });
     },
-    addScript: (script_name) => {
+    addScript: (script_name, animation=false) => {
         //console.log("Executing")
         const script = document.createElement('script');
         script.src = `js/${script_name}`;
         script.async = true; // Optional: load the script asynchronously
-        console.log(`Toggle Animation: ON`);
+        animation ? console.log(`Toggle Animation: ON`) : console.log(`${script_name} ADDED.`);
         document.body.appendChild(script);
     },
     AnimationReadyDispatch: ()=>{
@@ -418,7 +421,7 @@ contextBridge.exposeInMainWorld('electron', {
                 const reader = new FileReader();
                 reader.onloadend = () => {
                     const buffer = Buffer.from(reader.result);
-                    const outputPath = path.join(downloadsPath, 'output.jpg');
+                    const outputPath = path.join(downloadsPath, 'QuickAi-output.jpg');
 
                     fs.writeFile(outputPath, buffer, (err) => {
                         if (err) {
@@ -507,15 +510,7 @@ contextBridge.exposeInMainWorld('electron', {
         VconversationHistory[0].content = VSystem_init(previewOn);
     },
 
-    MISTRAL_API_KEY: async () =>{
-        return process.env.MISTRAL_API_KEY
-    },
-    MISTRAL_CODESTRAL_API_KEY: async () =>{
-        return process.env.MISTRAL_CODESTRAL_API_KEY
-    },
-    HUGGINGHUB_API_KEY: async () =>{
-        return process.env.HUGGINGHUB_API_KEY
-    },
+
     saveRecording:async  (blob) => {
         try{
             const randomFname = `hfaudio_${Math.random().toString(36).substring(1,12)}`;

@@ -1,7 +1,14 @@
 import { HfInference } from "@huggingface/inference";
 import SetAudioAnim from './animations/WaveFormAnim.js';
 
-const hf_API_KEY = await window.electron.HUGGINGHUB_API_KEY()
+let hf_API_KEY = null
+
+async function loadApiKey() {
+	const key = await window.api.getKeys('huggingfacex');
+	hf_API_KEY = key.huggingfaceKey; // Assign to global variable
+}
+
+await loadApiKey()
 
 const client = new HfInference(hf_API_KEY);
 

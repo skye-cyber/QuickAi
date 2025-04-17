@@ -72,7 +72,7 @@
       let z2 = -p.x * Math.sin(angleY) + z1 * Math.cos(angleY);
 
       // Perspective projection
-      const perspective = 600; // distance from viewer to screen
+      const perspective = 510; // distance from viewer to screen
       const scale = perspective / (perspective - z2 * sphereRadius);
       const x2d = cx + x1 * sphereRadius * scale;
       const y2d = cy + y1 * sphereRadius * scale;

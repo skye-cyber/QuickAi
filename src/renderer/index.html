@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>QuickAi - Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/viz.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/full.render.js"></script>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.2/katex.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.12.1/polyfill.min.js"></script>
+
     <script>
         window.MathJax = {
             tex: {
@@ -18,6 +21,7 @@
                 packages: {'[+]': ['ams', 'newcommand', 'textmacros']}
             },
     };
+
 </script>
     <script id="MathJax-script" type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
@@ -37,7 +41,7 @@
                     </svg>
                 </button>
             </section>
-            <select id="model" class="hidden">
+            <select id="model" class="hidden transition-all duration-700">
                 <!--Chat & coding models-->
                 <option data-class="hf" value="Qwen/Qwen2.5-72B-Instruct">Basic mode</option>
                 <option data-class="hf" value="Qwen/Qwen2.5-Coder-32B-Instruct">Coding mode</option>
@@ -91,7 +95,7 @@
                     <svg class="mt-1" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 </button>
-                <div id="modelDropdown" class="fixed z-50 mt-1 hidden w-fit max-h-[88vh] overflow-y-auto py-1 max-w-md bg-white border-2 border-gray-300 dark:border-none dark:bg-neutral-700 text-gray-800 dark:text-gray-300 rounded-lg shadow-lg overflow-x-hidden whitespace-wrap text-ellipsis ::-webkit-scrollbar-track:rounded-lg ::-webkit-scrollbar-color-[#0055ff] transition-colors duration-1000">
+                <div id="modelDropdown" class="fixed z-50 mt-1 hidden w-fit max-h-[88vh] overflow-y-auto py-1 max-w-md bg-white border-2 border-gray-300 dark:border-none dark:bg-neutral-700 text-gray-800 dark:text-gray-300 rounded-lg shadow-lg overflow-x-hidden whitespace-wrap text-ellipsis ::-webkit-scrollbar-track:rounded-lg ::-webkit-scrollbar-color-[#0055ff] animation transition-colors duration-1000">
                     <div role="menu" aria-orientation="vertical">
                         <div role="menuitem" class="flex items-center m-1.5 p-2.5 text-sm cursor-pointer focus-visible:outline-0 radix-disabled:pointer-events-none radix-disabled:opacity-50 group relative hover:bg-gray-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-700 radix-state-open:bg-zinc-700 rounded-md py-3 px-3 gap-2.5 border-x-2 border-x-[#00aeff] transition-colors duration-1000" tabindex="-1" data-value="Qwen/Qwen2.5-72B-Instruct">
                             <div class="flex grow items-center justify-between gap-2">
@@ -104,7 +108,7 @@
                                     </div>
                                     <div>
                                     Basic mode <sub><span class="text-yellow-500 text-xl">{</span>
-                                <span class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-700 to-orange-400 text-sm"> <span class="">Qwen2.5-72B-Instruct<span class="text-orange-500 text-xl">}</span></sub>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-700 to-orange-400 text-sm"> <span class="font-mono">Qwen2.5-72B-Instruct<span class="text-orange-500 text-xl">}</span></sub>
                                     <div class="text-gray-500 dark:text-gray-400 text-xs">Default conversation model</div>
                                     </div>
                                 </div>
@@ -120,7 +124,7 @@
                                 </div>
                                 <div>
                                 Coding mode <sub><span class="text-yellow-500 text-xl">{</span>
-                                <span class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-700 to-orange-400 text-sm"> <span class="">Qwen2.5-Coder-32B-Instruct<span class="text-orange-500 text-xl">}</span></sub>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-700 to-orange-400 text-sm"> <span class="font-mono">Qwen2.5-Coder-32B-Instruct<span class="text-orange-500 text-xl">}</span></sub>
                                 <div class="text-gray-500 dark:text-gray-400 text-xs">Supports advanced coding tasks</div>
                                 </div>
                             </div>
@@ -293,7 +297,7 @@
                                 </div>
                                 <div>
                                 Vision <sub><span class="text-yellow-500 text-xl">{</span>
-                                <span class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-700 to-orange-400 text-sm"> <span class="">Llama-3.2-11B-Vision-Instruct<span class="text-orange-500 text-xl">}</span></sub>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-700 to-orange-400 text-sm"> <span class="font-mono">Llama-3.2-11B-Vision-Instruct<span class="text-orange-500 text-xl">}</span></sub>
                                 <div class="text-gray-500 dark:text-gray-400 text-xs">The latest multimodal model from Meta! Supports image inputs natively.</div>
                                 </div>
                             </div>
@@ -384,7 +388,7 @@
                             <div class="flex-1 h-px bg-gradient-to-r from-[#55ff7f] to-[#0055ff]"></div>
                         </div>
 
-                        <div class="mx-5 my-2 text-sm text-center font-mono text-[#5e01ff] font-semibold">
+                        <div class="mx-5 my-2 text-sm text-center font-mono text-[#5e01ff] dark:text-[#aaaaff] font-semibold">
                             <p>Mistral models</p>
                         </div>
 
@@ -395,7 +399,7 @@
                                         <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="../assets/mistral-logo.png" alt="mistral-large-latest logo">
                                     </div>
                                     <div>
-                                    mistral-large-latest <sup class="text-green-400 font-bold">Recommended</sup>
+                                    mistral-large-latest <sup class="text-green-400 font-mono">Recommended</sup>
                                     <div class="text-gray-500 dark:text-gray-400 text-xs">The latest iteration of the large LLM.</div>
                                     </div>
                                 </div>
@@ -635,7 +639,7 @@
                                         <img class="overflown aspect-square size-6 rounded-full border dark:border-gray-700" src="../assets/mistral-logo.png" alt="codestral-2501 logo">
                                     </div>
                                     <div>
-                                    codestral-latest <sup class="text-green-400 font-bold"><i class="text-sky-500">@</i>Recommended</sup>
+                                    codestral-latest <sup class="text-green-400 font-bold"><i class="text-sky-500 font-mono">@</i>Recommended</sup>
                                     <div class="text-gray-500 dark:text-gray-400 text-xs">Latest coding-focused model.</div>
                                     </div>
                                 </div>
@@ -753,7 +757,7 @@
                             <div class="flex-1 h-px bg-gradient-to-r from-[#00ff26] to-[#0011ff]"></div>
                         </div>
 
-                        <div class="mx-5 my-2 text-sm text-center font-mono text-[#00aa7f] font-semibold">
+                        <div class="mx-5 my-2 text-sm text-center font-mono text-[#00aa7f] dark:text-[#00fdba] font-semibold">
                             <p>Mistral Moderation models</p>
                         </div>
                         <!-- Mistral Moderation-->
@@ -779,10 +783,10 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm12-8v2a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" />
                                 </svg>
                             </div>
-                            <div class="flex-1 h-px bg-gradient-to-r from-[#5454ff] to-[#0011ff]"></div>
+                            <div class="flex-1 h-px bg-gradient-to-r from-[#5454ff] dark:from-[#aaaaff] to-[#0011ff] dark:to-[#0055ff]"></div>
                         </div>
 
-                        <div class="mx-5 my-2 text-sm text-center font-mono text-[#aa20ff] font-semibold">
+                        <div class="mx-5 my-2 text-sm text-center font-mono text-[#aa20ff] dark:text-[#ffaaff] font-semibold">
                             <p>Mistral embedding models</p>
                         </div>
                         <!--Mistral embed -->
@@ -868,7 +872,7 @@
 
 
     <!-- Conversation Pane -->
-    <div id="conversationPane" class="fixed top-[10vh] h-[90vh] left-0 rounded-r-lg w-fit max-w-[45%] sm:max-w-[40vw] md:max-w-[30vw] lg:max-w-[20vw] bg-teal-900 dark:bg-stone-950 p-4 transform -translate-x-full transition duration-300 ease-in-out z-40 border-r-2 border-y-2 border-sky-300 dark:border-gray-600 shadow-md overflow-hidden transition-colors duration-1000">
+    <div id="conversationPane" class="fixed top-[10vh] h-[90vh] left-0 rounded-r-lg w-fit max-w-[45%] sm:max-w-[40vw] md:max-w-[30vw] lg:max-w-[20vw] bg-teal-900 dark:bg-stone-950 p-4 transform -translate-x-full transition duration-500 ease-in-out z-40 border-r-2 border-y-2 border-sky-300 dark:border-gray-600 shadow-md overflow-hidden">
         <section class="fixed w-full bg-indigo-800 dark:bg-cyan-950 mb-8 left-0 top-[0vh] z-50">
             <div class="relative flex space-x-2 w-full">
                 <h2 class="text-2xl p-1 font-bold bg-gradient-to-r from-blue-400 to-pink-400 dark:from-cyan-400 dark:to-cyan-400 bg-clip-text text-transparent">Chats</h2>
@@ -995,6 +999,22 @@
                     <button id="microphone" class="mx-2">
                         <svg id="microphoneSVG" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="stroke-blue-600 dark:stroke-cyan-400 hover:stroke-sky-800 dark:hover:stroke-sky-200 w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                        </svg>
+                    </button>
+
+                    <!-- Toolbar button with SVG icon -->
+                    <button
+                    id='diagToggle'
+                    class="px-1 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 bg-blue-200 dark:bg-teal-700 rounded-md"
+                    aria-label="Open Diagram modal"
+                    aria-label="Open Diagram modal">
+                        <!-- SVG: Nodes/Flow Diagram -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-8 text-gray-800 dark:text-gray-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <circle cx="5" cy="12" r="2" stroke-width="2" />
+                            <circle cx="12" cy="5" r="2" stroke-width="2" />
+                            <circle cx="12" cy="19" r="2" stroke-width="2" />
+                            <circle cx="19" cy="12" r="2" stroke-width="2" />
+                            <path d="M7 12h4M13 5v2M13 19v-2M17 12h-4" stroke-width="2" stroke-linecap="round" />
                         </svg>
                     </button>
 
@@ -1505,6 +1525,19 @@
         </div>
     </div>
 
+    <!--DiagView Modal Wrapper -->
+    <div id="diagViewModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-all duration-1000 z-40 translate-x-full opacity-0">
+        <section class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-3xl w-full h-[90vh] overflow-hidden relative">
+            <button
+                onclick="closediagViewModal();"
+                class="absolute top-1 right-3 text-white bg-red-600 hover:bg-red-700 px-2 py-1 rounded z-30"
+            >Close</button>
+            <div class="w-full h-full overflow-auto">
+                <div id="modal-content" class="p-4 flex flex-col"></div>
+            </div>
+        </section>
+    </div>
+
 </main>
 </body>
 <script src="js/packed_hfaudio.js"></script>
@@ -1516,4 +1549,5 @@
 <script src="js/simulator.js"></script>
 <script src="js/apiUtils.js"></script>
 <script src="js/animations/DotSphereAnim.js"></script>
+<script src="js/diagraming/packed_dotDraw.js"></script>
 </html>
