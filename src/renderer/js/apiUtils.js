@@ -187,7 +187,7 @@ function SuccessModal(action="close", message=null, timeout=null, restart=false)
     const modalBox = document.getElementById('successModalContent');
 
     //Deactivate restart button if restart not required
-    (restart) ? document.getElementById('restartBt').classList.remove('hidden') : '';
+    (restart===true) ? document.getElementById('restartBt').classList.remove('hidden') : '';
 
     if (action === "show"){
         if (message){
@@ -210,3 +210,4 @@ function SuccessModal(action="close", message=null, timeout=null, restart=false)
 }
 
 document.addEventListener('DOMContentLoaded', loadKeys);
+window.SuccessModal = SuccessModal;

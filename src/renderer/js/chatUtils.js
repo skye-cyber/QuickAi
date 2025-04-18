@@ -22,7 +22,7 @@ renderer.code = function(code) {
 	let jsonLang = (validLanguage.endsWith('-draw') || validLanguage === 'dot') ? validLanguage : null;
 	validLanguage = jsonLang ? validLanguage.slice(0, -5) : validLanguage;
 
-	console.log('jsonLang:', jsonLang, 'validLang:', validLanguage);
+	//console.log('jsonLang:', jsonLang, 'validLang:', validLanguage);
 
 	// Highlight the code
 	let highlighted;
@@ -50,8 +50,8 @@ renderer.code = function(code) {
 	//const bg = validLanguage && ['css', 'html'].includes(validLanguage) ? 'dark:bg-[#000000]' : 'dark:bg-[#161420]';
 	console.log(validLanguage)
 	return `
-		<div class="my-2 block bg-gray-200 dark:bg-zinc-800  rounded-md">
-		<section class="flex justify-between top-1 p-1 w-full bg-gray-300 rounded-t-md dark:bg-slate-700 box-border">
+		<div class="my-2 block bg-blue-300 dark:bg-[#171717]  rounded-md">
+		<section class="flex justify-between top-1 p-1 w-full bg-sky-300 rounded-t-md dark:bg-[#222222] box-border">
 		<!-- Language -->
 		<p class="code-language p-1 justify-start rounded-md text-slate-950 dark:text-white rounded-lg font-normal text-sm cursor-pointer opacity-80 hover:opacity-50">
 		${validLanguage}
@@ -77,7 +77,7 @@ renderer.code = function(code) {
 			` : ''}
 
 			<!-- Copy button -->
-			<button id="${copyButtonId}" onclick='window.handleCodeCopy(this);' class="copy-button flex items-center rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 text-sm text-white cursor-pointer transform transition-all duration-700">
+			<button id="${copyButtonId}" onclick="window.handleCodeCopy(this, '${renderButtonId}');" class="copy-button flex items-center rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 text-sm text-white cursor-pointer transform transition-all duration-700">
 			<svg class="mt-1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy mr-1">
 			<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
 			<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -86,14 +86,14 @@ renderer.code = function(code) {
 			</button>
 		</div>
 		</section>
-		<div class="p-2 border border-gray-300 dark:border-none w-full bg-white dark:bg-[#14121e] rounded-md rounded-t-none overflow-auto scrollbar-hide transition-colors duration-700">
-		<code data-value=${renderButtonId} class="p-2 hljs ${validLanguage} block whitespace-pre bg-white dark:bg-[#14121e] font-mono transition-colors duration-700">${highlighted}</code>
+		<div class="p-2 border border-[#00ffff] dark:border-none w-full bg-sky-200 dark:bg-[#171717] rounded-md rounded-t-none overflow-auto scrollbar-hide transition-colors duration-700">
+		<code data-value=${renderButtonId} class="p-2 hljs ${validLanguage} block whitespace-pre rounded-md bg-sky-200 dark:bg-[#171717] font-mono transition-colors duration-700 overflow-x-auto">${highlighted}</code>
 		</div>
 		</div>
 		`;
 };
 
-// Configure marked.js
+// Configure marked.js white
 marked.setOptions({
 	renderer: renderer,
 	breaks: true,
@@ -103,7 +103,7 @@ marked.setOptions({
 function addCopyListeners() {
 	document.querySelectorAll('.copy-button').forEach(button => {
 		button.addEventListener('click', async function() {
-			const codeBlock = this.parentNode.nextElementSibling.querySelector('code');
+			const codeBlock = this.parentNode.parentNode.nextElementSibling.querySelector('code');
 			const textToCopy = codeBlock.innerText;
 			const button = document.getElementById(this.id);
 			try {
@@ -120,8 +120,10 @@ function addCopyListeners() {
 	});
 }
 
-async function handleCodeCopy(element){
-		const codeBlock = element.parentNode.nextElementSibling.querySelector('code');
+async function handleCodeCopy(element, id=null){
+	console.log(id)
+	const codeBlock = document.querySelector(`[data-value="${id}"]`);
+	console.log(codeBlock)
 	const textToCopy = codeBlock.innerText;
 	const button = document.getElementById(element.id);
 	try {
@@ -385,14 +387,14 @@ function showCopyModal(_color=null, text="Text copied") {
 	// Slide modal to 20% height and make it visible after 1 second
 	setTimeout(() => {
 		modal.classList.add('top-1/5', 'opacity-100', 'pointer-events-auto');
-	}, 300); // 1 second delay
+	}, 500); // 1 second delay
 
 	// Slide modal to the left and fade out after 5 seconds
 	setTimeout(() => {
 		modal.classList.remove('top-1/5', 'left-1/2', '-translate-x-1/2');
 		modal.classList.add('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
 
-	}, 2000); // 5 seconds for staying in the middle plus 1 second delay
+	}, 4000); // 5 seconds for staying in the middle plus 1 second delay
 
 	// Reset transform after fully fading out and moving off-screen
 	setTimeout(() => {

@@ -201,7 +201,7 @@ class ConversationManager {
             userText = content.slice(-1) === ']' ? content.substring(0, content.length - 22) : content
         }
         const messageHtml = `
-            <div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl transition-colors duration-1000">
+            <div data-id="${userMessageId}" class="${userMessageId} relative bg-[#566fdb] dark:bg-[#142384] text-black dark:text-white rounded-lg rounded-br-none p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl transition-colors duration-1000">
                 <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.escapeHTML(userText)}</p>
                 <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
                 Copy
@@ -257,7 +257,7 @@ class ConversationManager {
         aiMessage.innerHTML = `
                 <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
 					${hasThinkTag || thinkContent ? `
-						<div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl transition-colors duration-1000">
+						<div class="think-section bg-blue-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl transition-colors duration-1000">
 						<div class="flex items-center justify-between">
 						<strong style="color: #007bff;">Thoughts:</strong>
 						<button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
@@ -276,7 +276,7 @@ class ConversationManager {
 						` : ''}
 						${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
 						${actualResponse ? `
-							<div class="${aiMessageId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
+							<div class="${aiMessageId} bg-blue-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4">
 							${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
 							<p style="color: #333;">${window.marked(actualResponse)}</p>
 							<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">

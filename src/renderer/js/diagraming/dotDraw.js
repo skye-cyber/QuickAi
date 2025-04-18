@@ -125,26 +125,32 @@ async function handleDiagrams(input, mode = 'both', isPlainCode = false) {
 }
 
 async function renderWithViz(dotCode, Cname, desc = null) {
-    // Create a Viz instance
-    const viz = new Viz();
+    try{
+        // Create a Viz instance
+        const viz = new Viz();
 
-    // Render the DOT code to SVG and insert into the page
-    viz.renderSVGElement(dotCode)
-        .then(function(element) {
-            const section = document.createElement('section')
-            const title = document.createElement('p');
-            title.id = Cname;
-            title.className = `bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400 transition-all duration-1000`
-            title.textContent = `Name: ${Cname}`
-            section.className = `block p-2 border border-blue-400`
-            section.appendChild(title);
-            section.appendChild(element);
-            diagViewContent.appendChild(section);
-        })
-        .catch(error => {
-            // Handle or display errors
-            console.error("Error rendering diagram:", error);
-        });
+        // Render the DOT code to SVG and insert into the page
+        viz.renderSVGElement(dotCode)
+            .then(function(element) {
+                const section = document.createElement('section')
+                const title = document.createElement('p');
+                title.id = Cname;
+                title.className = `bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400 transition-all duration-1000`
+                title.textContent = `Name: ${Cname}`
+                section.className = `block p-2 border border-blue-400`
+                section.appendChild(title);
+                section.appendChild(element);
+                diagViewContent.appendChild(section);
+            })
+            .catch(error => {
+                // Handle or display errors
+                console.error("Error rendering diagram:", error);
+            });
+
+            //show success message
+            window.showCopyModal(null, message="Rendered ✅... Open DiagView modal to view", 700);
+    }catch(err){console.error(err)
+    }
 }
 
 async function renderWithCytoscape(graphJson, Cname, desc = '') {
@@ -272,6 +278,8 @@ async function renderWithCytoscape(graphJson, Cname, desc = '') {
         cy.style(window.isDark ? darkStyle : lightStyle).update();
     });
 
+    //show success message
+    window.showCopyModal(null, message="Rendered ✅... Open DiagView modal to view", 700);
     }catch(err){
         console.log("Error rendering diagram :", err)
     }

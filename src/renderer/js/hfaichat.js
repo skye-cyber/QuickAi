@@ -53,7 +53,7 @@ async function routeToHf(text) {
 	} else {
 		//console.log(typeof(escapedText))
 		userMessage.innerHTML = `
-			<div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
+			<div data-id="${userMessageId}" class="${userMessageId} relative bg-[#566fdb] dark:bg-[#142384] text-black dark:text-white rounded-lg rounded-br-none p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
 			<p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${escapedText}</p>
 			<button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80 " onclick="CopyAll('.${userMessageId}', this)">
 			Copy
@@ -166,7 +166,7 @@ async function routeToHf(text) {
 					aiMessage.innerHTML = `
 							<section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
 							${isThinking || thinkContent ? `
-								<div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 lg:max-w-6xl transition-colors duration-1000">
+								<div class="think-section bg-blue-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 lg:max-w-6xl transition-colors duration-1000">
 								<div class="flex items-center justify-between">
 								<strong style="color: #007bff;">Thoughts:</strong>
 								<button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
@@ -185,7 +185,7 @@ async function routeToHf(text) {
 								` : ''}
 								${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
 								${actualResponse ? `
-									<div class="${aiMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4 transition-colors duration-1000">
+									<div class="${aiMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-1000">
 									${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
 									<p style="color: #333;">${window.marked(actualResponse)}</p>
 									<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
@@ -424,7 +424,7 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 				visionMs += choice.delta.content;
 				VisionMessage.innerHTML = `
 					<section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-					<div class="${VisionMessageUId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl transition-colors duration-1000">${window.marked(visionMs)}
+					<div class="${VisionMessageUId} bg-blue-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl transition-colors duration-1000">${window.marked(visionMs)}
 						<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
 							<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
 								<div
@@ -542,7 +542,7 @@ function addUserMessage(text, fileType, fileDataUrl, fileContainerId) {
 	const userMessage = document.createElement("div");
 	userMessage.classList.add("flex", "justify-end", "mb-4");
 	const messageHtml = `
-		<div data-id="${VisionUserMessageUId}" class="${VisionUserMessageUId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
+		<div data-id="${VisionUserMessageUId}" class="${VisionUserMessageUId} relative bg-[#566fdb] dark:bg-[#142384] text-black dark:text-white rounded-lg rounded-br-none p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
 		<p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.escapeHTML(text)}</p>
 		<button id="${VisioncopyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${VisionUserMessageUId}', this)">
 		Copy

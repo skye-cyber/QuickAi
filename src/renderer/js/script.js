@@ -1,8 +1,10 @@
 const modelChange = new CustomEvent('ModelChange');
 document.addEventListener('DOMContentLoaded', function() {
-    for (const item of ['chatStore', 'keyshortcuts', 'preference', 'fileHandler', 'diagraming/visualUtils', 'diagraming/packed_dotDraw']) {
+    for (const item of ['chatStore', 'keyshortcuts', 'preference', 'fileHandler', 'diagraming/visualUtils', 'diagraming/packed_dotDraw',
+                        'setup/setup']) {
         addScripts(item);
     }
+
     const modal = document.getElementById("settingsModal");
     const themeSwitch = document.getElementById("themeSwitch");
     const rootElement = document.documentElement;
@@ -15,17 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const modelItems = document.querySelectorAll('[data-value]');
     const selectedModelText = document.getElementById('selectedModelText');
     const model = document.getElementById('model');
-
-    // Set default model to codestral-latest
-    const defaultModel = document.querySelector('[data-value="mistral-large-latest"]');
-
-    if (defaultModel) {  // Check if element exists
-        setTimeout(()=>{
-        defaultModel.click();  // Added parentheses for method call
-        }, 40);
-    } else {
-        console.error('Element with data-value="codestral-latest" not found!');
-    }
 
     // Query map for button actions
     const queryMap = {

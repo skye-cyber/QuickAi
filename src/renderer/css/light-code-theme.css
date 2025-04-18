@@ -1,11 +1,8 @@
-.hljs {
-    padding: 10px;
-    border-radius: 8px;
-    overflow-x: auto;
-    line-height: 1.5;
-    font-family: 'Fira Code', monospace;
+/*.hljs {
+ background-color: v*ar('bg-blue-200');
+ border-radius: 8px;
 }
-
+*/
 .hljs-tag {
     color: #1976d2;
 }
