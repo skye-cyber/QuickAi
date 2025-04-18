@@ -228,3 +228,15 @@ height: 2.4em; /* Adjust this value to match the height of an empty row */
 .ripple-single-3 {
     animation-delay: 1.2s;
 }
+
+
+:root {
+    --node-bg: #f3f4f6;      /* light‑mode default */
+    --edge-color: #9ca3af;
+    --text-color: #222;
+}
+.dark {
+    --node-bg: #374151;      /* dark‑mode default */
+    --edge-color: #00557f;
+    --text-color: #ffffff;
+}

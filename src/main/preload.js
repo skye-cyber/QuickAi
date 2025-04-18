@@ -60,6 +60,55 @@ function VSystem_init(previewOn = 'false', verbosity='low'){
     ---
 
     - Date/time should not be indicated in your response unless requested upon which you will get it from the last user message
+    ---
+    Diagram‐Generation Instructions
+
+    When asked to produce a diagram, your response must be exactly one fenced code block, with both an opening and a closing fence. Nothing else. No extra whitespace or text outside the fences.
+
+    Choose one format—either DOT or Cytoscape JSON—never both:
+
+    DOT
+
+    \`\`\`dot
+    // Short title comment (required)
+    digraph G {
+        rankdir=TB;
+        …valid DOT here…
+    }
+    \`\`\`
+    !important **\`rankdir\` must always be set to \`TB\` (Top to Bottom layout)**. Never use \`LR\`, \`RL\`, or \`BT\`. This is a strict requirement.
+    Cytoscape JSON
+
+    \`\`\`json-draw
+    // Short title comment (required)
+    {
+        "elements": [
+            { "data": { "id": "A", "label": "Start" } },
+            { "data": { "source": "A", "target": "B", "label": "to B" } }
+        ],
+        "meta": { "layout": "breadthfirst", "orientation": "LR" }
+    }
+    \`\`\`
+    Fences must match:
+
+    Opening: three backticks + language tag (dot or json-draw), then newline.
+
+    Closing: newline + three backticks.
+
+    Example:
+    \`\`\`dot
+    // Title
+    digraph G { A -> B; }
+
+    Missing closing fence is invalid.
+
+    First‐line comment (// or #) inside the block is required and will be used as the diagram’s title.
+
+    After generation, the diagram will auto‐render in the modal, and the user can also click the “Render” button next to the code block.
+
+    NOTE: Any deviation from given format (including missing \`rankdir=TB\`) will be rejected by the renderer or degrade desirability of outcome.
+
+    Fail‐safe: Before returning your answer, always check that your output ends with a line containing exactly three backticks (\`\`\`). If it doesn’t, add it.
     `;
     return VSystem_init
 }
@@ -160,6 +209,55 @@ function CSystem_init(previewOn = 'false', verbosity='low'){
     17.Date/time should not be indicated in your response unless requested upon which you will get it from the last user message
     18. Avoid previews that may interfere with current page layout, for example a modal that blocks interraction to the page.
     `: ""}
+    ---
+    Diagram‐Generation Instructions
+
+    When asked to produce a diagram, your response must be exactly one fenced code block, with both an opening and a closing fence. Nothing else. No extra whitespace or text outside the fences.
+
+    Choose one format—either DOT or Cytoscape JSON—never both:
+
+    DOT
+
+    \`\`\`dot
+    // Short title comment (required)
+    digraph G {
+        rankdir=TB;
+        …valid DOT here…
+    }
+    \`\`\`
+    !important **\`rankdir\` must always be set to \`TB\` (Top to Bottom layout)**. Never use \`LR\`, \`RL\`, or \`BT\`. This is a strict requirement.
+    Cytoscape JSON
+
+    \`\`\`json-draw
+    // Short title comment (required)
+    {
+        "elements": [
+        { "data": { "id": "A", "label": "Start" } },
+        { "data": { "source": "A", "target": "B", "label": "to B" } }
+        ],
+        "meta": { "layout": "breadthfirst", "orientation": "LR" }
+    }
+    \`\`\`
+    Fences must match:
+
+    Opening: three backticks + language tag (dot or json-draw), then newline.
+
+    Closing: newline + three backticks.
+
+    Example:
+    \`\`\`dot
+    // Title
+    digraph G { A -> B; }
+
+    Missing closing fence is invalid.
+
+    First‐line comment (// or #) inside the block is required and will be used as the diagram’s title.
+
+    After generation, the diagram will auto‐render in the modal, and the user can also click the “Render” button next to the code block.
+
+    NOTE: Any deviation from given format (including missing \`rankdir=TB\`) will be rejected by the renderer or degrade desirability of outcome.
+
+    Fail‐safe: Before returning your answer, always check that your output ends with a line containing exactly three backticks (\`\`\`). If it doesn’t, add it.
 `;
 return CSystem_init
 }
@@ -363,7 +461,7 @@ contextBridge.exposeInMainWorld('electron', {
             const scriptElement = document.createElement('script');
             scriptElement.src = script;
             scriptElement.async = true; // Optional: load the script asynchronously
-            document.body.appendChild(script);
+            document.body.appendChild(scriptElement);
         });
     },
     addScript: (script_name, animation=false) => {
@@ -374,10 +472,10 @@ contextBridge.exposeInMainWorld('electron', {
         animation ? console.log(`Toggle Animation: ON`) : console.log(`${script_name} ADDED.`);
         document.body.appendChild(script);
     },
-    AnimationReadyDispatch: ()=>{
+    ThemeChangeDispatch: ()=>{
         // Dispatch a custom event 'animationReady' on the element
-        const event = new CustomEvent('animationReady');
-        element.dispatchEvent(event);
+        const event = new CustomEvent('ThemeChange');
+        document.dispatchEvent(event);
     },
     removeScript: (script_name) => {
         const scripts = document.getElementsByTagName('script');

@@ -7,7 +7,7 @@ hljs.configure({ ignoreUnescapedHTML: true });
 const renderer = new marked.Renderer();
 renderer.code = function(code) {
 	// Handle case where `code` is an object
-	const validLanguage = code.lang || 'plaintext';
+	let validLanguage = code.lang || 'plaintext';
 	//console.log(`Language: ${validLanguage}`);
 	if (typeof code === "object" && code.text !== undefined) {
 		code = code.text; // Extract the actual code
@@ -19,10 +19,17 @@ renderer.code = function(code) {
 
 	}
 
+	let jsonLang = (validLanguage.endsWith('-draw') || validLanguage === 'dot') ? validLanguage : null;
+	validLanguage = jsonLang ? validLanguage.slice(0, -5) : validLanguage;
+
+	console.log('jsonLang:', jsonLang, 'validLang:', validLanguage);
+
 	// Highlight the code
 	let highlighted;
 	try {
+
 		highlighted = hljs.highlight(code, { language: validLanguage }).value;
+
 	} catch (error) {
 		if (error.message === "Unknown language") {
 			console.log("Undetermined language")
@@ -33,10 +40,15 @@ renderer.code = function(code) {
 		}
 	}
 
+	// Reset language to json-draw
+	validLanguage = jsonLang ? jsonLang : validLanguage
+
 	// Generate unique ID for the copy button
 	const copyButtonId = `copy-button-${Math.random().toString(36).substring(2, 9)}`;
-	//const bg = validLanguage && ['css', 'html'].includes(validLanguage) ? 'dark:bg-[#000000]' : 'dark:bg-[#161420]';
+	const renderButtonId = `render-button-${Math.random().toString(36).substring(2, 9)}`;
 
+	//const bg = validLanguage && ['css', 'html'].includes(validLanguage) ? 'dark:bg-[#000000]' : 'dark:bg-[#161420]';
+	console.log(validLanguage)
 	return `
 		<div class="my-2 block bg-gray-200 dark:bg-zinc-800  rounded-md">
 		<section class="flex justify-between top-1 p-1 w-full bg-gray-300 rounded-t-md dark:bg-slate-700 box-border">
@@ -44,17 +56,38 @@ renderer.code = function(code) {
 		<p class="code-language p-1 justify-start rounded-md text-slate-950 dark:text-white rounded-lg font-normal text-sm cursor-pointer opacity-80 hover:opacity-50">
 		${validLanguage}
 		</p>
-		<!-- Copy button -->
-		<button id="${copyButtonId}" onclick='window.handleCodeCopy(this);' class="copy-button flex justify-end rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 text-sm text-white cursor-pointer">
-		<svg class="mt-1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy mr-1">
-		<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-		<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-		</svg>
-		<p id="BtText">copy</p>
-		</button>
+		<div class="flex justify-between space-x-3"
+		${(jsonLang) ? `
+			<!-- Render Button -->
+			<button
+			id="${renderButtonId}"
+			onclick="window.handleDiagrams(this, '${validLanguage==='dot' ? 'dot' : 'json'}', isPlainCode=true)"
+			class="render-button flex items-center gap-1 rounded-md p-1 bg-gradient-to-r from-[#00aaff] to-purple-700 hover:to-[#55ff00] text-sm text-white cursor-pointer transform transition-all duration-700"
+			>
+			<!-- Network / Diagram Icon -->
+			<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+			<circle cx="12" cy="5" r="2" />
+			<circle cx="5" cy="19" r="2" />
+			<circle cx="19" cy="19" r="2" />
+			<line x1="12" y1="7" x2="5" y2="17" />
+			<line x1="12" y1="7" x2="19" y2="17" />
+			</svg>
+			<p id="BtText">Render</p>
+			</button>
+			` : ''}
+
+			<!-- Copy button -->
+			<button id="${copyButtonId}" onclick='window.handleCodeCopy(this);' class="copy-button flex items-center rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 text-sm text-white cursor-pointer transform transition-all duration-700">
+			<svg class="mt-1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy mr-1">
+			<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+			<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+			</svg>
+			<p id="BtText">copy</p>
+			</button>
+		</div>
 		</section>
-		<div class="p-2 border border-gray-300 dark:border-none w-full bg-white dark:bg-[#14121e] rounded-md rounded-t-none overflow-auto scrollbar-hide">
-		<code class="p-2 hljs ${validLanguage} block whitespace-pre bg-white dark:bg-[#14121e] font-mono">${highlighted}</code>
+		<div class="p-2 border border-gray-300 dark:border-none w-full bg-white dark:bg-[#14121e] rounded-md rounded-t-none overflow-auto scrollbar-hide transition-colors duration-700">
+		<code data-value=${renderButtonId} class="p-2 hljs ${validLanguage} block whitespace-pre bg-white dark:bg-[#14121e] font-mono transition-colors duration-700">${highlighted}</code>
 		</div>
 		</div>
 		`;
@@ -63,25 +96,6 @@ renderer.code = function(code) {
 // Configure marked.js
 marked.setOptions({
 	renderer: renderer,
-	highlight: function(code) {
-		// Handle case where `code` is an object
-		const validLanguage = code.lang || 'plaintext';
-		if (typeof code === "object" && code.text !== undefined) {
-			code = code.text; // Extract the actual code
-		}
-
-		if (typeof code !== "string" || code.trim() === "") {
-			console.warn("Empty or invalid code provided:", code);
-			code = "// No code provided"; // Default fallback for empty code
-		}
-
-		try {
-			return hljs.highlight(code, { language: validLanguage }).value;
-		} catch (error) {
-			console.error("Highlighting error:", error);
-			return hljs.highlightAuto(code).value; // Fallback to auto-detection
-		}
-	},
 	breaks: true,
 });
 
@@ -433,7 +447,7 @@ function escapeHTML(unsafe) {
 	}
 	return unsafe
 	.replace(/&/g, "&amp;")
-	.replace(/\n/g, "<br>")
+	.replace(/\n+/g, '\n')  // 1+ newlines → 1 newline
 	.replace(/</g, "&lt;")
 	.replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;")

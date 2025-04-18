@@ -1,6 +1,6 @@
 const modelChange = new CustomEvent('ModelChange');
 document.addEventListener('DOMContentLoaded', function() {
-    for (const item of ['chatStore', 'keyshortcuts', 'preference', 'fileHandler', 'diagraming/visualUtils']) {
+    for (const item of ['chatStore', 'keyshortcuts', 'preference', 'fileHandler', 'diagraming/visualUtils', 'diagraming/packed_dotDraw']) {
         addScripts(item);
     }
     const modal = document.getElementById("settingsModal");
@@ -15,6 +15,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const modelItems = document.querySelectorAll('[data-value]');
     const selectedModelText = document.getElementById('selectedModelText');
     const model = document.getElementById('model');
+
+    // Set default model to codestral-latest
+    const defaultModel = document.querySelector('[data-value="mistral-large-latest"]');
+
+    if (defaultModel) {  // Check if element exists
+        setTimeout(()=>{
+        defaultModel.click();  // Added parentheses for method call
+        }, 40);
+    } else {
+        console.error('Element with data-value="codestral-latest" not found!');
+    }
 
     // Query map for button actions
     const queryMap = {
@@ -59,14 +70,21 @@ document.addEventListener('DOMContentLoaded', function() {
     //Set code these styleSheet
     window.electron.addCodeThemeSheet(currentTheme);
 
+
     // Function to set the theme
     function setTheme(theme) {
+
         if (theme === "dark") {
             rootElement.classList.add("dark");
             themeSwitch.checked = true;
+            window.isDark = true;
         } else {
             rootElement.classList.remove("dark");
+            window.isDark = false;
         }
+
+        window.electron.ThemeChangeDispatch()
+
         localStorage.setItem("theme", theme);
     }
 
@@ -201,7 +219,6 @@ function selectModel(value) {
 
 }
 
-window.selectModel = selectModel;
 // Event listener for button click to toggle dropdown
 modelButton.addEventListener('click', toggleDropdown);
 
@@ -228,6 +245,7 @@ modelItems.forEach(item => {
 
 // Initial selection based on the select element's default value
 selectModel(model.value);
+window.selectModel = selectModel;
 
 const animationToggle = document.getElementById('animation-toggle');
 
@@ -247,7 +265,6 @@ animationTogglePeer.addEventListener('click', ()=>{
     }
 })
 });
-
 
 // Function to show the modal
 function Notify(_color=null, time=null, text="") {
@@ -279,9 +296,6 @@ function Notify(_color=null, time=null, text="") {
 }
 
 
-//Store Notify to window
-window.Notify = Notify;
-
 // Function to toggle the fold/unfold of the think section
 function toggleFold(event, selector) {
     const content = document.getElementById(selector);
@@ -291,3 +305,6 @@ function toggleFold(event, selector) {
 }
 // Make toggleFold available to the window
 window.toggleFold = toggleFold;
+
+//Store Notify to window
+window.Notify = Notify;

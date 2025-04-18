@@ -4,218 +4,127 @@ const graphlibDot = require('graphlib-dot');
 
 const diagViewContent = document.getElementById('modal-content');
 
-// 1) Define two stylesheets:
-const lightStyle = [
-    { selector: 'node', style: { 'background-color': 'data(fillColor)', 'color': '#000', 'content': 'data(label)' } },
-    { selector: 'edge', style: { 'line-color': '#888', 'curve-style': 'bezier' } }
-];
-const darkStyle = [
-    { selector: 'node', style: { 'background-color': 'data(fillColor)', 'color': '#fff', 'content': 'data(label)' } },
-    { selector: 'edge', style: { 'line-color': '#ccc', 'curve-style': 'bezier' } }
-];
 
-const dotCodes = [`\`\`\`dot\n
-digraph G {
-    A -> B;
-    B -> C;
-    C -> A;
-    D [shape=box, label="Node D"];
-    A -> D;
-}
-\`\`\``,
-    `\`\`\`dot\n
-digraph G {
-    A -> B;
-    B -> C;
-    C -> A;
-    D [shape=box, label="Node D"];
-    A -> D;
-}\`\`\``,
-    `\`\`\`dot\n
-//Complex
-digraph ClassDiagram {
-    node [shape=record, style=filled, fillcolor=lightgrey];
-
-    User [label="{User|user_id: INT|name: STRING|email: STRING|submit_data()}"];
-    FarmData [label="{FarmData|phosphorus : FLOAT | rainfall : FLOAT | temperature : FLOAT | potassium : FLOAT | ph : FLOAT | nitrogen : FLOAT | humidity : FLOAT|analyze_data()}"];
-    SoilData [label="{SoilData| crop : SRING | phosphorus : FLOAT | potassium : FLOAT | ph : FLOAT | nitrogen : FLOAT |evaluate_soil_health()}"];
-    CropRecommendation [label="{CropRecommendation|recommendation_id: INT|crop: STRING|suitability_score: FLOAT|generate_recommendation()}"];
-    SoilHealthEvaluator [label="{SoilHealthEvaluator|crop: STRING|SoilData|suitability_score: FLOAT|generate_evaluation()}"]
-    WeatherForecast [label="{WeatherForecast|forecast_id: INT|date: DATE|temperature: FLOAT|precipitation: FLOAT|get_forecast()}"];
-    ActivityScheduler [label="{ActivityScheduler|activity_id: INT|date: DATE|suggested_activity: STRING|schedule_activity()}"];
-
-    User -> SoilData [label="submits"];
-    User -> FarmData [label="submits"];
-    SoilData -> SoilHealthEvaluator [label="feeds"];
-    FarmData -> CropRecommendation [label="feeds"];
-    WeatherForecast -> ActivityScheduler [label="provides data"];
-    CropRecommendation -> ActivityScheduler [label="informs"];
-}
-\`\`\``,
-    `\`\`\`dot\n
-//sample diagram3
-digraph G {
-    A -> B;
-    B -> C;
-    C -> A;
-    D [shape=box, label="Node D"];
-    A -> D;
-}
-\`\`\``,
-    `\`\`\`dot\n
-//sample diagram3
-digraph G {
-    A -> B;
-    B -> C;
-    C -> A;
-    D [shape=box, label="Node D"];
-    A -> D;
-}
-\`\`\``
-];
-const sample = `
-\`\`\`json-diag
-//sample test
-{
-    "elements": [
-        {
-            "data": {
-                "id": "User",
-                "label": "👤 User",
-                "shape": "square"
-            }
-        },
-        {
-            "data": {
-                "id": "FarmData",
-                "label": "🌾 Farm Data",
-                "type": "entity"
-            }
-        },
-        {
-            "data": {
-                "id": "AIModel",
-                "label": "🤖 AI Model",
-                "type": "service"
-            }
-        },
-        {
-            "data": {
-                "id": "SoilReport",
-                "label": "🧪 Soil Report",
-                "type": "report"
-            }
-        },
-        {
-            "data": {
-                "id": "WeatherAPI",
-                "label": "☁️ Weather API",
-                "type": "external"
-            }
-        },
-        {
-            "data": {
-                "id": "Recommendation",
-                "label": "✅ Crop Recommendation",
-                "type": "result"
-            }
-        },
-        {
-            "data": {
-                "id": "e1",
-                "source": "User",
-                "target": "FarmData",
-                "label": "inputs"
-            }
-        },
-        {
-            "data": {
-                "id": "e2",
-                "source": "FarmData",
-                "target": "AIModel",
-                "label": "feeds"
-            }
-        },
-        {
-            "data": {
-                "id": "e3",
-                "source": "SoilReport",
-                "target": "AIModel",
-                "label": "analyzed by"
-            }
-        },
-        {
-            "data": {
-                "id": "e4",
-                "source": "WeatherAPI",
-                "target": "AIModel",
-                "label": "enriched with"
-            }
-        },
-        {
-            "data": {
-                "id": "e5",
-                "source": "AIModel",
-                "target": "Recommendation",
-                "label": "produces"
-            }
+function fixUnclosedCodeBlocks(text) {
+    const codeBlockPattern = /```(dot|json-draw)[ \t]*\r?\n([\s\S]*?)(```)?(?=\n|$)/gi;
+    return text.replace(codeBlockPattern, (match, lang, body, closing) => {
+        if (!closing) {
+            return `\`\`\`${lang}\n${body.trim()}\n\`\`\``;
         }
-    ],
-    "meta": {
-        "layout": "breadthfirst",
-        "orientation": "LR"
-    }
+        return match;
+    });
 }
-\`\`\``
 
 
+//Extracts json-draw, dot or both
+function extractDiagCodesWithNames(aiResponse, type = 'both') {
+    //console.log('aiRes:', aiResponse)
+    const safeResponse = aiResponse //fixUnclosedCodeBlocks(aiResponse);
+    // 1) Decide which languages to look for
+    const langs =
+        type === 'dot' ? ['dot'] :
+            type === 'json' ? ['json-draw'] :
+                ['dot', 'json-draw'];
 
-dotHandler(sample)
+    // 2) Escape and build the alternation pattern
+    const langPattern = langs
+        .map(l => l.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'))
+        .join('|');
 
+    // 3) Regex that requires a closing ``` (no end‑of‑string fallback)
+    //    - ```(dot|json\-draw)[ \t]*\n     → opening fence + optional spaces + newline
+    //    - ([\s\S]*?)                     → code block (non‑greedy)
+    //    - \n```                          → closing fence on its own line
+    const fenceRe = new RegExp(
+        '```(' + langPattern + ')[ \\t]*\\r?\\n' +
+        '([\\s\\S]*?)' +
+        '\\r?\\n```',
+        'gi'
+    );
 
-function extractDotCodesWithNames(aiResponse) {
-    try {
-        const dotBlocks = [];
+    const results = [];
+    let match;
+    while ((match = fenceRe.exec(safeResponse)) !== null) {
+        const [, lang, rawCode] = match;
+        const lines = rawCode.trim().split(/\r?\n/);
 
-        const dotCodeRegex = /```json-diag\s+([\s\S]*?)```/gi;
-        let match;
-
-        while ((match = dotCodeRegex.exec(aiResponse)) !== null) {
-            const fullCode = match[1].trim();
-
-            // Split into lines and check if first line is a comment
-            const lines = fullCode.split('\n');
-            let name = "Unnamed Diagram";
-
-            const firstLine = lines[0].trim();
-            if (firstLine.startsWith('//') || firstLine.startsWith('#')) {
-                name = firstLine.replace(/^\/{2,}|^#/, '').trim();
-                lines.shift(); // remove name line from code
-            }
-
-            dotBlocks.push({
-                name,
-                code: lines.join('\n').trim()
-            });
+        // Extract first line as name if it’s a comment
+        let name = 'Unnamed Diagram';
+        if (/^\s*(\/\/|#)/.test(lines[0])) {
+            name = lines[0].replace(/^\s*(?:\/\/|#)\s*/, '').trim();
+            lines.shift();
         }
 
-        return dotBlocks;
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-
-async function dotHandler(message) {
-    const dotBlocks = extractDotCodesWithNames(message);
-    if (dotBlocks) {
-        dotBlocks.forEach(block => {
-            renderDiagramCytoscape(block.code, block.name);
+        results.push({
+            lang,               // "dot" or "json-draw"
+            name,
+            code: lines.join('\n').trim()
         });
     }
+    return results;
 }
 
-async function renderDiagramViz(dotCode, Cname, desc = null) {
+function getCodeFromBlock(id){
+    const codeBlock = document.querySelector(`[data-value^="${id}"]`);
+    const codeText = codeBlock.textContent;
+    return codeText ? codeText: ''
+}
+
+/**
+ * Wrap a raw code string in markdown fences for the given language,
+ * unless it’s already fenced.
+ */
+function wrapInFences(text, lang) {
+    const fence = '```' + lang;
+    if (text.trim().startsWith(fence)) {
+        return text;
+    }
+    return `${fence}\n${text.trim()}\n\`\`\``;
+}
+
+/**
+ * Handle either a raw code string (single block) or a full message.
+ *
+ * @param {string} input   – raw code or full message
+ * @param {'dot'|'json'|'both'} mode – what to extract/render
+ */
+async function handleDiagrams(input, mode = 'both', isPlainCode = false) {
+    let toParse = input;
+    //console.log("Input:", input);
+    // If it doesn’t start with a fence, assume it’s raw code
+    if (!/^\s*```/.test(input) && isPlainCode) {
+        input = getCodeFromBlock(input.id);
+        if (mode === 'dot') {
+            toParse = wrapInFences(input, 'dot');
+        } else if (mode === 'json') {
+            toParse = wrapInFences(input, 'json-draw');
+        }
+        // if mode==='both' but no fences, we could wrap twice or default to one—
+        // here we’ll just try parsing both languages from the raw text.
+    }
+
+    // Extract all blocks of the requested types
+    const blocks = extractDiagCodesWithNames(
+        toParse,
+        mode === 'both' ? 'both' : (mode === 'json' ? 'json' : 'dot')
+    );
+
+    if (!blocks || blocks.length === 0) {
+        console.warn('No diagram blocks found.');
+        return;
+    }
+
+    // Render each block with the appropriate engine
+    blocks.forEach(({ name, code, lang }) => {
+        if (lang === 'dot') {
+            renderWithViz(code, name);
+        } else if (lang === 'json-draw') {
+            renderWithCytoscape(code, name);
+        }
+    });
+}
+
+async function renderWithViz(dotCode, Cname, desc = null) {
     // Create a Viz instance
     const viz = new Viz();
 
@@ -223,11 +132,12 @@ async function renderDiagramViz(dotCode, Cname, desc = null) {
     viz.renderSVGElement(dotCode)
         .then(function(element) {
             const section = document.createElement('section')
-            const namesec = document.createElement('p');
-            namesec.className = `bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400`
-            namesec.textContent = `Name goes here ${Cname}`
+            const title = document.createElement('p');
+            title.id = Cname;
+            title.className = `bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400 transition-all duration-1000`
+            title.textContent = `Name: ${Cname}`
             section.className = `block p-2 border border-blue-400`
-            section.appendChild(namesec);
+            section.appendChild(title);
             section.appendChild(element);
             diagViewContent.appendChild(section);
         })
@@ -237,7 +147,7 @@ async function renderDiagramViz(dotCode, Cname, desc = null) {
         });
 }
 
-async function renderDiagramCytoscape(graphJson, Cname, desc = '') {
+async function renderWithCytoscape(graphJson, Cname, desc = '') {
     let graph;
     try {
         graph = JSON.parse(graphJson);
@@ -246,80 +156,126 @@ async function renderDiagramCytoscape(graphJson, Cname, desc = '') {
         return;
     }
 
-    console.log(JSON.stringify(graph.elements.nodes))
     // 🔁 Convert input format to Cytoscape-compatible format
     // Assuming 'graph' has the correct structure now
-    const elements = graph.elements.map(element => ({
-        data: element.data // Access the 'data' part of each element (node or edge)
-    }));
+    // for (const node of graph.elements){
+    try{
+        const elements = graph.elements.map(element => ({
+            data: element.data // Access the 'data' part of each element (node or edge)
+        }));
+    // }
 
 
     // DOM structure
     const section = document.createElement('section');
-    section.className = 'block p-2 border border-blue-400 rounded-md bg-white dark:bg-zinc-900';
+    section.className = 'block p-2 border border-blue-400 rounded-md bg-white dark:bg-zinc-900 transition-all duration-1000';
 
     const title = document.createElement('p');
-    title.className = 'bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400';
+    title.id = Cname;
+    title.className = 'bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400 transition-all duration-1000';
     title.textContent = `Name: ${Cname}`;
     section.appendChild(title);
 
     if (desc) {
         const d = document.createElement('p');
-        d.className = 'text-sm text-gray-500 dark:text-gray-300 italic mb-2';
+        d.className = 'text-sm text-gray-500 dark:text-gray-300 italic mb-2 transition-all duration-1000';
         d.textContent = desc;
         section.appendChild(d);
     }
 
     const graphContainer = document.createElement('div');
     graphContainer.id = `cy-${Cname}`;
-    graphContainer.className = 'h-[400px] w-full rounded-lg bg-gray-50 dark:bg-zinc-800';
+    graphContainer.className = 'h-[400px] w-full rounded-lg bg-gray-50 dark:bg-zinc-800 transition-all duration-1000';
     section.appendChild(graphContainer);
     diagViewContent.appendChild(section);
 
     // Cytoscape setup
+
+    const lightStyle = [
+        {
+            selector: 'node',
+            style: {
+                'label': 'data(label)',
+                'text-valign': 'center',
+                'color': '#222',
+                'text-wrap': 'wrap',
+                'text-max-width': 100,
+                'font-size': 13,
+                'width': 'data(width)' || 100,               // pixels
+                'height': 'data(height)' || 60,
+                'background-color': '#aaaaff',
+                'shape': 'data(shape)' || 'ellipsis'
+            }
+        },
+        {
+            selector: 'edge',
+            style: {
+                'width': 2,
+                'line-color': '#9ca3af',
+                'target-arrow-color': '#aa007f',
+                'target-arrow-shape': 'triangle',
+                'curve-style': 'bezier',
+                'label': 'data(label)',
+                'font-size': 13,
+                'text-rotation': 'autorotate',
+                'text-margin-x': 0,
+                'text-margin-y': -10,
+            }
+        }
+    ]
+    const darkStyle = [
+        {
+            selector: 'node',
+            style: {
+                'label': 'data(label)',
+                'text-valign': 'center',
+                'color': '#ff8000',
+                'text-wrap': 'wrap',
+                'text-max-width': 100,
+                'font-size': 13,
+                'width': 'data(width)' || 100,               // pixels
+                'height': 'data(height)' || 60,
+                'background-color': '#c5f5ff',
+                'shape': 'data(shape)' || 'ellipsis'
+            }
+        },
+        {
+            selector: 'edge',
+            style: {
+                'width': 2,
+                'color': '#ffaa7f',
+                'line-color': '#00557f',
+                'target-arrow-color': '#ffff7f',
+                'target-arrow-shape': 'triangle',
+                'curve-style': 'bezier',
+                'label': 'data(label)',
+                'font-size': 13,
+                'text-rotation': 'autorotate',
+                'text-margin-x': 0,
+                'text-margin-y': -10,
+            }
+        }
+    ]
+
+    const style = window.isDark === true ? darkStyle : lightStyle;
+
     const cy = cytoscape({
         container: graphContainer,
         elements,
-        style: [
-            {
-                selector: 'node',
-                style: {
-                    'label': 'data(label)',
-                    'text-valign': 'center',
-                    'color': '#222',
-                    'text-wrap': 'wrap',
-                    'text-max-width': 100,
-                    'font-size': 12,
-                    'background-color': 'data(backgroundColor)',
-                    'shape': 'data(shape)'
-                }
-            },
-            {
-                selector: 'edge',
-                style: {
-                    'width': 2,
-                    'line-color': '#ccc',
-                    'target-arrow-color': '#ccc',
-                    'target-arrow-shape': 'triangle',
-                    'curve-style': 'bezier',
-                    'label': 'data(label)',
-                    'font-size': 10,
-                    'text-rotation': 'autorotate',
-                    'text-margin-x': 0,
-                    'text-margin-y': -10,
-                }
-            }
-        ],
+        style: style,
         layout: { name: 'breadthfirst', orientation: 'horizontal', padding: 10 }
     });
 
-    // Optional theme toggle:
-    /*
-     *    document.getElementById('toggleTheme').addEventListener('click', () => {
-     *        const isDark = document.documentElement.classList.toggle('dark');
-     *        cy.style(isDark ? darkStyle : lightStyle).update();
-});
-*/
+
+    document.addEventListener('ThemeChange', () => {
+        console.log('Theme:', window.isDark)
+        cy.style(window.isDark ? darkStyle : lightStyle).update();
+    });
+
+    }catch(err){
+        console.log("Error rendering diagram :", err)
+    }
+
 }
 
 
@@ -368,3 +324,5 @@ function parseDotToCytoscape(dotCode) {
 
     return { elements, graphAttributes };
 }
+
+window.handleDiagrams = handleDiagrams;
