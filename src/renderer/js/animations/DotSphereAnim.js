@@ -11,7 +11,7 @@
   resize();
 
   // Settings for the sphere
-  const numPoints = 500;
+  const numPoints = 800;
   const sphereRadius = 500;
   const points = [];
   const goldenAngle = Math.PI * (3 - Math.sqrt(5)); // for even distribution
@@ -36,7 +36,7 @@
 
   // Function to get a random color in HSL format for vibrant colors
   function getRandomColor() {
-    const hue = Math.floor(Math.random() * 360);
+    const hue = Math.floor(Math.random() * 720);
     return `hsl(${hue}, 80%, 60%)`;
   }
 
@@ -71,9 +71,16 @@
       let x1 = p.x * Math.cos(angleY) + z1 * Math.sin(angleY);
       let z2 = -p.x * Math.sin(angleY) + z1 * Math.cos(angleY);
 
+      // === DEPTH CULLING ===
+      // Only keep points in front of the camera (i.e. positive z2)
+      if (z2 >= 0.99) {
+        continue;
+      }
+
       // Perspective projection
       const perspective = 510; // distance from viewer to screen
-      const scale = perspective / (perspective - z2 * sphereRadius);
+      const z3D = z2 * sphereRadius;
+      const scale = perspective / (perspective - z3D);
       const x2d = cx + x1 * sphereRadius * scale;
       const y2d = cy + y1 * sphereRadius * scale;
 
