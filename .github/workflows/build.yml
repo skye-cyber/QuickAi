@@ -162,19 +162,20 @@ jobs:
 
     - name: Commit and push changes
       run: |
+        git config --global core.autocrlf false
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
     - name: Check for changes
       run: |
-        if [ -z "$(git status --porcelain)" ]; then
-          echo "No changes detected."
+        if [ -z "$(git diff --exit-code --quiet last_version.txt)" ]; then
+        echo "No changes detected in last_version.txt."
         else
-          echo "Changes detected. Proceeding with commit."
-          git add last_version.txt package-lock.json package.json
-          git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
-          git pull --rebase -X ours
-          git push
+        echo "Changes detected in last_version.txt. Proceeding with commit."
+        git add last_version.txt package-lock.json package.json
+        git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
+        git pull --rebase -X ours
+        git push
         fi
       shell: bash
       env:
