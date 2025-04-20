@@ -2,15 +2,15 @@ const path = require('path');
 const webpack = require('webpack');
 
 const entries = {
-    //hfaichat: './src/renderer/js/hfaichat.js',
-    // utility: './src/renderer/js/exportUtilities.js',
+    hfaichat: './src/renderer/js/hfaichat.js',
+    utility: './src/renderer/js/exportUtilities.js',
     MistralChatsAdmin: './src/renderer/js/MistralChatsAdmin.js',
     chatUtils: './src/renderer/js/chatUtils.js',
-    // hfaudio: './src/renderer/js/hfaudio.js',
+    hfaudio: './src/renderer/js/hfaudio.js',
     dotDraw: './src/renderer/js/diagraming/dotDraw.js',
-    // preference: './src/renderer/js/preference.js',
-    // keyshortcuts: './src/renderer/js/keyshortcuts.js',
-    // fileHandler: './src/renderer/js/fileHandler.js'
+    preference: './src/renderer/js/preference.js',
+    keyshortcuts: './src/renderer/js/keyshortcuts.js',
+    fileHandler: './src/renderer/js/fileHandler.js'
 };
 
 module.exports = Object.entries(entries).map(([name, entryPath]) => {
