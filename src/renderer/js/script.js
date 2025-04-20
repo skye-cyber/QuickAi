@@ -1,7 +1,6 @@
 const modelChange = new CustomEvent('ModelChange');
 document.addEventListener('DOMContentLoaded', function() {
-    for (const item of ['chatStore', 'keyshortcuts', 'preference', 'fileHandler', 'diagraming/visualUtils', 'diagraming/packed_dotDraw',
-                        'setup/setup']) {
+    for (const item of ['chatStore', 'keyshortcuts', 'preference', 'fileHandler', 'diagraming/visualUtils', 'diagraming/packed_dotDraw', 'OpStatus', 'setup/setup']) {
         addScripts(item);
     }
 

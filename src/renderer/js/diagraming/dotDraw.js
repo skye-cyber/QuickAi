@@ -1,5 +1,8 @@
 const cytoscape = require('cytoscape');
 const graphlibDot = require('graphlib-dot');
+//const Viz = require('viz.js');
+import { Graphviz } from "@hpcc-js/wasm-graphviz";
+
 //import graphlib from 'graphlib';
 
 const diagViewContent = document.getElementById('modal-content');
@@ -64,10 +67,10 @@ function extractDiagCodesWithNames(aiResponse, type = 'both') {
     return results;
 }
 
-function getCodeFromBlock(id){
+function getCodeFromBlock(id) {
     const codeBlock = document.querySelector(`[data-value^="${id}"]`);
     const codeText = codeBlock.textContent;
-    return codeText ? codeText: ''
+    return codeText ? codeText : ''
 }
 
 /**
@@ -125,32 +128,75 @@ async function handleDiagrams(input, mode = 'both', isPlainCode = false) {
 }
 
 async function renderWithViz(dotCode, Cname, desc = null) {
-    try{
-        // Create a Viz instance
-        const viz = new Viz();
+    try {
+        // 1) Load the WASM Graphviz engine
+        const graphviz = await Graphviz.load();
 
-        // Render the DOT code to SVG and insert into the page
-        viz.renderSVGElement(dotCode)
-            .then(function(element) {
-                const section = document.createElement('section')
-                const title = document.createElement('p');
-                title.id = Cname;
-                title.className = `bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400 transition-all duration-1000`
-                title.textContent = `Name: ${Cname}`
-                section.className = `block p-2 border border-blue-400`
-                section.appendChild(title);
-                section.appendChild(element);
-                diagViewContent.appendChild(section);
-            })
-            .catch(error => {
-                // Handle or display errors
-                console.error("Error rendering diagram:", error);
-            });
+        const svgElement = graphviz.dot(dotCode);
 
-            //show success message
-            window.showCopyModal(null, message="Rendered ✅... Open DiagView modal to view", 700);
-    }catch(err){console.error(err)
-    }
+        const section = document.createElement('section')
+        section.className = 'block p-1 border border-blue-400 rounded-md bg-white dark:bg-zinc-900 transition-all duration-1000';
+
+        const header = document.createElement('div');
+        header.className = "flex justify-between";
+
+        //Title
+        const title = document.createElement('p');
+        title.id = Cname;
+        title.className = 'bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400 transition-all duration-1000';
+        title.textContent = `Name: ${Cname}`;
+
+        //Export option
+        const Export = document.createElement('p');
+        const diagId = `diag_${Math.random().toString(30).substring(3, 9)}`;
+        // Use dataset property to set a custom data attribute
+        Export.dataset.value = `cx-Viz-${Cname}-${diagId}`;
+
+        // Set class names (Tailwind CSS classes)
+        Export.className = "bg-blue-300 text-[#003953] rounded-md p-2 hover:scale-95 hover:bg-purple-400 w-fit h-fit transform transition-all duration-700 cursor-pointer";
+
+        // Set the visible text inside the <p> element
+        Export.textContent = 'export';
+
+        // Assign a click event handler function properly
+        Export.addEventListener('click', (event) => {
+            event.stopPropagation();
+            window.exportSvgToPng(Export.dataset.value);
+        })
+
+        //};
+        header.appendChild(title);
+        header.appendChild(Export);
+
+        section.appendChild(header);
+
+        //Add description if present
+        if (desc) {
+            const d = document.createElement('p');
+            d.className = 'text-sm text-gray-500 dark:text-gray-300 italic mb-2 transition-all duration-1000';
+            d.textContent = desc;
+            section.appendChild(d);
+        }
+
+        const diagCanvas = document.createElement('div');
+        diagCanvas.id = `cx-Viz-${Cname}-${diagId}`;
+        diagCanvas.className = 'h-full w-full rounded-lg bg-gray-50 dark:bg-zinc-800 transition-all duration-1000';
+
+        //Add element to the canvas
+        diagCanvas.innerHTML=svgElement;
+        section.appendChild(diagCanvas);
+
+        //add section to parent daigView
+        diagViewContent.appendChild(section);
+
+
+    //show success message
+    window.showCopyModal(null, "Rendered ✅... Open DiagView modal to view", 700);
+
+}catch (err) {
+    console.error(err)
+    window.displayStatus(err, 'error');
+}
 }
 
 async function renderWithCytoscape(graphJson, Cname, desc = '') {
@@ -165,126 +211,207 @@ async function renderWithCytoscape(graphJson, Cname, desc = '') {
     // 🔁 Convert input format to Cytoscape-compatible format
     // Assuming 'graph' has the correct structure now
     // for (const node of graph.elements){
-    try{
+    try {
         const elements = graph.elements.map(element => ({
             data: element.data // Access the 'data' part of each element (node or edge)
         }));
-    // }
+        // }
 
 
-    // DOM structure
-    const section = document.createElement('section');
-    section.className = 'block p-2 border border-blue-400 rounded-md bg-white dark:bg-zinc-900 transition-all duration-1000';
+        // DOM structure
+        const section = document.createElement('section');
+        section.className = 'block p-1 border border-blue-400 rounded-md bg-white dark:bg-zinc-900 transition-all duration-1000';
 
-    const title = document.createElement('p');
-    title.id = Cname;
-    title.className = 'bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400 transition-all duration-1000';
-    title.textContent = `Name: ${Cname}`;
-    section.appendChild(title);
+        //header section for the diagram
+        const header = document.createElement('div');
 
-    if (desc) {
-        const d = document.createElement('p');
-        d.className = 'text-sm text-gray-500 dark:text-gray-300 italic mb-2 transition-all duration-1000';
-        d.textContent = desc;
-        section.appendChild(d);
-    }
+        header.className = "flex justify-between";
+        // figure title
+        const title = document.createElement('p');
+        title.id = Cname;
+        title.className = 'bg-gray-200 dark:bg-zinc-700 rounded-md p-1 my-2 w-fit font-mono text-blue-500 dark:text-blue-400 transition-all duration-1000';
+        title.textContent = `Name: ${Cname}`;
 
-    const graphContainer = document.createElement('div');
-    graphContainer.id = `cy-${Cname}`;
-    graphContainer.className = 'h-[400px] w-full rounded-lg bg-gray-50 dark:bg-zinc-800 transition-all duration-1000';
-    section.appendChild(graphContainer);
-    diagViewContent.appendChild(section);
+        //export options
+        const Export = document.createElement('p');
+        const diagId = `diag_${Math.random().toString(30).substring(3, 9)}`;
 
-    // Cytoscape setup
+        // Use dataset property to set a custom data attribute
+        Export.dataset.value = `cy-crytoscape-${Cname}-${diagId}`;
 
-    const lightStyle = [
-        {
-            selector: 'node',
-            style: {
-                'label': 'data(label)',
-                'text-valign': 'center',
-                'color': '#222',
-                'text-wrap': 'wrap',
-                'text-max-width': 100,
-                'font-size': 13,
-                'width': 'data(width)' || 100,               // pixels
-                'height': 'data(height)' || 60,
-                'background-color': '#aaaaff',
-                'shape': 'data(shape)' || 'ellipsis'
-            }
-        },
-        {
-            selector: 'edge',
-            style: {
-                'width': 2,
-                'line-color': '#9ca3af',
-                'target-arrow-color': '#aa007f',
-                'target-arrow-shape': 'triangle',
-                'curve-style': 'bezier',
-                'label': 'data(label)',
-                'font-size': 13,
-                'text-rotation': 'autorotate',
-                'text-margin-x': 0,
-                'text-margin-y': -10,
-            }
+        // Set class names (Tailwind CSS classes)
+        Export.className = "bg-blue-300 text-[#003953] rounded-md p-2 hover:scale-95 hover:bg-purple-400 w-fit h-fit transform transition-all duration-700 cursor-pointer";
+
+        // Set the visible text inside the <p> element
+        Export.textContent = 'export';
+
+        Export.className = "bg-blue-300 text-[#003953] rounded-md p-2 hover:scale-95 hover:bg-purple-400 w-fit h-fit transform transition-all duration-700 cursor-pointer"
+
+        header.appendChild(title);
+        header.appendChild(Export);
+
+        section.appendChild(header);
+
+        if (desc) {
+            const d = document.createElement('p');
+            d.className = 'text-sm text-gray-500 dark:text-gray-300 italic mb-2 transition-all duration-1000';
+            d.textContent = desc;
+            section.appendChild(d);
         }
-    ]
-    const darkStyle = [
-        {
-            selector: 'node',
-            style: {
-                'label': 'data(label)',
-                'text-valign': 'center',
-                'color': '#ff8000',
-                'text-wrap': 'wrap',
-                'text-max-width': 100,
-                'font-size': 13,
-                'width': 'data(width)' || 100,               // pixels
-                'height': 'data(height)' || 60,
-                'background-color': '#c5f5ff',
-                'shape': 'data(shape)' || 'ellipsis'
+
+        const graphContainer = document.createElement('div');
+        graphContainer.id = `cy-crytoscape-${Cname}-${diagId}`;
+        graphContainer.className = 'h-[400px] max-h-full w-full rounded-lg bg-gray-50 dark:bg-zinc-800 transition-all duration-1000';
+        section.appendChild(graphContainer);
+        diagViewContent.appendChild(section);
+
+        // Cytoscape setup
+
+        const lightStyle = [
+            {
+                selector: 'node',
+                style: {
+                    'label': 'data(label)',
+                    'text-valign': 'center',
+                    'color': '#222',
+                    'text-wrap': 'wrap',
+                    'text-max-width': 100,
+                    'font-size': 13,
+                    'width': 'data(width)' || 100,               // pixels
+                    'height': 'data(height)' || 60,
+                    'background-color': '#aaaaff',
+                    'shape': 'data(shape)' || 'ellipsis'
+                }
+            },
+            {
+                selector: 'edge',
+                style: {
+                    'width': 2,
+                    'line-color': '#9ca3af',
+                    'target-arrow-color': '#aa007f',
+                    'target-arrow-shape': 'triangle',
+                    'curve-style': 'bezier',
+                    'label': 'data(label)',
+                    'font-size': 13,
+                    'text-rotation': 'autorotate',
+                    'text-margin-x': 0,
+                    'text-margin-y': -10,
+                }
             }
-        },
-        {
-            selector: 'edge',
-            style: {
-                'width': 2,
-                'color': '#ffaa7f',
-                'line-color': '#00557f',
-                'target-arrow-color': '#ffff7f',
-                'target-arrow-shape': 'triangle',
-                'curve-style': 'bezier',
-                'label': 'data(label)',
-                'font-size': 13,
-                'text-rotation': 'autorotate',
-                'text-margin-x': 0,
-                'text-margin-y': -10,
+        ]
+        const darkStyle = [
+            {
+                selector: 'node',
+                style: {
+                    'label': 'data(label)',
+                    'text-valign': 'center',
+                    'color': '#ff8000',
+                    'text-wrap': 'wrap',
+                    'text-max-width': 100,
+                    'font-size': 13,
+                    'width': 'data(width)' || 100,               // pixels
+                    'height': 'data(height)' || 60,
+                    'background-color': '#c5f5ff',
+                    'shape': 'data(shape)' || 'ellipsis'
+                }
+            },
+            {
+                selector: 'edge',
+                style: {
+                    'width': 2,
+                    'color': '#ffaa7f',
+                    'line-color': '#00557f',
+                    'target-arrow-color': '#ffff7f',
+                    'target-arrow-shape': 'triangle',
+                    'curve-style': 'bezier',
+                    'label': 'data(label)',
+                    'font-size': 13,
+                    'text-rotation': 'autorotate',
+                    'text-margin-x': 0,
+                    'text-margin-y': -10,
+                }
             }
-        }
-    ]
+        ]
 
-    const style = window.isDark === true ? darkStyle : lightStyle;
+        const style = window.isDark === true ? darkStyle : lightStyle;
 
-    const cy = cytoscape({
-        container: graphContainer,
-        elements,
-        style: style,
-        layout: { name: 'breadthfirst', orientation: 'horizontal', padding: 10 }
-    });
+        const cy = cytoscape({
+            container: graphContainer,
+            elements,
+            style: style,
+            layout: { name: 'breadthfirst', orientation: 'horizontal', padding: 10 }
+        });
 
+        const cyId = Export.dataset.value;
+        // Register it safely
+        window.CyManager.register(cyId, cy);
 
-    document.addEventListener('ThemeChange', () => {
-        console.log('Theme:', window.isDark)
-        cy.style(window.isDark ? darkStyle : lightStyle).update();
-    });
+        // Assign a click event handler function properly
+        Export.onclick = (event) => {
+            event.stopPropagation();
+            //const cyId = Export.dataset.value;
+            const cy = window.CyManager.get(cyId);
+            console.log(cy)
 
-    //show success message
-    window.showCopyModal(null, message="Rendered ✅... Open DiagView modal to view", 700);
-    }catch(err){
+            if (!cy) {
+                return window.displayStatus("Diagram not found", "error");
+            }
+
+            const png = cy.png({ scale: 2, bg: "white", full: true });
+
+            const a = document.createElement("a");
+            a.href = png;
+            a.download = `${cyId}.png`;
+            a.click();
+            // Use Export.dataset.value to access the data attribute inside the handler
+            window.exportCanvasToPng(Export.dataset.value);
+        };
+
+        document.addEventListener('ThemeChange', () => {
+            console.log('Theme:', window.isDark)
+            cy.style(window.isDark ? darkStyle : lightStyle).update();
+        });
+
+        //show success message
+        window.showCopyModal(null, "Rendered ✅... Open DiagView modal to view", 700);
+    } catch (err) {
         console.log("Error rendering diagram :", err)
+        window.displayStatus(err, 'error');
     }
 
 }
+
+
+
+// cytoscapeManager.js or inline in main script
+window.CyManager = (function () {
+    const _store = new Map();
+
+    return {
+        register(id, cyInstance) {
+            if (_store.has(id)) {
+                console.warn(`[CyManager] Replacing existing cy instance for: ${id}`);
+            }
+            _store.set(id, cyInstance);
+        },
+
+        get(id) {
+            return _store.get(id) || null;
+        },
+
+        remove(id) {
+            _store.delete(id);
+        },
+
+        clearAll() {
+            _store.clear();
+        },
+
+        has(id) {
+            return _store.has(id);
+        }
+    };
+})();
 
 
 // 2) Main parser: builds nodes & edges arrays, plus captures graph-wide attrs

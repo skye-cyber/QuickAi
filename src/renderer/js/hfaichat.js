@@ -166,9 +166,9 @@ async function routeToHf(text) {
 					aiMessage.innerHTML = `
 							<section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
 							${isThinking || thinkContent ? `
-								<div class="think-section bg-blue-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 pt-2 lg:max-w-6xl transition-colors duration-1000">
+								<div class="think-section bg-blue-200 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg px-4 pt-2 lg:max-w-6xl transition-colors duration-1000">
 								<div class="flex items-center justify-between">
-								<strong style="color: #007bff;">Thoughts:</strong>
+								<strong class="text-[#007bff]">Thoughts:</strong>
 								<button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
 								<p class="flex">Fold
 								<svg class="mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="32" height="38" class="fold-icon">
@@ -185,9 +185,9 @@ async function routeToHf(text) {
 								` : ''}
 								${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
 								${actualResponse ? `
-									<div class="${aiMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-1000">
-									${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
-									<p style="color: #333;">${window.marked(actualResponse)}</p>
+									<div class="${aiMessageUId} bg-blue-200 py-4 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-1000">
+									${actualResponse && thinkContent ? `<strong class="text-[#28a745]">Response:</strong>` : ''}
+									<p class="text-[#333]">${window.marked(actualResponse)}</p>
 									<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
 										<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
 											<div
@@ -196,7 +196,7 @@ async function routeToHf(text) {
 												aria-expanded="false"
 												onclick="window.toggleExportOptions(this);"
 												aria-label="Export"
-												class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-700 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
+												class="relative overflow-hidden bg-white/80 backdrop-blur-md transition-all duration-700 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
 												style="border: 2px solid rgba(255,85,0,0); background-clip: padding-box, border-box; background-origin: border-box; background-image: linear-gradient(to bottom right, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.8)), linear-gradient(135deg, rgba(255,0,255,170) 0%, rgba(0,0,255,85) 50%, rgba(0,255,255,170) 100%);"
 											>
 												<div class="flex items-center space-x-2 px-4 py-1">
@@ -249,24 +249,25 @@ async function routeToHf(text) {
 										</div>
 									</section>
 									</div>
-									<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-all duraton-700">
+									<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-[radial-gradient(closest-side,var(--tw-gradient-stops))] from-[#009393] dark:from-[#002f42] via-[#45cece] dark:via-[#002f42] to-blue-400 dark:to-[#002f42] dark:bg-gray-800 p-2 rounded shadow-md z-50 border border-[#0055ff] dark:border-[#009fe8] transition-colors duration-1000">
 									<ul class="list-none p-0">
 									<li class="mb-2">
-									<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">Export to PDF</a>
+									<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Pdf(event, '.${aiMessageUId}')">Export to PDF</p>
 									</li>
 									<li class="mb-2">
-									<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">Export to JPG</a>
+									<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Jpg(event, '.${aiMessageUId}')">Export to JPG</p>
 									</li>
 									<li>
-									<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">Export to DOCX</a>
+									<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 cursor-pointer" onclick="HTML2Word(event, '.${aiMessageUId}')">Export to DOCX</p>
 									</li>
 									<li>
-									<a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline transition-colors duration-1000" onclick="">Word Export Advance</a>
+									<p class="cursor-not-allowed text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 decoration-underline" onclick="">Word Export Advance</p>
 									</li>
 									</ul>
 									</div>
 									</section>`: ""}
 									`;
+
 					AutoScroll.checked ? scrollToBottom(chatArea) : null;
 				}
 
@@ -424,7 +425,7 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 				visionMs += choice.delta.content;
 				VisionMessage.innerHTML = `
 					<section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-					<div class="${VisionMessageUId} bg-blue-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl transition-colors duration-1000">${window.marked(visionMs)}
+					<div class="${VisionMessageUId} bg-blue-200 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl transition-colors duration-1000">${window.marked(visionMs)}
 						<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
 							<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
 								<div
@@ -433,7 +434,7 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 									aria-expanded="false"
 									onclick="window.toggleExportOptions(this);"
 									aria-label="Export"
-									class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-700 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
+									class="relative overflow-hidden bg-white/80 backdrop-blur-md transition-all duration-700 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
 									style="border: 2px solid rgba(255,85,0,0); background-clip: padding-box, border-box; background-origin: border-box; background-image: linear-gradient(to bottom right, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.8)), linear-gradient(135deg, rgba(255,0,255,170) 0%, rgba(0,0,255,85) 50%, rgba(0,255,255,170) 100%);"
 								>
 									<div class="flex items-center space-x-2 px-4 py-1">
@@ -486,20 +487,19 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 						</section>
 					</div>
 
-					<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-all duartion-700">
-
+					<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-[radial-gradient(closest-side,var(--tw-gradient-stops))] from-[#009393] dark:from-[#002f42] via-[#45cece] dark:via-[#002f42] to-blue-400 dark:to-[#002f42] dark:bg-gray-800 p-2 rounded shadow-md z-50 border border-[#0055ff] dark:border-[#009fe8] transition-colors duration-1000">
 					<ul class="list-none p-0">
 					<li class="mb-2">
-					<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${VisionMessageUId}')">1. Export to PDF</a>
+					<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Pdf(event, '.${VisionMessageUId}')">Export to PDF</p>
 					</li>
 					<li class="mb-2">
-					<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${VisionMessageUId}')">2. Export to JPG</a>
+					<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Jpg(event, '.${VisionMessageUId}')">Export to JPG</p>
 					</li>
 					<li>
-					<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${VisionMessageUId}')">3. Export to DOCX</a>
+					<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 cursor-pointer" onclick="HTML2Word(event, '.${VisionMessageUId}')">Export to DOCX</p>
 					</li>
 					<li>
-					<a href="" class="text-blue-500 dark:text-blue-400 decoration-underline cursor-not-allowed" onclick="">4. Word Export Advance</a>
+					<p class="cursor-not-allowed text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 decoration-underline" onclick="">Word Export Advance</p>
 					</li>
 					</ul>
 					</div>

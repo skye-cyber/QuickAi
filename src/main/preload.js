@@ -1,7 +1,8 @@
-const { contextBridge, ipcRenderer, shell } = require('electron');
+const { contextBridge, ipcRenderer, shell, dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { Buffer } = require('node:buffer');
 //import trash from 'trash';
 let CurrentId = "";
 window.global = window;
@@ -9,20 +10,21 @@ contextBridge.exposeInMainWorld('global', window);
 let VId = '';
 let CId = '';
 
-try{ const _fpath = path.join(os.homedir(), '.quickai/.quickai.config/.pref.config')
-    if (fs.statfsSync(_fpath)){
+try {
+    const _fpath = path.join(os.homedir(), '.quickai/.quickai.config/.pref.config')
+    if (fs.statfsSync(_fpath)) {
         var profile = fs.readFileSync(_fpath, 'utf-8')
     }
-}catch(err){
+} catch (err) {
     //console.log(err)
 }
 
 ChatconversationHistory = []
 VconversationHistory = []
 
-function VSystem_init(previewOn = 'false', verbosity='low'){
-    const VSystem_init =`
-    Your name is QuickAi. You are a scoped, concise and helpful assistant. You are deployed in a cross-platform application built on Electron by Wambua. ${previewOn==="true"? `He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Electron, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).`:""}
+function VSystem_init(previewOn = 'false', verbosity = 'low') {
+    const VSystem_init = `
+    Your name is QuickAi. You are a scoped, concise and helpful assistant. You are deployed in a cross-platform application built on Electron by Wambua. ${previewOn === "true" ? `He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Electron, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).` : ""}
 
     ---
     Only respond with what the user currently asks for.
@@ -113,9 +115,9 @@ function VSystem_init(previewOn = 'false', verbosity='low'){
     return VSystem_init
 }
 
-function CSystem_init(previewOn = 'false', verbosity='low'){
-    const CSystem_init =  `
-    Your name is **QuickAi**. You are a scoped, concise and helpful assistant. You are deployed in a cross-platform application built on Electron by **Wambua**.${previewOn==="true"? `He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Electron, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).`:""}
+function CSystem_init(previewOn = 'false', verbosity = 'low') {
+    const CSystem_init = `
+    Your name is **QuickAi**. You are a scoped, concise and helpful assistant. You are deployed in a cross-platform application built on Electron by **Wambua**.${previewOn === "true" ? `He is an undergraduate software developer at Kirinyaga University in Kenya. He has mastered many digital technologies, including but not limited to: HTML5, CSS3, JavaScript, TailwindCSS, Node.js, Python, Django, Electron, Git, MySQL/MariaDB, Markdown, GIMP (GNU Image Manipulation Program), scikit-learn, and OpenCV. You can find him on his [GitHub Profile](https://github.com/skye-cyber) or [Huggingface Profile](https://huggingface.co/skye-waves).` : ""}
 
     ---
     Only respond with what the user currently asks for.
@@ -131,7 +133,7 @@ function CSystem_init(previewOn = 'false', verbosity='low'){
     #Definition of terms:
     - Language identifier: Shall include the language and both the opening and closing backticks, for example, \`\`\`html...code...\`\`\`.
 
-    ${previewOn==="true"? `
+    ${previewOn === "true" ? `
     #When interacting with the user:
     - If the user needs to visualize/preview diagrams or generate images, inform them that you cannot directly generate diagrams or images. Instead, come up with a query describing what you or the user would wish to visualize, and instruct them to paste this prompt in the text area starting with '/image' to generate the image.
     - If it is not clear what image the user wants to generate, ask them for a description of what they want, and then restructure it to form a clear prompt for the user.
@@ -160,7 +162,7 @@ function CSystem_init(previewOn = 'false', verbosity='low'){
     - Dark theme background color is lightgray.
     - Light theme background color is a gradient from-blue-500 to-sky-500.
     - Use color gradient for even more elegance.
-    `:""}
+    `: ""}
     ---
     #User Information and preference:
     - The "UserProfile" section contains detailed user information and preferences.
@@ -188,7 +190,7 @@ function CSystem_init(previewOn = 'false', verbosity='low'){
     #UserProfile
     ${profile ? profile : ""}
     ---
-    ${previewOn==="true"?`
+    ${previewOn === "true" ? `
     #Important:
     1. Always remove the language identifier (e.g., \`\`\`\`html\`\`\`) when providing previews, tables, svgs, icons, diagrams, etc.
     2. Strictly adhere to decisions like size, color, placement, and alignment choices.
@@ -259,7 +261,7 @@ function CSystem_init(previewOn = 'false', verbosity='low'){
 
     Fail‐safe: Before returning your answer, always check that your output ends with a line containing exactly three backticks (\`\`\`). If it doesn’t, add it.
 `;
-return CSystem_init
+    return CSystem_init
 }
 
 contextBridge.exposeInMainWorld('electron', {
@@ -331,28 +333,28 @@ contextBridge.exposeInMainWorld('electron', {
     joinPath: (node, child) => {
         return path.join(node, child);
     },
-    Rename: (base_dir, id, name) =>{
-        try{
+    Rename: (base_dir, id, name) => {
+        try {
             fs.renameSync(path.join(base_dir, `${id}.json`), path.join(base_dir, `${name}.json`))
-            return  true
-        }catch (err){
+            return true
+        } catch (err) {
             console.log(err)
             return false
         }
     },
     deleteChat: (base_dir, id) => {
-        try{
+        try {
             const file = path.join(base_dir, `${id}.json`)
-            if (fs.statSync(file)){
+            if (fs.statSync(file)) {
                 fs.rmSync(file)
                 // Move the item to the trash
                 //trash([file])
                 return true
-            }else{
+            } else {
                 console.log('Item not found')
                 return false
             }
-        }catch (err){
+        } catch (err) {
             console.log(err);
         }
     },
@@ -399,12 +401,12 @@ contextBridge.exposeInMainWorld('electron', {
         // Clean all messages by removing non-text content
         const cleanedHistory = history.map(item => {
             const cleanedContent = item.content
-            .filter(val => val.type === "text")
-            .map(textContent => ({
-                ...textContent,
-                // Remove extra whitespace from text
-                text: textContent.text.trim()
-            }));
+                .filter(val => val.type === "text")
+                .map(textContent => ({
+                    ...textContent,
+                    // Remove extra whitespace from text
+                    text: textContent.text.trim()
+                }));
             return {
                 ...item,
                 content: cleanedContent
@@ -428,7 +430,7 @@ contextBridge.exposeInMainWorld('electron', {
         return cleanedHistory;
     },
     CreateNew: (conversation, model) => {
-        if (model == "text"){
+        if (model == "text") {
             ChatconversationHistory = conversation
         } else {
             VconversationHistory = conversation;
@@ -457,14 +459,14 @@ contextBridge.exposeInMainWorld('electron', {
     addUtilityScript: () => {
         //console.log("Executing")
         scripts = ['js/packed_utility.js']
-        scripts.forEach(script=>{
+        scripts.forEach(script => {
             const scriptElement = document.createElement('script');
             scriptElement.src = script;
             scriptElement.async = true; // Optional: load the script asynchronously
             document.body.appendChild(scriptElement);
         });
     },
-    addScript: (script_name, animation=false) => {
+    addScript: (script_name, animation = false) => {
         //console.log("Executing")
         const script = document.createElement('script');
         script.src = `js/${script_name}`;
@@ -472,7 +474,7 @@ contextBridge.exposeInMainWorld('electron', {
         animation ? console.log(`Toggle Animation: ON`) : console.log(`${script_name} ADDED.`);
         document.body.appendChild(script);
     },
-    ThemeChangeDispatch: ()=>{
+    ThemeChangeDispatch: () => {
         // Dispatch a custom event 'animationReady' on the element
         const event = new CustomEvent('ThemeChange');
         document.dispatchEvent(event);
@@ -491,7 +493,7 @@ contextBridge.exposeInMainWorld('electron', {
             }
         });
     },
-    addCodeThemeSheet: (theme) =>{
+    addCodeThemeSheet: (theme) => {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = `css/${theme}-code-theme.css`;
@@ -543,12 +545,12 @@ contextBridge.exposeInMainWorld('electron', {
             //for (let [i, res] of data.e)
             data.forEach(res => {
                 // console.log(data)
-                if (res.role === "user"){
+                if (res.role === "user") {
 
-                    if (data[data.indexOf(res)+1].role !== "assistant"){
-                        console.log("Pair: !index", data.indexOf(res)+1)
-                        data.slice(data.indexOf(res), data.indexOf(res)+1).values()
-                    }else if (data[data.indexOf(res)+1].role === "assistant"){
+                    if (data[data.indexOf(res) + 1].role !== "assistant") {
+                        console.log("Pair: !index", data.indexOf(res) + 1)
+                        data.slice(data.indexOf(res), data.indexOf(res) + 1).values()
+                    } else if (data[data.indexOf(res) + 1].role === "assistant") {
                         console.log("Pair: OK", data.indexOf(res))
                     }
                 }
@@ -559,42 +561,43 @@ contextBridge.exposeInMainWorld('electron', {
     getDateTime: () => {
         return getFormattedDateTime(true);
     },
-    savePreference: async (data) =>{
-        try{
+    savePreference: async (data) => {
+        try {
             const prefFile = ".pref.config"
             const prefPath = path.join(os.homedir(), '.quickai/.quickai.config');
-            try{
-                if (!fs.mkdirSync(prefPath)){
+            try {
+                if (!fs.mkdirSync(prefPath)) {
                     fs.mkdirSync(prefPath);
                 }
-            }catch(error){
+            } catch (error) {
                 //
             }
             const prefFpath = path.join(prefPath, prefFile);
             fs.writeFileSync(prefFpath, data);
             return true
-        } catch(err){
+        } catch (err) {
             //console.log(err);
             return false
         }
     },
-    deletePreference: async (data) =>{
-        try{
+    deletePreference: async (data) => {
+        try {
             const prefPath = path.join(os.homedir(), '.quickai/.quickai.config/.pref.config');
             fs.rmSync(prefPath, data);
             return true
-        } catch(err){
+        } catch (err) {
             console.log(err);
             return false
         }
     },
     getPreferences: async () => {
-        try{ const _fpath = path.join(os.homedir(), '.quickai/.quickai.config/.pref.config')
-            if (fs.statfsSync(_fpath)){
+        try {
+            const _fpath = path.join(os.homedir(), '.quickai/.quickai.config/.pref.config')
+            if (fs.statfsSync(_fpath)) {
                 const prefData = fs.readFileSync(_fpath, 'utf-8')
                 return prefData
             }
-        }catch(err){
+        } catch (err) {
             //console.log(err)
         }
     },
@@ -609,9 +612,9 @@ contextBridge.exposeInMainWorld('electron', {
     },
 
 
-    saveRecording:async  (blob) => {
-        try{
-            const randomFname = `hfaudio_${Math.random().toString(36).substring(1,12)}`;
+    saveRecording: async (blob) => {
+        try {
+            const randomFname = `hfaudio_${Math.random().toString(36).substring(1, 12)}`;
             const savePath = path.join(os.homedir(), `.quickai/.quickai.cache/${randomFname}.wav`)
             // Extract the directory path from the file path
             const dirPath = path.dirname(savePath);
@@ -631,31 +634,61 @@ contextBridge.exposeInMainWorld('electron', {
             fs.writeFileSync(savePath, buffer);
             console.log(`File saved at ${savePath}`);
             return savePath
-        }catch(err){
+        } catch (err) {
             console.log(err)
         }
     },
-    readFileData: async (filePath) =>{
-        if(!fs.existsSync(filePath)){
+    readFileData: async (filePath) => {
+        if (!fs.existsSync(filePath)) {
             return false
         }
         data = fs.readFileSync(filePath)
         return data
     },
+    saveImageBuffer: async (canvas, path, url = null) => {
+        try {
+            return new Promise((resolve, reject) => {
+                canvas.toBlob(async (blob) => {
+                    if (!blob) {
+                        reject(new Error('Canvas toBlob returned null'));
+                        return;
+                    }
+
+                    try {
+                        // Convert the Blob to an ArrayBuffer
+                        const arrayBuffer = await blob.arrayBuffer();
+                        // Create a Buffer from the ArrayBuffer
+                        const buffer = Buffer.from(arrayBuffer);
+
+                        // Invoke the IPC method to save the image
+                        const response = await ipcRenderer.invoke('save-dg-As-PNG', buffer, path);
+                        console.log(response)
+                        resolve(response === true);
+                    } catch (err) {
+                        reject(err);
+                    }
+                }, 'image/png');
+            })
+
+        } catch (err) {
+            console.log(err)
+            return 'Runtime error: Failed to save image'
+        }
+    }
 });
 
 
 //Exporse Api keys
 contextBridge.exposeInMainWorld('api', {
     saveKeys: async (keys) => ipcRenderer.invoke('save-keys', keys),
-    getKeys: async (key=null) => ipcRenderer.invoke('get-keys', key),
+    getKeys: async (key = null) => ipcRenderer.invoke('get-keys', key),
 });
 
 
 document.addEventListener('DOMContentLoaded', function() {
     //initialize conversation histories when is ready/loaded
     ChatconversationHistory = [{ role: "system", content: CSystem_init() }]; // Define your array here
-    VconversationHistory = [{role: "system", content:[ { type: "text", text: VSystem_init() } ]}];
+    VconversationHistory = [{ role: "system", content: [{ type: "text", text: VSystem_init() }] }];
 
     CurrentId = ""; //Reset id on DomLoading so that new one is genearted once interraction starts to avoid resusing the previous
     const formattedDateTime = getFormattedDateTime();
@@ -670,12 +703,12 @@ document.addEventListener('NewConversationOpened', function() {
     const formattedDateTime = getFormattedDateTime();
     VId = `V-${formattedDateTime}` //${Date.now()}-${Math.random().toString(34).substring(2, 12)}`;
     CId = `C-${formattedDateTime}` //${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    VconversationHistory = [{role: "system", content:[ { type: "text", text: VSystem_init() } ]}]
+    VconversationHistory = [{ role: "system", content: [{ type: "text", text: VSystem_init() }] }]
     ChatconversationHistory = [{ role: "system", content: CSystem_init() }]
     //console.log(ChatconversationHistory)
     //console.log(VconversationHistory)
 })
-function getFormattedDateTime(reverse=false) {
+function getFormattedDateTime(reverse = false) {
     // Step 1: Create a Date object
     const now = new Date();
 
@@ -689,8 +722,8 @@ function getFormattedDateTime(reverse=false) {
 
     // Step 3: Combine the components
     const formattedDateTime = reverse === true
-    ? `${hours}:${minutes} ${day}-${month}-20${year}`
-    : `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+        ? `${hours}:${minutes} ${day}-${month}-20${year}`
+        : `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
 
     return formattedDateTime;
 }

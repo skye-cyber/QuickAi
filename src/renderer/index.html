@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!--<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">-->
     <title>QuickAi - Chat</title>
-    <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/viz.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/full.render.js"></script>
     <link rel="stylesheet" href="css/styles.css">
     <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css" />-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous"/>
@@ -27,10 +26,10 @@
 
 </head>
 <!-- Main Container -->
-<body id="main" class="h-[100vh] w-[100vw] max-h-[100vh] max-w-[100vw] px-3 py-4 mt-0 bg-white bg-opacity-90 rounded-b-none shadow-lg shadow-inner shadow-gray-800 dark:bg-neutral-900 rounded-t-none overflow-hidden transition-colors duration-1000">
+<body id="main" class="h-[100vh] w-[100vw] max-h-[100vh] max-w-[100vw] px-3 py-4 mt-0 bg-white bg-opacity-90 rounded-b-none shadow-lg shadow-inner shadow-gray-800 dark:bg-neutral-900 rounded-t-none overflow-hidden transition-all duration-500">
 
 <!-- Header -->
-<header class="space-b-2 mb-2 z-15">
+<header class="space-b-2 mb-2 z-15 transition-all duration-500">
     <div class="flex justify-between">
         <section class="flex justify-start">
             <!-- Toggle Button -->
@@ -816,7 +815,7 @@
         </section>
     </div>
 </header>
-<main class="relative z-5">
+<main class="relative z-5 transition-all duration-500">
     <canvas class="absolute z-0 bg-white bg-opacity-0" id="body-canvas"></canvas>
 
     <!--Notification Modal Background -->
@@ -944,14 +943,14 @@
 
 
      <!--scroll to bottom-->
-    <button id="scroll-bottom" class="hidden z-40 cursor-pointer absolute rounded-full bg-fuchsia-400 border border-blue-400 dark:border-gray-300 dark:bg-white right-1/2 translate-x-1/2 shadow w-8 h-8 flex items-center justify-center bottom-[15%] transition-colors duration-1000" title="scroll👇">
+    <button id="scroll-bottom" class="hidden z-40 cursor-pointer absolute rounded-full bg-fuchsia-400 border border-blue-400 dark:border-gray-300 dark:bg-white right-1/2 translate-x-1/2 shadow w-8 h-8 flex items-center justify-center bottom-[6%] md:bottom-[4%] transition-colors duration-1000" title="scroll👇" aria-label="scroll to bottom">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-md text-token-text-primary"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z" fill="currentColor"></path>
             </svg>
     </button>
 
     <!-- User Message Input Section -->
-    <div class="fixed flex left-0 lg:left-auto w-full lg:items-center lg:justify-center z-30 bottom-[1%] transition-opacity duration-500">
-        <section class="relative w-full lg:w-[70vw] flex space-x-4 z-30">
+    <div class="fixed flex left-0 lg:left-auto w-full lg:items-center lg:justify-center z-30 bottom-[1%] transition-all duration-1000">
+        <section class="relative w-full lg:w-[70vw] flex space-x-4 z-30 transition-all duration-700">
             <!-- Custom input field -->
             <div id="userInput"
                 contenteditable="true"
@@ -961,7 +960,7 @@
                 data-placeholder="Message QuickAi 💫 To generate an image, start with `/image`"
                 oninput="this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 28 * window.innerHeight / 100) + 'px'; this.scrollTop = this.scrollHeight;"
                 value="this.textContent()"
-                class="w-full overflow-auto scrollbar-hide py-1 px-[4%] md:py-3 md:pl-[2%] md:pr-[7%] border border-teal-400 dark:border-teal-600 rounded-lg focus:outline-none dark:outline-teal-600 focus:border-2 bg-gray-50 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-700 dark:text-white max-h-[28vh] pb-2 transition-colors duration-1000"></div>
+                class="w-full overflow-auto scrollbar-hide py-1 px-[4%] md:py-3 md:pl-[2%] md:pr-[7%] border border-teal-400 dark:border-teal-600 rounded-lg focus:outline-none dark:outline-teal-600 focus:border-2 bg-gray-50 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-700 dark:text-white max-h-[28vh] pb-2 transition-all duration-1000"></div>
 
             <section class="absolute right-[0.5px] bottom-0 p-1 flex w-full rounded-b-md dark:border-teal-600 shadow-xl">
                 <!-- Tools section (Attach Files and Preview) -->
@@ -982,7 +981,7 @@
                         <button id="previewBtn"
                                 class="flex h-9 min-w-8 items-center justify-center rounded-full border p-2 text-[13px] font-medium
                                         border-sky-900 bg-blue-300 hover:bg-blue-400 dark:border-red-400 dark:bg-red-700 dark:hover:bg-red-600
-                                        text-gray-900 dark:text-white"
+                                        text-gray-900 dark:text-white transition-colors duration-1000"
                                 aria-pressed="false"
                                 aria-label="Preview">
                             <div class="h-[18px] w-[18px]">
@@ -997,7 +996,7 @@
                         </div>
                     </div>
                     <button id="microphone" class="mx-2">
-                        <svg id="microphoneSVG" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="stroke-blue-600 dark:stroke-cyan-400 hover:stroke-sky-800 dark:hover:stroke-sky-200 w-6 h-6">
+                        <svg id="microphoneSVG" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="stroke-blue-600 dark:stroke-cyan-400 hover:stroke-sky-800 dark:hover:stroke-sky-200 w-6 h-6 transition-colors duration-1000">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
                         </svg>
                     </button>
@@ -1007,9 +1006,9 @@
                     id='diagToggle'
                     class="px-1 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-300 bg-blue-200 dark:bg-teal-700 rounded-md"
                     aria-label="Open Diagram modal"
-                    aria-label="Open Diagram modal">
+                    title="Open Diagram modal">
                         <!-- SVG: Nodes/Flow Diagram -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-8 text-gray-800 dark:text-gray-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-8 text-gray-800 dark:text-gray-100 transition-colors duration-1000" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <circle cx="5" cy="12" r="2" stroke-width="2" />
                             <circle cx="12" cy="5" r="2" stroke-width="2" />
                             <circle cx="12" cy="19" r="2" stroke-width="2" />
@@ -1019,7 +1018,7 @@
                     </button>
 
                     <!-- Triple Ripple with Gradient Border -->
-                    <button id="sendBtn" class="absolute right-2 h-14 w-14 bottom-4 rounded-full transition ease-in-out duration-200 z-32 bg-white border border-gray-200 bg-gradient-to-br from-[#00246c] dark:from-[#a800fc] to-[#008dd3] dark:to-indigo-900 overflow-hidden" aria-label="Send message" title="Send message">
+                    <button id="sendBtn" class="absolute right-2 h-14 w-14 bottom-4 rounded-full transition-all ease-in-out duration-1000 z-32 bg-white border border-gray-200 bg-gradient-to-br from-[#00246c] dark:from-[#a800fc] to-[#008dd3] dark:to-indigo-900 overflow-hidden" aria-label="Send message" title="Send message">
                     <div id="normalSend" class=" flex items-center justify-center h-full w-full">
                         <!-- Alternative Send Icon with a warm gradient -->
                         <svg class="w-8 h-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -1091,31 +1090,31 @@
         </div>
     </div>
 
-    <div id="dropZoneModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-40 hidden z-40">
-        <section id="dropZoneContent" title="Attach files" class="relative p-3 bg-white dark:bg-stone-800 rounded-xl shadow-lg w-full h-full md:mx-auto max-w-[70vw] max-h-[70vh] md:max-h-[80vh] lg:md:max-w-[50vw] mb-16" >
-            <button id="closeFileEModal" title="Close" class="absolute top-3 right-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:rotate-90">
+    <div id="dropZoneModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-40 hidden z-40 transition-colors duration-1000">
+        <section id="dropZoneContent" title="Attach files" class="relative p-3 bg-white dark:bg-stone-800 rounded-xl shadow-lg w-full h-full md:mx-auto max-w-[70vw] max-h-[70vh] md:max-h-[80vh] lg:md:max-w-[50vw] mb-16 transition-colors duration-1000" >
+            <button id="closeFileEModal" title="Close" class="absolute top-3 right-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:rotate-90 transition-colors duration-1000">
                 <svg class="fill-current h-5 w-5" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                     <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.65-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"></path>
                 </svg>
             </button>
             <h2 class="text-2xl font-semibold text-blue-700 dark:text-sky-300 mb-6">Upload File</h2>
-            <div id="dropZone" class="p-4 rounded-xl border-2 border-dashed border-blue-400 dark:border-cyan-400 w-full h-full md:mx-auto max-w-[calc(70vw-30px)] max-h-[calc(70vh-20vh)] md:max-h-[calc(80vh-20vh] cursor-pointer" onclick="event.stopPropagation()">
+            <div id="dropZone" class="p-4 rounded-xl border-2 border-dashed border-blue-400 dark:border-cyan-400 w-full h-full md:mx-auto max-w-[calc(70vw-30px)] max-h-[calc(70vh-20vh)] md:max-h-[calc(80vh-20vh] cursor-pointer transition-colors duration-1000" onclick="event.stopPropagation()">
                 <div class="flex flex-col items-center justify-center h-full">
                     <div id="dropZoneSVG" class="flex items-center justify-center">
-                        <svg class="fill-current h-12 w-12 text-blue-400 dark:text-blue-300" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <svg class="fill-current h-12 w-12 text-blue-400 dark:text-blue-300 transition-colors duration-1000" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
                             <path d="M14 2H6a2 2 0 00-2 2v6a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z"></path>
                         </svg>
                     </div>
-                    <p id="dropZoneText" class="text-gray-600 dark:text-gray-300 text-lg mb-4">Drag & drop files here or <span class="text-cyan-400 dark:text-blue-400">click to select</span></p>
+                    <p id="dropZoneText" class="text-gray-600 dark:text-gray-300 text-lg mb-4 transition-colors duration-1000">Drag & drop files here or <span class="text-cyan-400 dark:text-blue-400">click to select</span></p>
                     <!-- Modal Trigger Button -->
-                    <button id="modalTrigger" onclick="document.getElementById('previewModal').classList.remove('hidden')" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-purple-600 hover:to-blue-500 text-white font-semibold py-2.5 px-6 rounded-full shadow-md transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                    <button id="modalTrigger" onclick="document.getElementById('previewModal').classList.remove('hidden')" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-purple-600 hover:to-blue-500 text-white font-semibold py-2.5 px-6 rounded-full shadow-md transition-colors duration-1000 focus:outline-none focus:ring-2 focus:ring-purple-400">
                         <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                         Preview Files
                     </button>
                 </div>
             </div>
-            <section class="w-[calc(70vw-30px)] lg:max-w-[calc(50vw-30px)] absolute bg-gradient-to-r from-purple-200 via-pink-200 to-indigo-200 dark:bg-gradient-to-r dark:from-purple-800 dark:via-pink-800 dark:to-indigo-800 flex space-x-2 bottom-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-2">
+            <section class="w-[calc(70vw-30px)] lg:max-w-[calc(50vw-30px)] absolute bg-gradient-to-r from-purple-200 via-pink-200 to-indigo-200 dark:bg-gradient-to-r dark:from-purple-800 dark:via-pink-800 dark:to-indigo-800 flex space-x-2 bottom-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-2 transition-colors duration-1000">
                 <textarea type="text" aria-label="prompt input field" title="prompt field" id="imagePrompt" class="w-full pt-2 scrollbar-hide resize-none text-black dark:text-white max-h-[10vh] overflow-wrap rows-2 bg-transparent focus:outline-none" oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';" placeholder="Enter your prompt here"></textarea>
                 <div class="flex items-center justify-end">
                     <button id="submitImage" aria-label="submit button" title="submit" class="p-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg focus:outline-none hover:from-blue-600 hover:to-purple-700 w-fit">
@@ -1336,15 +1335,6 @@
         </div>
     </div>
 
-    <!-- Loading Modal -->
-    <div id="loadingModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div id="modalMainBox" class="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center animate-exit">
-            <!-- Spinner Animation -->
-            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <p id="loadingMSG" class="mt-3 text-gray-700">Processing, please wait...</p>
-        </div>
-    </div>
-
 
     <!-- API KEY Modal -->
     <div id="apiKeyModal" class="fixed inset-0 bg-blue-900/40 dark:bg-zinc-900/80 flex items-center justify-center z-30 hidden transition-colors duration-1000">
@@ -1494,9 +1484,9 @@
     </div>
 
 
-    <!-- Success Modal -->
+    <!-- API setting Success Modal -->
     <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 pointer-events-none transition-opacity duration-500 hidden">
-        <div id="successModalContent" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-96 transform scale-95 transition-transform duration-300">
+        <div id="successModalContent" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-96 transform scale-95 transition-all transform duration-1000">
 
             <!-- Success Icon & Title -->
             <h2 class="text-xl font-semibold text-center text-green-500 dark:text-green-400 flex items-center justify-center gap-2">
@@ -1532,10 +1522,55 @@
                 onclick="closediagViewModal();"
                 class="absolute top-1 right-3 text-white bg-red-600 hover:bg-red-700 px-2 py-1 rounded z-30 transition-all duration-1000"
             >Close</button>
-            <div class="w-full h-full overflow-auto">
+            <div class="w-full h-[96%] my-4 overflow-auto">
                 <div id="modal-content" class="p-4 flex flex-col"></div>
             </div>
         </section>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-41">
+        <div id="modalMainBox" class="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center animate-exit transition-all duration-1000">
+            <!-- Spinner Animation -->
+            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <p id="loadingMSG" class="mt-3 text-gray-700">Processing, please wait...</p>
+        </div>
+    </div>
+
+    <!-- General Success Modal -->
+    <div id="success-modal-GN" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden z-41">
+        <div id="successBoxBody-GN" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm text-center animate-exit transition-all duration-1000">
+            <!-- Animated Checkmark -->
+            <div class="flex items-center justify-center">
+                <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center animate-scale">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 animate-draw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-4">Success!</h2>
+            <p id="SuccessMsg-GN" class="text-sm text-gray-600 dark:text-gray-300 mt-2">Your action was completed successfully.</p>
+
+            <!-- Close Button -->
+            <button id="CloseSucsessModal-GN" onclick="window.hideStatus('success')" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal-GN" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-41">
+        <div id="errorBox-GN" class="bg-white p-6 rounded-lg shadow-lg min-w-80 max-w-[90vw] md:max-w-[70vw] animate-exit transition-all duration-1000">
+            <h2 class="text-lg font-semibold text-red-600">Error!</h2>
+            <p id="error-message-GN" class="mt-2 text-gray-600" id="errorMessage">Something went wrong.</p></p>
+            <section class="flex justify-center">
+                <button onclick="window.hideStatus('error')" class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    Close
+                </button>
+            </section>
+        </div>
     </div>
 
 </main>

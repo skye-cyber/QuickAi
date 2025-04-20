@@ -50,8 +50,8 @@ renderer.code = function(code) {
 	//const bg = validLanguage && ['css', 'html'].includes(validLanguage) ? 'dark:bg-[#000000]' : 'dark:bg-[#161420]';
 	console.log(validLanguage)
 	return `
-		<div class="my-2 block bg-blue-300 dark:bg-[#171717]  rounded-md">
-		<section class="flex justify-between top-1 p-1 w-full bg-sky-300 rounded-t-md dark:bg-[#222222] box-border">
+		<div class="my-2 block bg-blue-300 dark:bg-[#002f42]  rounded-md transition-colors duration-100">
+		<section class="flex justify-between top-1 p-1 w-full bg-sky-300 rounded-t-md dark:bg-[#001922] box-border transition-colors duration-700">
 		<!-- Language -->
 		<p class="code-language p-1 justify-start rounded-md text-slate-950 dark:text-white rounded-lg font-normal text-sm cursor-pointer opacity-80 hover:opacity-50">
 		${validLanguage}
@@ -77,7 +77,7 @@ renderer.code = function(code) {
 			` : ''}
 
 			<!-- Copy button -->
-			<button id="${copyButtonId}" onclick="window.handleCodeCopy(this, '${renderButtonId}');" class="copy-button flex items-center rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 text-sm text-white cursor-pointer transform transition-all duration-700">
+			<button id="${copyButtonId}" onclick="window.handleCodeCopy(this, '${renderButtonId}');" class="copy-button flex items-center rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 dark:from-[#00a5ce] dark:to-[#5500ff] dark:hover:from-[#00557f] dark:hover:to-[#006ea1] text-sm text-white cursor-pointer transform transition-all duration-700">
 			<svg class="mt-1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy mr-1">
 			<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
 			<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -86,8 +86,8 @@ renderer.code = function(code) {
 			</button>
 		</div>
 		</section>
-		<div class="p-2 border border-[#00ffff] dark:border-none w-full bg-sky-200 dark:bg-[#171717] rounded-md rounded-t-none overflow-auto scrollbar-hide transition-colors duration-700">
-		<code data-value=${renderButtonId} class="p-2 hljs ${validLanguage} block whitespace-pre rounded-md bg-sky-200 dark:bg-[#171717] font-mono transition-colors duration-700 overflow-x-auto">${highlighted}</code>
+		<div class="p-2 border border-[#00aaff] dark:border-[#00a5ce] w-full bg-cyan-100 dark:bg-[#001c24] rounded-md rounded-t-none overflow-auto scrollbar-hide transition-colors duration-700">
+		<code data-value=${renderButtonId} class="p-2 hljs ${validLanguage} block whitespace-pre rounded-md bg-cyan-100 dark:bg-[#001c24] font-mono transition-colors duration-700 overflow-x-auto">${highlighted}</code>
 		</div>
 		</div>
 		`;
