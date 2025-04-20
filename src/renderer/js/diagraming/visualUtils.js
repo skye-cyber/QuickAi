@@ -20,7 +20,7 @@ diagToggle.addEventListener('click', () => {
     opendiagViewModal();
 })
 
-async function exportSvgToPng(svgElementId, outputFileName = "diagram-dot-viz.png") {
+async function exportSvgToPng(svgElementId, outputFileName = `${svgElementId}.png`) {
     try {
         console.log('Exporting:', svgElementId)
         const parentDiv = document.getElementById(svgElementId);
