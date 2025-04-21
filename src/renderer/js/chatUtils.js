@@ -47,8 +47,16 @@ renderer.code = function(code) {
 	const copyButtonId = `copy-button-${Math.random().toString(36).substring(2, 9)}`;
 	const renderButtonId = `render-button-${Math.random().toString(36).substring(2, 9)}`;
 
-	//const bg = validLanguage && ['css', 'html'].includes(validLanguage) ? 'dark:bg-[#000000]' : 'dark:bg-[#161420]';
-	console.log(validLanguage)
+	function render(instance) {
+		if (validLanguage === 'html') {
+			console.log('html')
+			window.renderHtml(instance);
+		} else {
+			console.log("rest")
+			window.handleDiagrams(instance, validLanguage === 'dot' ? 'dot' : 'json', true);
+		}
+	}
+
 	return `
 		<div class="my-2 block bg-blue-300 dark:bg-[#002f42]  rounded-md transition-colors duration-100">
 		<section class="flex justify-between top-1 p-1 w-full bg-sky-300 rounded-t-md dark:bg-[#001922] box-border transition-colors duration-700">
@@ -61,7 +69,7 @@ renderer.code = function(code) {
 			<!-- Render Button -->
 			<button
 			id="${renderButtonId}"
-			onclick="window.handleDiagrams(this, '${validLanguage==='dot' ? 'dot' : 'json'}', isPlainCode=true)"
+			onclick="window.handleDiagrams(this, '${validLanguage === 'dot' ? 'dot' : 'json'}', isPlainCode=true, trigger='click')"
 			class="render-button flex items-center gap-1 rounded-md p-1 bg-gradient-to-r from-[#00aaff] to-purple-700 hover:to-[#55ff00] text-sm text-white cursor-pointer transform transition-all duration-700"
 			>
 			<!-- Network / Diagram Icon -->
@@ -75,6 +83,26 @@ renderer.code = function(code) {
 			<p id="BtText">Render</p>
 			</button>
 			` : ''}
+
+			<div class="flex justify-between space-x-3"
+			${(['html', 'svg'].includes(validLanguage)) ? `
+				<!-- Render html+svg -->
+				<button
+				id="${renderButtonId}"
+				onclick="window.renderHtml(this);"
+				class="render-button flex items-center gap-1 rounded-md p-1 bg-gradient-to-r from-[#00aaff] to-purple-700 hover:to-[#55ff00] text-sm text-white cursor-pointer transform transition-all duration-700"
+				>
+				<!-- Network / Diagram Icon -->
+				<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+				<circle cx="12" cy="5" r="2" />
+				<circle cx="5" cy="19" r="2" />
+				<circle cx="19" cy="19" r="2" />
+				<line x1="12" y1="7" x2="5" y2="17" />
+				<line x1="12" y1="7" x2="19" y2="17" />
+				</svg>
+				<p id="BtText">Render</p>
+				</button>
+				` : ''}
 
 			<!-- Copy button -->
 			<button id="${copyButtonId}" onclick="window.handleCodeCopy(this, '${renderButtonId}');" class="copy-button flex items-center rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 dark:from-[#00a5ce] dark:to-[#5500ff] dark:hover:from-[#00557f] dark:hover:to-[#006ea1] text-sm text-white cursor-pointer transform transition-all duration-700">
@@ -120,7 +148,7 @@ function addCopyListeners() {
 	});
 }
 
-async function handleCodeCopy(element, id=null){
+async function handleCodeCopy(element, id = null) {
 	console.log(id)
 	const codeBlock = document.querySelector(`[data-value="${id}"]`);
 	console.log(codeBlock)
@@ -148,8 +176,8 @@ function debounceRenderMathJax(_currentclass, delay = 1000, noDelay = false) {
 	if (noDelay) {
 		if (window.MathJax) {
 			MathJax.typesetPromise(Array.from(document.querySelectorAll('[class^="msg_"], [class*=" msg_"]')))
-			.then(() => console.log("MathJax rendering complete"))
-			.catch((err) => console.error("MathJax rendering error:", err.message));
+				.then(() => console.log("MathJax rendering complete"))
+				.catch((err) => console.error("MathJax rendering error:", err.message));
 		} else {
 			console.error("MathJax is not loaded or available.");
 		}
@@ -157,8 +185,8 @@ function debounceRenderMathJax(_currentclass, delay = 1000, noDelay = false) {
 		renderTimeout = setTimeout(() => {
 			if (window.MathJax) {
 				MathJax.typesetPromise(Array.from(document.querySelectorAll('[class^="msg_"], [class*=" msg_"]')))
-				.then(() => console.log("MathJax rendering complete"))
-				.catch((err) => console.error("MathJax rendering error:", err.message));
+					.then(() => console.log("MathJax rendering complete"))
+					.catch((err) => console.error("MathJax rendering error:", err.message));
 			} else {
 				console.error("MathJax is not loaded or available.");
 			}
@@ -166,7 +194,7 @@ function debounceRenderMathJax(_currentclass, delay = 1000, noDelay = false) {
 	}
 }
 
-function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
+function handleRequestError(error, userMessage, aiMessage, VS_url = null) {
 	try {
 		//start timer
 		const _Timer = new Timer();
@@ -179,7 +207,7 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 			console.log("History length:", conversationHistory.length);
 			console.log('Error:', JSON.stringify(error, null, 2));
 		} else {
-			if (error.message === "[object Object]"){
+			if (error.message === "[object Object]") {
 				console.log('Error:', error);
 				removeFirstConversationPairs(conversationHistory);
 			}
@@ -192,13 +220,13 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 			let lastMessage = conversationHistory.slice(-1); // Safely access the last message
 			//console.log(lastMessage)
 
-			function HideLoaderUserAiMs(all=false){
+			function HideLoaderUserAiMs(all = false) {
 				//Remove loading animation if present
-				if (aiMessage){
-					if (aiMessage.firstElementChild.id === "loader-parent"){
-						if (all){
+				if (aiMessage) {
+					if (aiMessage.firstElementChild.id === "loader-parent") {
+						if (all) {
 							userMessage.remove();
-						} else{
+						} else {
 							aiMessage.remove();
 						}
 					}
@@ -236,7 +264,7 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 					errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
 				}, 200); // 0.3 second delay
 				let ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check your Internet!" : error.message;
-				if (error.message === "[object Object]"){
+				if (error.message === "[object Object]") {
 					ErrorMs = "This model is unreachabble: It might be overloaded!"
 				}
 				errorArea.textContent = ErrorMs;
@@ -257,12 +285,12 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 				}, 0); // 1 second for reset
 			}
 			// Remove existing event listeners before adding a new one
-			async function retryHandler(){
+			async function retryHandler() {
 				await HideErrorModal()
 
 				if (VS_url) {
 
-					try{
+					try {
 						var text = lastMessage[0].content[0].text;
 						var fileDataUrl = [];
 
@@ -286,13 +314,13 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 						}
 					}
 
-					text = text.slice(-1)===']' ? text.slice(0, text.length - 22) : text;
+					text = text.slice(-1) === ']' ? text.slice(0, text.length - 22) : text;
 					fileDataUrl = fileDataUrl.length !== 0 ? fileDataUrl : null;
 					window.VisionChat(text, VS_url[1], fileDataUrl);
 				} else {
 
 					// Strip date && time from user message
-					lastMessage = lastMessage[0].content.slice(-1)===']' ? lastMessage[0].content.slice(0, lastMessage[0].content.length - 22) : lastMessage[0].content;
+					lastMessage = lastMessage[0].content.slice(-1) === ']' ? lastMessage[0].content.slice(0, lastMessage[0].content.length - 22) : lastMessage[0].content;
 
 					// Retry action
 					window.requestRouter(lastMessage.trim());
@@ -301,7 +329,7 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 				if (aiMessage) aiMessage.remove();
 				if (userMessage) userMessage.remove();
 			};
-				showError();
+			showError();
 		}
 	} catch (err) {
 		console.error('Error handling request error:', err);
@@ -351,7 +379,7 @@ function CopyAll(UId, bt = null) {
 	if (textToCopy.length >= 50) {
 		try {
 			navigator.clipboard.writeText(textToCopy);
-			if (bt){
+			if (bt) {
 				bt.textContent = 'Copied!';
 				setTimeout(() => {
 					bt.textContent = 'Copy';
@@ -367,14 +395,14 @@ function CopyAll(UId, bt = null) {
 }
 
 // Function to show the modal
-function showCopyModal(_color=null, text="Text copied") {
+function showCopyModal(_color = null, text = "Text copied") {
 	const modal = document.getElementById('copyModal');
 	const txtSpace = document.getElementById("text-space")
 	txtSpace.textContent = text;
 	addRmColor();
-	function addRmColor(task="add"){
-		if (_color){
-			if (task==="add"){
+	function addRmColor(task = "add") {
+		if (_color) {
+			if (task === "add") {
 				txtSpace.classList.add(_color);
 				console.log("Added", _color)
 			}
@@ -422,7 +450,7 @@ function removeFirstConversationPairs(conversationHistory, count = 2) {
 }
 
 
-function copyBMan(){
+function copyBMan() {
 	document.querySelectorAll(".Vision-user-copy-button").forEach(button => {
 		//console.log("Adding copy control")
 		// Get the next sibling of the current element
@@ -448,27 +476,27 @@ function escapeHTML(unsafe) {
 		return '';
 	}
 	return unsafe
-	.replace(/&/g, "&amp;")
-	.replace(/\n+/g, '\n')  // 1+ newlines → 1 newline
-	.replace(/</g, "&lt;")
-	.replace(/>/g, "&gt;")
-	.replace(/"/g, "&quot;")
-	.replace(/'/g, "&#039;");
+		.replace(/&/g, "&amp;")
+		.replace(/\n+/g, '\n')  // 1+ newlines → 1 newline
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
 }
 
 
-function HandleProcessingEventChanges(status){
+function HandleProcessingEventChanges(status) {
 	const sendBtn = document.getElementById("sendBtn");
 	const normalSend = document.getElementById("normalSend"); //initially displayed
 	const spinningSquares = document.getElementById("spinningSquares"); //inirially hidden
-	if (status === 'show'){
+	if (status === 'show') {
 		normalSend.classList.add('hidden')
 		spinningSquares.classList.remove('hidden')
 		//Disable the send button
 		sendBtn.disabled = true;
 		// Add Cursor prohibited/disabled cursor class
 		sendBtn.classList.add('cursor-disable');
-	} else if (status === 'hide'){
+	} else if (status === 'hide') {
 		spinningSquares.classList.add('hidden')
 		normalSend.classList.remove('hidden')
 		//re-enable the send button
@@ -548,7 +576,7 @@ previewBtn.addEventListener('click', function() {
 	//update system instructions
 	window.electron.updateSysInit()
 
-	if (isActive!=="true") {
+	if (isActive !== "true") {
 		// When activated: switch to vibrant green theme
 		this.classList.remove('border-sky-900', 'bg-blue-300', 'hover:bg-blue-400', 'dark:border-red-400', 'dark:bg-red-700', 'dark:hover:bg-red-600');
 		this.classList.add('border-green-500', 'bg-green-300', 'hover:bg-green-400', 'dark:border-green-400', 'dark:bg-green-700', 'dark:hover:bg-green-600');

@@ -112,10 +112,6 @@ async function exportSvgToPng(svgElementId, outputFileName = `${svgElementId}.pn
     }
 }
 
-function exportCanvasToPng(canvasElement) {
-    //
-}
-
 //opendiagViewModal();
 window.opendiagViewModal = opendiagViewModal;
 window.closediagViewModal = closediagViewModal;
