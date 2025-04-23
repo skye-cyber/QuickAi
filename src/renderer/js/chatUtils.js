@@ -168,34 +168,6 @@ async function handleCodeCopy(element, id = null) {
 }
 
 
-// Function to ensure Katex renders dynamically injected content
-let renderTimeout;
-
-function debounceRenderMathJax(_currentclass, delay = 1000, noDelay = false) {
-	if (renderTimeout) clearTimeout(renderTimeout);
-
-	if (noDelay) {
-		if (window.MathJax) {
-			MathJax.typesetPromise(Array.from(document.querySelectorAll('[class^="msg_"], [class*=" msg_"]')))
-				.then(() => console.log("MathJax rendering complete"))
-				.catch((err) => console.error("MathJax rendering error:", err.message));
-		} else {
-			console.error("MathJax is not loaded or available.");
-		}
-	} else {
-		renderTimeout = setTimeout(() => {
-			if (window.MathJax) {
-				MathJax.typesetPromise(Array.from(document.querySelectorAll('[class^="msg_"], [class*=" msg_"]')))
-					.then(() => console.log("MathJax rendering complete"))
-					.catch((err) => console.error("MathJax rendering error:", err.message));
-			} else {
-				console.error("MathJax is not loaded or available.");
-			}
-		}, delay);
-	}
-}
-
-
 function handleRequestError(error, userMessage, aiMessage, VS_url = null) {
 	try {
 		//start timer
@@ -473,18 +445,17 @@ function copyBMan() {
 }
 
 
-function escapeHTML(unsafe) {
-	if (typeof unsafe !== 'string') {
-		return '';
-	}
-	return unsafe
-		.replace(/&/g, "&amp;")
-		.replace(/\n+/g, '\n')  // 1+ newlines → 1 newline
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;");
+function smartEscapeMathPreserve(text) {
+	return text.replace(/\$\$.*?\$\$|\$.*?\$|\\\[.*?\\\]|\\\(.*?\\\)/gs, (match) => {
+		// Math block detected — return as is
+		return match;
+	}).replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/&/g, '&amp;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#039;');
 }
+
 
 
 function HandleProcessingEventChanges(status) {
@@ -605,12 +576,30 @@ function setutilityScriptisSet() {
 	return exists
 }
 
+function normalizeMathDelimiters(text) {
+	return text
+	// 1) convert [ … ] → $$ … $$, but only if it contains math operators or \commands
+	.replace(
+		/\[([^\[\]]*?(?:\\|[\d\^+\-*/])[^\[\]]*?)\]/g,
+			 (_, expr) => `$$${expr.trim()}$$`
+	)
+
+	// 2) merge stray newlines in $$…$$—but only $$ blocks that look like math
+	.replace(
+		/\$\$(?=[\s\S]*?(?:\\|[\d\^+\-*/]))([\s\S]*?)\$\$/g,
+			 (_, expr) => `$$${expr.replace(/\n/g, ' ').trim()}$$`
+	);
+}
+
+
+
+
 //avail marked to the other scripts
 window.Timer = Timer
 window.marked = marked;
 window.CopyAll = CopyAll
 window.copyBMan = copyBMan
-window.escapeHTML = escapeHTML
+window.escapeHTML = smartEscapeMathPreserve
 window.showCopyModal = showCopyModal
 window.handleCodeCopy = handleCodeCopy;
 window.showDeletionStatus = showCopyModal
@@ -618,6 +607,6 @@ window.showDeletionStatus = showCopyModal
 window.implementUserCopy = implementUserCopy
 window.handleRequestError = handleRequestError
 window.setutilityScriptisSet = setutilityScriptisSet
-window.debounceRenderMathJax = debounceRenderMathJax
+window.normalizeMathDelimiters = normalizeMathDelimiters
 window.removeFirstConversationPairs = removeFirstConversationPairs
 window.HandleProcessingEventChanges = HandleProcessingEventChanges;

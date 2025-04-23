@@ -108,6 +108,7 @@ class ConversationManager {
                 }
             }
             window.electron.CreateNew(conversationData, model)
+            window.debounceRenderKaTeX(null, null, true);
         });
 
         window.implementUserCopy();
@@ -130,7 +131,7 @@ class ConversationManager {
             };
 
             // Find the item with type "image_url" or "file_url"
-            const fileTypeItem = content.find(item => item.type === "image_url" || item.type === "file_url");
+            const fileTypeItem = content.find(item => item.type === "image_url" || item.type === "document_url");
 
             // Check if the found item exists and has a valid type
             if (fileTypeItem && fileDict[fileTypeItem.type]) {
@@ -270,7 +271,7 @@ class ConversationManager {
 						</button>
 						</div>
 						<div id="${foldId}" class="">
-						<p style="color: #333;">${window.marked(thinkContent)}</p>
+						<p style="color: #333;">${window.marked(window.normalizeMath(thinkContent))}</p>
 						</div>
 						</div>
 						` : ''}
@@ -278,7 +279,7 @@ class ConversationManager {
 						${actualResponse ? `
 							<div class="${aiMessageId} bg-blue-200 py-4 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-1000">
 							${actualResponse && thinkContent ? `<strong class="text-[#28a745]">Response:</strong>` : ''}
-							<p class="text-white">${window.marked(actualResponse)}</p>
+							<p class="text-white">${window.marked(window.normalizeMathDelimiters(actualResponse))}</p>
 							<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
 								<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
 									<div
@@ -360,6 +361,9 @@ class ConversationManager {
                 `;
         // render diagrams fromthis response
         window.handleDiagrams(actualResponse, 'both');
+        window.debounceRenderKaTeX(`.${aiMessageId}`, null, true);
+        normaliZeMathDisplay(`.${aiMessageId}`)
+
     }
 
     // Render vision-based assistant message
@@ -375,7 +379,7 @@ class ConversationManager {
         //const fileDataUrl = this.getFileUrl(content);
         visionMessage.innerHTML = `
                 <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-					<div class="${visionMessageId} bg-blue-200 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl transition-colors duration-1000">${window.marked(textContent)}
+					<div class="${visionMessageId} bg-blue-200 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl transition-colors duration-1000">${window.marked(window.normalizeMathDelimiters(textContent))}
 					</div>
 					<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
 						<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
@@ -458,6 +462,9 @@ class ConversationManager {
 
         // render diagrams from this response
         window.handleDiagrams(textContent, 'both');
+        window.debounceRenderKaTeX(`.${visionMessageId}`, null, true);
+        normaliZeMathDisplay(`.${visionMessageId}`)
+
     }
 }
 const conversationManager = new ConversationManager(storagePath);

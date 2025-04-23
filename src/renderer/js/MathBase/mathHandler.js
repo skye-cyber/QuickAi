@@ -8,34 +8,41 @@ window.renderMathInElement = renderMathInElement;
 // Function to ensure Katex renders dynamically injected content
 //let renderTimeout;
 
+const renderTimeouts = new Map();
+
 function debounceRenderKaTeX(containerSelector, delay = 1000, noDelay = false) {
-    //if (renderTimeout) clearTimeout(renderTimeout);
+    const selector = containerSelector ? containerSelector : 'body'
+    let element = document.querySelector(selector);
+
+    if (!element) return;
 
     const render = () => {
-        const elements = document.querySelector(containerSelector)
+        renderTimeouts.delete(containerSelector);  // Clear from the map once rendered
 
-        console.log('Container', containerSelector||'body')
-        console.log('Rendering:', elements)
         if (window.renderMathInElement) {
-            window.renderMathInElement(containerSelector? elements:document.body, {
+            window.renderMathInElement(element, {
                 delimiters: [
                     { left: '$$', right: '$$', display: true },
                     { left: '\\[', right: '\\]', display: true },
                     { left: '$', right: '$', display: false },
-                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\(', right: '\\)', display: true },
                 ],
                 throwOnError: false,
             });
-            console.log('KaTeX rendering complete');
+            console.log('KaTeX rendering complete for', selector);
         } else {
             console.error('KaTeX auto-render extension not loaded.');
         }
     };
 
+    // Avoid scheduling another render if one is already queued for the same container
+    if (renderTimeouts.has(containerSelector)) return;
+
     if (noDelay) {
         render();
     } else {
-        setTimeout(render, delay);
+        const timeout = setTimeout(render, delay);
+        renderTimeouts.set(containerSelector, timeout);
     }
 }
 

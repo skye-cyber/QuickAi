@@ -269,15 +269,14 @@ async function routeToHf(text) {
 									`;
 
 					AutoScroll.checked ? scrollToBottom(chatArea) : null;
+					// Debounce katex rendering to avoid freezing
+					window.debounceRenderKaTeX(`.${aiMessageUId}`, 3000, false);
 				}
 
 			//stop timer
 			_Timer.trackTime("stop");
 
 			//window.addCopyListeners();
-
-			// Debounce MathJax rendering to avoid freezing
-			window.debounceRenderMathJax(aiMessageUId);
 
 			// Resent send button appearance
 			window.HandleProcessingEventChanges('hide')
@@ -289,7 +288,9 @@ async function routeToHf(text) {
 			}
 
 			// Render mathjax immediately
-			window.debounceRenderMathJax(aiMessageUId, 0, true);
+			window.debounceRenderKaTeX(null, null, true);
+			normaliZeMathDisplay(`.${aiMessageUId}`)
+
 			// Store conversation history
 			window.electron.addToChat({ role: "assistant", content: fullResponse });
 
@@ -425,7 +426,7 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 				visionMs += choice.delta.content;
 				VisionMessage.innerHTML = `
 					<section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-					<div class="${VisionMessageUId} bg-blue-200 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl transition-colors duration-1000">${window.marked(visionMs)}
+					<div class="${VisionMessageUId} bg-blue-200 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl transition-colors duration-1000">${window.marked(window.normalizeMathDelimiters(visionMs))}
 						<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
 							<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
 								<div
@@ -507,11 +508,9 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 					`;
 
 				AutoScroll.checked ? scrollToBottom(chatArea) : null;
+				window.debounceRenderKaTeX(`.${VisionMessageUId}`, 3000, true);
 
 				//window.addCopyListeners();
-
-				// Debounce MathJax rendering to avoid freezing
-				window.debounceRenderMathJax(VisionMessageUId);
 			}
 		}
 
@@ -524,7 +523,9 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 		window.setutilityScriptisSet();
 
 		// Render mathjax immediately
-		window.debounceRenderMathJax(VisionMessageUId, 0, true);
+		window.debounceRenderKaTeX(null, null, true);
+		normaliZeMathDisplay(`.${VisionMessageUId}`)
+
 		window.electron.addToVisionChat({ role: "assistant", content: [{ type: "text", text: visionMs }] });
 		//console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
 

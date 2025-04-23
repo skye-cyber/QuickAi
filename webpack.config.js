@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const CopyPlugin = require("copy-webpack-plugin");
 
 const entries = {
-    //hfaichat: './src/renderer/js/hfaichat.js',
+    hfaichat: './src/renderer/js/hfaichat.js',
     //utility: './src/renderer/js/exportUtilities.js',
     MistralChatsAdmin: './src/renderer/js/MistralChatsAdmin.js',
     chatUtils: './src/renderer/js/chatUtils.js',

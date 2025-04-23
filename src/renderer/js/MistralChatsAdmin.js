@@ -148,7 +148,7 @@ async function MistraChat(text, modelName) {
 							</button>
 							</div>
 							<div id="${foldId}" class="">
-							<p style="color: #333;">${window.marked(thinkContent)}</p>
+							<p style="color: #333;">${window.marked(window.normalizeMathDelimiters(thinkContent))}</p>
 							</div>
 							</div>
 							` : ''}
@@ -156,7 +156,7 @@ async function MistraChat(text, modelName) {
 							${actualResponse ? `
 								<div class="${aiMessageUId} bg-blue-200 py-4 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-1000">
 								${actualResponse && thinkContent ? `<strong class="text-[#28a745]">Response:</strong>` : ''}
-								<p style="color: #333;">${window.marked(actualResponse)}</p>
+								<p style="color: #333;">${window.marked(window.normalizeMathDelimiters(actualResponse))}</p>
 								<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
 									<div class="group relative max-w-fit transition-all duration-300 hover:z-50">
 										<div
@@ -239,6 +239,8 @@ async function MistraChat(text, modelName) {
 			`;
 
 			AutoScroll.checked ? scrollToBottom(chatArea) : null;
+			// Render mathjax immediately
+			window.debounceRenderKaTeX(`.${aiMessageUId}`, 3000, false);
 		}
 		//stop timer
 		_Timer.trackTime("stop");
@@ -251,8 +253,11 @@ async function MistraChat(text, modelName) {
 		// Sending a message to the main process if script does not exist already
 		window.setutilityScriptisSet();
 
-		// Render mathjax immediately
-		window.debounceRenderMathJax(aiMessageUId, 0, true);
+		// Render katex immediately
+		window.debounceRenderKaTeX(null, null, true);
+		normaliZeMathDisplay(`.${aiMessageUId}`)
+
+
 		// Store conversation history
 		window.electron.addToChat({ role: "assistant", content: output });
 
@@ -434,13 +439,13 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 							</button>
 						</div>
 						<div id="${foldId}" class="">
-							<p style="color: #333;">${window.marked(thinkContent)}</p>
+							<p style="color: #333;">${window.marked(window.normalizeMathDelimiters(thinkContent))}</p>
 						</div>
 					</div>
 					` : ''}
 						${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
 						${actualResponse ? `<div class="${VisionMessageUId} bg-blue-200 py-4 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-100">${actualResponse && thinkContent ? `<strong class="text-[#28a745]">Response:</strong>` : ''}
-							<p style="color: #333;">${window.marked(actualResponse)}</p>
+							<p style="color: #333;">${window.marked(window.normalizeMathDelimiters(actualResponse))}</p>
 					<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
 						<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
 							<div
@@ -517,17 +522,13 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 				</li>
 				</ul>
 				</div>
-				</section>`:""}
+				</section>`: ""}
 				`;
 
 			AutoScroll.checked ? scrollToBottom(chatArea) : null;
 
-			//window.addCopyListeners();
-
 			// Debounce MathJax rendering to avoid freezing
-			window.debounceRenderMathJax(VisionMessageUId);
-
-			AutoScroll.checked ? scrollToBottom(chatArea) : null;
+			window.debounceRenderKaTeX(`.${VisionMessageUId}`, 3000, true);
 		}
 
 		//stop timer
@@ -538,8 +539,10 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 
 		window.setutilityScriptisSet()
 
-		// Render mathjax immediately
-		window.debounceRenderMathJax(VisionMessageUId, 0, true);
+		// Render katex immediately
+		window.debounceRenderKaTeX(null, null, true);
+		normaliZeMathDisplay(`.${VisionMessageUId}`)
+
 		window.electron.addToVisionChat({ role: "assistant", content: [{ type: "text", text: output }] });
 		//console.log("Final VisionHistory:", JSON.stringify(window.electron.getVisionChat(), null, 2));
 
