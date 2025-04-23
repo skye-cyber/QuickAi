@@ -126,14 +126,17 @@ function handleFiles(files) {
             const reader = new FileReader();
 
             const AllfileTypes = "image";
-            window.AllfileTypes = AllfileTypes
+            window.AllfileTypes = fileType //AllfileTypes
             reader.onload = (e) => {
                 const imageDataUrl = e.target.result;
                 fileUrls.push(imageDataUrl);
             };
             reader.readAsDataURL(file);
         } else {
-            Notify(null, "Unsupported files were ignored!")
+            window.displayStatus("Unsupported files were ignored!", "success");
+            setTimeout(()=>{
+                window.hideStatus('success')
+            }, 3000)
         }
     }
     // Store the image data URL in the global window object
@@ -177,12 +180,19 @@ function submitImageAndText() {
         document.dispatchEvent(event);
         document.getElementById('dropZoneSVG').classList.remove('hidden')
         CloseFileModal();
-        document.getElementById('suggestions').classList.add('hidden');
+        const suggestions = document.getElementById('suggestions')
+        suggestions ? suggestions.classList.add('hidden') : '';
     } else {
         if (!imageDataUrl) {
-            Notify(null, "Please select a file!")
+            window.displayStatus("Please select a file!", "success");
+            setTimeout(()=>{
+                window.hideStatus('success')
+            }, 3000)
         } else if (!text) {
-            Notify(null, "Please Enter a prompt relating to the upload")
+            window.displayStatus("Please Enter a prompt relating to the upload", "success");
+            setTimeout(()=>{
+                window.hideStatus('success')
+            }, 3000)
         }
     }
 }

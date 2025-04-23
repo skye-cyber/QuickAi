@@ -307,7 +307,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 
 		else if (fileType == "document") {
 			const documentContent = fileDataUrl.map(_url => ({
-				type: "file_url",
+				type: "document_url",
 				documentUrl: {
 					url: _url,
 				}
@@ -330,8 +330,6 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 			},
 		];
 	}
-
-	console.log(userContent)
 
 	// Add user message to VisionHistory
 	window.electron.addToVisionChat({
@@ -441,7 +439,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 					</div>
 					` : ''}
 						${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
-						${actualResponse ? `<div class="${VisionMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-100">${actualResponse && thinkContent ? `<strong class="text-[#28a745]">Response:</strong>` : ''}
+						${actualResponse ? `<div class="${VisionMessageUId} bg-blue-200 py-4 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-100">${actualResponse && thinkContent ? `<strong class="text-[#28a745]">Response:</strong>` : ''}
 							<p style="color: #333;">${window.marked(actualResponse)}</p>
 					<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
 						<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
@@ -543,7 +541,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 		// Render mathjax immediately
 		window.debounceRenderMathJax(VisionMessageUId, 0, true);
 		window.electron.addToVisionChat({ role: "assistant", content: [{ type: "text", text: output }] });
-		console.log("Final VisionHistory:", JSON.stringify(window.electron.getVisionChat(), null, 2));
+		//console.log("Final VisionHistory:", JSON.stringify(window.electron.getVisionChat(), null, 2));
 
 		// render diagrams fromthis response
 		window.handleDiagrams(output, 'both');

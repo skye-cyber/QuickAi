@@ -1,16 +1,18 @@
 const path = require('path');
 const webpack = require('webpack');
+const CopyPlugin = require("copy-webpack-plugin");
 
 const entries = {
     //hfaichat: './src/renderer/js/hfaichat.js',
     //utility: './src/renderer/js/exportUtilities.js',
-    //MistralChatsAdmin: './src/renderer/js/MistralChatsAdmin.js',
+    MistralChatsAdmin: './src/renderer/js/MistralChatsAdmin.js',
     chatUtils: './src/renderer/js/chatUtils.js',
     //hfaudio: './src/renderer/js/hfaudio.js',
     visualRenderer: './src/renderer/js/diagraming/visualRenderer.js',
     //preference: './src/renderer/js/preference.js',
     //keyshortcuts: './src/renderer/js/keyshortcuts.js',
-    //fileHandler: './src/renderer/js/fileHandler.js'
+    //fileHandler: './src/renderer/js/fileHandler.js',
+    mathHandler: './src/renderer/js/MathBase/mathHandler.js'
 };
 
 module.exports = Object.entries(entries).map(([name, entryPath]) => {
@@ -29,6 +31,14 @@ module.exports = Object.entries(entries).map(([name, entryPath]) => {
                 process: 'process/browser',
                 Buffer: ['buffer', 'Buffer'],
                 crypto: ['crypto-browserify'],
+            }),
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: path.join(__dirname, "node_modules/katex/dist"),
+                        to: "katex"        // <-- this folder will appear in your `dist/`
+                    }
+                ]
             }),
         ],
         optimization: {
@@ -63,6 +73,18 @@ module.exports = Object.entries(entries).map(([name, entryPath]) => {
                     use: {
                         loader: 'babel-loader',
                     },
+                },
+                {
+                    test: /\.html$/i,
+                    loader: "html-loader",
+                    options: { sources: false }   // don’t rewrite <link>/@href URLs
+                },
+                {
+                    test: /\.css$/i,
+                    use: [
+                        'style-loader', // Injects CSS into <style> tags at runtime
+                        'css-loader'    // Resolves @import and url()
+                    ]
                 },
             ],
         },

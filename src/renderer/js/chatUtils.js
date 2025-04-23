@@ -1,5 +1,6 @@
 import { marked } from "marked";
 import hljs from 'highlight.js';
+
 // Initialize highlight.js
 hljs.configure({ ignoreUnescapedHTML: true });
 
@@ -167,7 +168,7 @@ async function handleCodeCopy(element, id = null) {
 }
 
 
-// Function to ensure MathJax renders dynamically injected content
+// Function to ensure Katex renders dynamically injected content
 let renderTimeout;
 
 function debounceRenderMathJax(_currentclass, delay = 1000, noDelay = false) {
@@ -193,6 +194,7 @@ function debounceRenderMathJax(_currentclass, delay = 1000, noDelay = false) {
 		}, delay);
 	}
 }
+
 
 function handleRequestError(error, userMessage, aiMessage, VS_url = null) {
 	try {

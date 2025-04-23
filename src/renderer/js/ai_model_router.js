@@ -43,34 +43,49 @@ userInput.addEventListener("keydown", (e) => {
 });
 
 
-function switchToVision() {
+async function switchToVision() {
     // switch to vision model
     if (AllVisionModels.length > 0) {
-        modelSelection.value = (!AllVisionModels.includes(modelSelection.value))
-            ? AllVisionModels[Math.floor(Math.random() * AllVisionModels.length)]
-            : modelSelection.value;
+        if (!AllVisionModels.includes(modelSelection.value)) {
+            const res = await window.setModel('mistral-small-latest')
+            return res
+        }
     } else {
         console.warn("AllVisionModels is empty.");
     }
 }
 
-// Listen for the imageLoaded event
-document.addEventListener('imageLoaded', function(event) {
+async function getModelValue() {
+    return document.getElementById('model').value
+}
+
+async function chooseRoute() {
+    //document.querySelector(`[data-value="mistral-small-latest"]`).click();
     const fileDataUrl = event.detail.fileDataUrl;
     const text = event.detail.text;
     const fileType = event.detail.fileType
-    const modelName = modelSelection.value
+
+    // Define the set of models that should use MistraVision
+    const mistralModels = ["pixtral-12b-2409", "pixtral-large-2411", "mistral-small-latest"];
 
     //switch to vision model
-    switchToVision()
+    const res = await switchToVision()
 
-    if (["pixtral-12b-2409", "pixtral-large-2411", "mistral-small-latest"].includes(modelName)) {
+    const modelName = await getModelValue();
+
+    if (!res===true){
+        console.log('fail')
+    }
+
+    if (mistralModels.includes(modelName)) {
         window.MistraVision(text, fileType, fileDataUrl, modelName);
     } else {
         window.VisionChat(text, fileType, fileDataUrl, null);
     }
+}
 
-});
+// Listen for the imageLoaded event
+document.addEventListener('imageLoaded', async (event) => {await chooseRoute(event);});
 
 /**
  * Classify the input text by checking the current model category and
@@ -86,7 +101,7 @@ function requestRouter(text) {
     // Get the data-class attribute from the selected option
     const dataClass = selectedOption.getAttribute('data-class');
 
-    console.log("DataClass:", dataClass); // This will log the value of the data-avalue attribute
+    //console.log("DataClass:", dataClass); // This will log the value of the data-avalue attribute
     if (dataClass === "hf") {
         window.routeToHf(text);
     } else if (dataClass === "mistral") {

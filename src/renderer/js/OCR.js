@@ -6,7 +6,7 @@ const client = new Mistral({apiKey: apiKey});
 const ocrResponse = await client.ocr.process({
     model: "mistral-ocr-latest",
     document: {
-        type: "document_url",
+            type: "document_url",
         documentUrl: "https://arxiv.org/pdf/2201.04234"
     },
     includeImageBase64: true
