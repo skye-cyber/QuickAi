@@ -14,10 +14,23 @@ async function normaliZeMathDisplay(selector, space=true) {
     }
     if (space){
         normalizeMathSpacing();
+        //normalizeCodeBlock(selector);
     }
 }
 
 
+async function normalizeCodeBlock(selector){
+    const element = document.querySelector(selector)
+    const blocks = element.querySelectorAll('code')
+    blocks.forEach(block =>{
+        const childItem = block.querySelectorAll()
+        // Replace $...$ with [...]
+        //block.textContent = block.textContent.replace(/\$(.*?)\$/g, '[$1]');
+
+        // Replace $$...$$ with [...]
+        block.innerText = block.innerText.replace(/\$\$(.*?)\$\$/g, '[$1]');
+    })
+}
 async function normalizeMathSpacing() {
     const items = document.querySelectorAll('.katex');
     if (items) {

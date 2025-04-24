@@ -66,7 +66,7 @@ renderer.code = function(code) {
 		${validLanguage}
 		</p>
 		<div class="flex justify-between space-x-3"
-		${(dgLang) ? `
+		${(dgCodeBlock) ? `
 			<!-- Render Button -->
 			<button
 			id="${renderButtonId}"
