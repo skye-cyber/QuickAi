@@ -20,10 +20,11 @@ renderer.code = function(code) {
 
 	}
 
-	let jsonLang = (validLanguage.endsWith('-draw') || validLanguage === 'dot') ? validLanguage : null;
-	validLanguage = jsonLang ? validLanguage.slice(0, -5) : validLanguage;
+	let dgCodeBlock = ['dot-draw', 'json-draw', 'json-chart'].includes(validLanguage) ? true : false;
 
-	//console.log('jsonLang:', jsonLang, 'validLang:', validLanguage);
+	let dgLang = dgCodeBlock ? validLanguage : null;
+
+	validLanguage = dgLang ? (['json', 'dot'].includes(dgLang) ? validLanguage.slice(0, -5) : validLanguage.slice(0, -6)) : validLanguage;
 
 	// Highlight the code
 	let highlighted;
@@ -42,20 +43,19 @@ renderer.code = function(code) {
 	}
 
 	// Reset language to json-draw
-	validLanguage = jsonLang ? jsonLang : validLanguage
+	validLanguage = dgLang ? dgLang : validLanguage
 
 	// Generate unique ID for the copy button
 	const copyButtonId = `copy-button-${Math.random().toString(36).substring(2, 9)}`;
 	const renderButtonId = `render-button-${Math.random().toString(36).substring(2, 9)}`;
 
-	function render(instance) {
-		if (validLanguage === 'html') {
-			console.log('html')
-			window.renderHtml(instance);
-		} else {
-			console.log("rest")
-			window.handleDiagrams(instance, validLanguage === 'dot' ? 'dot' : 'json', true);
+	function getdgFunction() {
+		const mapper = {
+			'dot-draw': `window.handleDiagrams(this, 'dot', isPlainCode=true, trigger='click')`,
+			'json-draw': `window.handleDiagrams(this, 'json'}', isPlainCode=true, trigger='click')`,
+			'json-chart': `window.LoopRenderCharts(this, type='code', trigger='click')`
 		}
+		return mapper[dgLang]
 	}
 
 	return `
@@ -66,11 +66,11 @@ renderer.code = function(code) {
 		${validLanguage}
 		</p>
 		<div class="flex justify-between space-x-3"
-		${(jsonLang) ? `
+		${(dgLang) ? `
 			<!-- Render Button -->
 			<button
 			id="${renderButtonId}"
-			onclick="window.handleDiagrams(this, '${validLanguage === 'dot' ? 'dot' : 'json'}', isPlainCode=true, trigger='click')"
+			onclick="${getdgFunction()}"
 			class="render-button flex items-center gap-1 rounded-md p-1 bg-gradient-to-r from-[#00aaff] to-purple-700 hover:to-[#55ff00] text-sm text-white cursor-pointer transform transition-all duration-700"
 			>
 			<!-- Network / Diagram Icon -->
@@ -576,23 +576,6 @@ function setutilityScriptisSet() {
 	return exists
 }
 
-function normalizeMathDelimiters(text) {
-	return text
-	// 1) convert [ … ] → $$ … $$, but only if it contains math operators or \commands
-	.replace(
-		/\[([^\[\]]*?(?:\\|[\d\^+\-*/])[^\[\]]*?)\]/g,
-			 (_, expr) => `$$${expr.trim()}$$`
-	)
-
-	// 2) merge stray newlines in $$…$$—but only $$ blocks that look like math
-	.replace(
-		/\$\$(?=[\s\S]*?(?:\\|[\d\^+\-*/]))([\s\S]*?)\$\$/g,
-			 (_, expr) => `$$${expr.replace(/\n/g, ' ').trim()}$$`
-	);
-}
-
-
-
 
 //avail marked to the other scripts
 window.Timer = Timer
@@ -607,6 +590,5 @@ window.showDeletionStatus = showCopyModal
 window.implementUserCopy = implementUserCopy
 window.handleRequestError = handleRequestError
 window.setutilityScriptisSet = setutilityScriptisSet
-window.normalizeMathDelimiters = normalizeMathDelimiters
 window.removeFirstConversationPairs = removeFirstConversationPairs
 window.HandleProcessingEventChanges = HandleProcessingEventChanges;

@@ -1,7 +1,7 @@
 //npm install --save-dev jscharting
 //npm install plotly.js --save-dev
 import JSC from 'jscharting';
-
+JSC.
 //Basic Usage Example (Bar Chart):
 JSC.chart('chartDiv', {
     type: 'column',

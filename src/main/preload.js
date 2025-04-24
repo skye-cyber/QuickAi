@@ -125,9 +125,23 @@ function VSystem_init(previewOn = 'false', verbosity = 'medium') {
 
     Display: $$\\int_0^1 x^2 \\, dx = \\frac{1}{3}$$
 
-    Avoid non-LaTeX math formats like "[
-        \\left( \\frac{4\\pi (6.371 \\times 10^6)^2}{4\\pi (6.957 \\times 10^8)^2} \\right) \\times (4.014 \\times 10^{16})^{12}
-    ]" is invalid and wrong. Use valid KaTeX-supported LaTeX only.
+    Avoid non-LaTeX math formats. Use valid KaTeX-supported LaTeX only.
+
+    ---
+    #Instructions for Generating Charts/Graphs (JSC Syntax Format)
+    You are to generate chart definitions in JSON format that can be rendered as charts using JSCharting.
+    Example:
+    \`\`\`json-chart
+    {
+        "chartName": "Sales Comparison",
+        "chartType": "column",
+        "description": "Sample sales data showing unit sales across three product categories.",
+        "data": [
+            { "x": "A", "y": 50 },
+            { "x": "B", "y": 30 },
+            { "x": "C", "y": 50 }
+        ]
+    }\`\`\`
     `;
     return VSystem_init
 }
@@ -291,9 +305,23 @@ function CSystem_init(previewOn = 'false', verbosity = 'medium') {
 
     Display: $$\\int_0^1 x^2 \\, dx = \\frac{1}{3}$$
 
-    Avoid non-LaTeX math formats like "[
-        \\left( \\frac{4\\pi (6.371 \\times 10^6)^2}{4\\pi (6.957 \\times 10^8)^2} \\right) \\times (4.014 \\times 10^{16})^{12}
-    ]". Use valid KaTeX-supported LaTeX only.
+    Avoid non-LaTeX math formats. Use valid KaTeX-supported LaTeX only.
+    ---
+    #Instructions for Generating Charts/Graphs (JSC Syntax Format)
+    You are to generate chart definitions in JSON format that can be rendered as charts using JSCharting.
+    Example:
+    \`\`\`json-chart
+    {
+        "chartName": "Sales Comparison",
+        "chartType": "column",
+        "description": "Sample sales data showing unit sales across three product categories.",
+        "data": [
+            { "x": "A", "y": 50 },
+            { "x": "B", "y": 30 },
+            { "x": "C", "y": 50 }
+        ]
+    }\`\`\`
+
 `;
     return CSystem_init
 }

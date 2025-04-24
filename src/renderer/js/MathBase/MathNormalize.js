@@ -1,4 +1,4 @@
-function normaliZeMathDisplay(selector, space=true) {
+async function normaliZeMathDisplay(selector, space=true) {
     let items = null
     if (selector) {
         const target = document.querySelector(selector)
@@ -18,7 +18,7 @@ function normaliZeMathDisplay(selector, space=true) {
 }
 
 
-function normalizeMathSpacing() {
+async function normalizeMathSpacing() {
     const items = document.querySelectorAll('.katex');
     if (items) {
         items.forEach(item => {
@@ -27,3 +27,33 @@ function normalizeMathSpacing() {
         })
     }
 }
+
+function normalizeMathDelimiters(text) {
+    // 1) extract all ```…``` blocks and replace with placeholders
+    const codeBlocks = [];
+    const placeholder = (_match, idx) => `@@CODEBLOCK${idx}@@`;
+    text = text.replace(/```[\s\S]*?```/g, match => {
+        const i = codeBlocks.push(match) - 1;
+        return `@@CODEBLOCK${i}@@`;
+    });
+
+    // 2) do your two math‐delimiter replacements
+    text = text
+    // […] → $$…$$ when inside looks like math
+    .replace(
+        /\[([^\[\]]*?(?:\\|[\d\^+\-*/])[^\[\]]*?)\]/g,
+             (_, expr) => `$$${expr.trim()}$$`
+    )
+    // merge stray newlines in $$…$$ blocks that look like math
+    .replace(
+        /\$\$(?=[\s\S]*?(?:\\|[\d\^+\-*/]))([\s\S]*?)\$\$/g,
+             (_, expr) => `$$${expr.replace(/\n/g, ' ').trim()}$$`
+    );
+
+    // 3) restore code-blocks back into their placeholders
+    text = text.replace(/@@CODEBLOCK(\d+)@@/g, (_, n) => codeBlocks[Number(n)]);
+
+    return text;
+}
+
+window.normalizeMathDelimiters = normalizeMathDelimiters

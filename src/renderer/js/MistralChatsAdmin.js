@@ -257,13 +257,14 @@ async function MistraChat(text, modelName) {
 		window.debounceRenderKaTeX(null, null, true);
 		normaliZeMathDisplay(`.${aiMessageUId}`)
 
-
 		// Store conversation history
 		window.electron.addToChat({ role: "assistant", content: output });
 
 		//console.log(actualResponse, fullResponse, output)
 		// render diagrams fromthis response
 		window.handleDiagrams(output, 'both');
+		window.LoopRenderCharts(output)
+
 
 	} catch (err) {
 		window.handleRequestError(err, userMessage, aiMessage)
@@ -548,6 +549,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 
 		// render diagrams fromthis response
 		window.handleDiagrams(output, 'both');
+		window.LoopRenderCharts(output)
 
 	} catch (error) {
 		window.handleRequestError(error, userMessage, VisionMessage, ["VS", fileType, fileContainerId])

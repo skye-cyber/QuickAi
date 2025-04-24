@@ -296,6 +296,7 @@ async function routeToHf(text) {
 
 			// render diagrams fromthis response
 			window.handleDiagrams(actualResponse, 'both');
+			window.LoopRenderCharts(actualResponse)
 
 		} catch (error) {
 			window.handleRequestError(error, userMessage, aiMessage);
@@ -531,6 +532,7 @@ async function VisionChat(text, fileType, fileDataUrl = null, Vmodel = null, pro
 
 		// render diagrams from this response
 		window.handleDiagrams(visionMs, 'both');
+		window.LoopRenderCharts(visionMs);
 
 	} catch (error) {
 		window.handleRequestError(error, userMessage, VisionMessage, ["VS", fileType, fileContainerId])

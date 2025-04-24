@@ -8,11 +8,12 @@ const entries = {
     MistralChatsAdmin: './src/renderer/js/MistralChatsAdmin.js',
     chatUtils: './src/renderer/js/chatUtils.js',
     //hfaudio: './src/renderer/js/hfaudio.js',
-    visualRenderer: './src/renderer/js/diagraming/visualRenderer.js',
+    visualDGRenderer: './src/renderer/js/diagraming/visualDGRenderer.js',
+    visualChartsRenderer: './src/renderer/js/diagraming/visualChartsRenderer.js',
     //preference: './src/renderer/js/preference.js',
     //keyshortcuts: './src/renderer/js/keyshortcuts.js',
     //fileHandler: './src/renderer/js/fileHandler.js',
-    mathHandler: './src/renderer/js/MathBase/mathHandler.js'
+    //mathHandler: './src/renderer/js/MathBase/mathHandler.js'
 };
 
 module.exports = Object.entries(entries).map(([name, entryPath]) => {
@@ -90,5 +91,6 @@ module.exports = Object.entries(entries).map(([name, entryPath]) => {
         },
         devtool: 'source-map',
         mode: 'production',
+        //watch: true, // Enable HMR for renderer
     };
 });

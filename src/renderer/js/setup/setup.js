@@ -27,6 +27,9 @@ async function setModel(modelName='mistral-large-latest', initial=false) {
     }
 }
 
+async function setAllLinkstoblank(){
+    //
+}
 //set default model
 setModel(modelNmae='mistral-large-latest', initial=true)
 

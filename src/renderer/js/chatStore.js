@@ -233,7 +233,7 @@ class ConversationManager {
     }
 
     // Render text-based assistant message
-    renderTextAssistantMessage(content) {
+    async renderTextAssistantMessage(content) {
         const aiMessageId = `msg_${Math.random().toString(30).substring(3, 9)}`;
         const foldId = `think-content-${Math.random().toString(28).substring(3, 9)}`;
         const aiMessage = document.createElement('div');
@@ -361,13 +361,14 @@ class ConversationManager {
                 `;
         // render diagrams fromthis response
         window.handleDiagrams(actualResponse, 'both');
+        window.LoopRenderCharts(actualResponse)
         window.debounceRenderKaTeX(`.${aiMessageId}`, null, true);
         normaliZeMathDisplay(`.${aiMessageId}`)
 
     }
 
     // Render vision-based assistant message
-    renderVisionAssistantMessage(content) {
+    async renderVisionAssistantMessage(content) {
         const visionMessageId = `msg_${Math.random().toString(30).substring(3, 9)}`;
         const visionMessage = document.createElement('div');
         const exportId = `export-${Math.random().toString(33).substring(3, 9)}`;
@@ -462,6 +463,7 @@ class ConversationManager {
 
         // render diagrams from this response
         window.handleDiagrams(textContent, 'both');
+        window.LoopRenderCharts(textContent);
         window.debounceRenderKaTeX(`.${visionMessageId}`, null, true);
         normaliZeMathDisplay(`.${visionMessageId}`)
 
