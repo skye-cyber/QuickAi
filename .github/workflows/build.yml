@@ -144,7 +144,7 @@ jobs:
       if: runner.os == 'Linux' && runner.arch == 'x64'
       uses: actions/upload-artifact@v4
       with:
-        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-DEB-x64
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-amd64
         path: dist/*amd64.deb
         if-no-files-found: error
 
@@ -152,7 +152,7 @@ jobs:
       if: runner.os == 'Linux' && runner.arch == 'arm64'
       uses: actions/upload-artifact@v4
       with:
-        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-DEB-arm64
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-arm64
         path: dist/*arm64.deb
         if-no-files-found: error
 
@@ -162,7 +162,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-AppImage-x64
-        path: dist/*64.AppImage
+        path: dist/*x86_64.AppImage
         if-no-files-found: error
 
     - name: Upload AppImage (arm64)
