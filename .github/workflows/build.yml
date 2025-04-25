@@ -131,43 +131,90 @@ jobs:
         fi
       shell: bash
 
-    - name: show dist contet
+    - name: show dist content
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
         ls dist
         fi
       shell: bash
-      
-    - name: Upload Linux artifacts
+
+    # Upload artifacts
+    - name: Begin Artifacts upload by file
+    # Upload .deb artifacts
+    - name: Upload DEB (x64)
+      if: runner.os == 'Linux' && runner.arch == 'x64'
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-DEB-x64
+        path: dist/*x64.deb
+        if-no-files-found: error
+
+    - name: Upload DEB (arm64)  
+      if: runner.os == 'Linux' && runner.arch == 'arm64'
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-DEB-arm64
+        path: dist/*arm64.deb
+        if-no-files-found: error
+
+    # Upload AppImage
+    - name: Upload AppImage (x64)
+      if: runner.os == 'Linux' && runner.arch == 'x64'
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-AppImage-x64
+        path: dist/*x64.AppImage
+        if-no-files-found: error
+
+    - name: Upload AppImage (arm64)
+      if: runner.os == 'Linux' && runner.arch == 'arm64'
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-AppImage-arm64
+        path: dist/*arm64.AppImage
+        if-no-files-found: error
+
+    # Upload Snap
+    - name: Upload Snap
       if: runner.os == 'Linux'
       uses: actions/upload-artifact@v4
       with:
-        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-${{ runner.arch }}
-        path: dist/*.deb
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-Snap
+        path: dist/*.snap
         if-no-files-found: error
 
-    - name: Upload macOS artifacts
-      if: runner.os == 'macOS'
+    # Upload macOS .dmg (x64 + arm64)
+    - name: Upload macOS DMG (x64)
+      if: runner.os == 'macOS' && runner.arch == 'x64'
       uses: actions/upload-artifact@v4
       with:
-        name: QuickAi-${{ env.CURRENT_VERSION }}-macOS-${{ runner.arch }}
-        path: dist/*.dmg
+        name: QuickAi-${{ env.CURRENT_VERSION }}-macOS-x64
+        path: dist/*x64.dmg
         if-no-files-found: error
 
-    - name: Upload Windows artifacts
-      if: runner.os == 'Windows'
+    - name: Upload macOS DMG (arm64)
+      if: runner.os == 'macOS' && runner.arch == 'arm64'
       uses: actions/upload-artifact@v4
       with:
-        name: QuickAi-${{ env.CURRENT_VERSION }}-Windows-${{ runner.arch }}
-        path: dist/*.exe
+        name: QuickAi-${{ env.CURRENT_VERSION }}-macOS-arm64
+        path: dist/*arm64.dmg
         if-no-files-found: error
 
-    - name: Upload AppImage artifacts
-      if: runner.os == 'Linux'
+    # Upload Windows NSIS and Portable
+    - name: Upload Windows Installer (NSIS x64)
+      if: runner.os == 'Windows' && runner.arch == 'x64'
       uses: actions/upload-artifact@v4
       with:
-        name: QuickAi-${{ env.CURRENT_VERSION }}-AppImage-${{ runner.arch }}
-        path: dist/*.AppImage
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Windows-NSIS-x64
+        path: dist/*Setup*x64.exe
+        if-no-files-found: error
+
+    - name: Upload Windows Portable (x64)
+      if: runner.os == 'Windows' && runner.arch == 'x64'
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Windows-Portable-x64
+        path: dist/*portable*x64.exe
         if-no-files-found: error
 
     - name: Save current version
