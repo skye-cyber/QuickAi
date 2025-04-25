@@ -205,7 +205,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: QuickAi-${{ env.CURRENT_VERSION }}-Windows-NSIS-x64
-        path: dist/*Setup*x64.exe
+        path: dist/*Setup*.exe
         if-no-files-found: error
 
     - name: Upload Windows Portable (x64)
