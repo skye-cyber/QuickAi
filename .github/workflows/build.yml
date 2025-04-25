@@ -145,7 +145,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-DEB-x64
-        path: dist/*x64.deb
+        path: dist/*amd64.deb
         if-no-files-found: error
 
     - name: Upload DEB (arm64)  
@@ -162,7 +162,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-AppImage-x64
-        path: dist/*x64.AppImage
+        path: dist/*amd64.AppImage
         if-no-files-found: error
 
     - name: Upload AppImage (arm64)
