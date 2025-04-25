@@ -96,14 +96,15 @@ jobs:
     - name: Build for specific platform
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          # Build each Linux target independently
-          sudo npm run dist -- --linux --x64
-          sudo npm run dist -- --linux --armv7l
-          sudo npm run dist -- --linux --arm64
+          # Build DEB separately
           sudo npm run dist -- --linux --deb --x64
           sudo npm run dist -- --linux --deb --arm64
+
+          # Build AppImage separately
           sudo npm run dist -- --linux --appimage --x64
           sudo npm run dist -- --linux --appimage --arm64
+
+          # Build SNAP separately
           sudo npm run dist -- --linux --snap
         elif [ "${{ runner.os }}" == "macOS" ]; then
           # Build the macOS target
