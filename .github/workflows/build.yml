@@ -96,11 +96,24 @@ jobs:
     - name: Build for specific platform
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          sudo npm run dist -- --linux
+          # Build each Linux target independently
+          sudo npm run dist -- --linux --x64
+          sudo npm run dist -- --linux --armv7l
+          sudo npm run dist -- --linux --arm64
+          sudo npm run dist -- --linux --deb --x64
+          sudo npm run dist -- --linux --deb --arm64
+          sudo npm run dist -- --linux --appimage --x64
+          sudo npm run dist -- --linux --appimage --arm64
+          sudo npm run dist -- --linux --snap
         elif [ "${{ runner.os }}" == "macOS" ]; then
-          sudo npm run dist -- --mac
+          # Build the macOS target
+          sudo npm run dist -- --mac --x64
+          sudo npm run dist -- --mac --arm64
         elif [ "${{ runner.os }}" == "Windows" ]; then
-          npm run dist -- --win
+          # Build the Windows target
+          npm run dist -- --win --x64
+          npm run dist -- --win --ia32
+          npm run dist -- --win --arm64
         else
           echo "Unsupported platform: ${{ runner.os }}"
           exit 1

@@ -445,15 +445,17 @@ function copyBMan() {
 }
 
 
-function smartEscapeMathPreserve(text) {
-	return text.replace(/\$\$.*?\$\$|\$.*?\$|\\\[.*?\\\]|\\\(.*?\\\)/gs, (match) => {
-		// Math block detected — return as is
-		return match;
-	}).replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/&/g, '&amp;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&#039;');
+function escapeHTML(unsafe) {
+	if (typeof unsafe !== 'string') {
+		return '';
+	}
+	return unsafe
+	.replace(/&/g, "&amp;")
+	.replace(/\n+/g, '\n')  // 1+ newlines → 1 newline
+	.replace(/</g, "&lt;")
+	.replace(/>/g, "&gt;")
+	.replace(/"/g, "&quot;")
+	.replace(/'/g, "&#039;");
 }
 
 
@@ -582,7 +584,7 @@ window.Timer = Timer
 window.marked = marked;
 window.CopyAll = CopyAll
 window.copyBMan = copyBMan
-window.escapeHTML = smartEscapeMathPreserve
+window.escapeHTML = escapeHTML
 window.showCopyModal = showCopyModal
 window.handleCodeCopy = handleCodeCopy;
 window.showDeletionStatus = showCopyModal
