@@ -12,10 +12,10 @@ const AllVisionModels = [
 ]
 
 sendBtn.addEventListener("click", () => {
-    const inputText = userInput.textContent.trim();
+    const inputText = userInput.innerHTML.trim();
     if (inputText) {
         // Reset the input field
-        userInput.textContent = "";
+        userInput.innerHTML = "";
         // Adjust input field height
         userInput.style.height = 'auto';
         userInput.style.height = Math.min(userInput.scrollHeight, 0.28 * window.innerHeight) + 'px';
@@ -29,9 +29,9 @@ userInput.addEventListener("keydown", (e) => {
     // When sendBtn is visible and the user presses Enter without shift
     if (!sendBtn.classList.contains('hidden') && e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        const inputText = userInput.textContent.trim();
+        const inputText = userInput.innerHTML.trim();
         if (inputText) {
-            userInput.textContent = "";
+            userInput.innerHTML = "";
             userInput.style.height = 'auto';
             userInput.style.height = Math.min(userInput.scrollHeight, 0.28 * window.innerHeight) + 'px';
             userInput.scrollTop = userInput.scrollHeight;

@@ -22,7 +22,7 @@ async function routeToHf(text) {
 	console.log("Reached Target: hfRoute")
 
 	const isImageRequest = text.startsWith("/image");
-	const escapedText = window.escapeHTML(text);
+	const escapedText = window.InputPurify(text);
 	const Currentmodel = modelSelect.value;
 
 	// Display user message
@@ -546,8 +546,8 @@ function addUserMessage(text, fileType, fileDataUrl, fileContainerId) {
 	userMessage.classList.add("flex", "justify-end", "mb-4");
 	const messageHtml = `
 		<div data-id="${VisionUserMessageUId}" class="${VisionUserMessageUId} relative bg-[#566fdb] dark:bg-[#142384] text-black dark:text-white rounded-lg rounded-br-none p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
-		<p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.escapeHTML(text)}</p>
-		<button id="${VisioncopyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${VisionUserMessageUId}', this)">
+		<p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.InputPurify(text)}</p>
+		<button id="${VisioncopyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${VisionUserMessageUId}', this, true)">
 		Copy
 		</button>
 		</div>

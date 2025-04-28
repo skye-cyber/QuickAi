@@ -1,7 +1,7 @@
 const storagePath = window.electron.joinPath(window.electron.home_dir(), '.quickai/.quickai.store');
 const chatArea = document.getElementById('chatArea');
 const conversationsPanel = document.getElementById('conversations');
-escapeHTML = window.escapeHTML;
+InputPurify = window.InputPurify;
 const modalTitle = document.getElementById('modalTitle');
 const newNameInput = document.getElementById('newName');
 const renameButton = document.getElementById('renameButton');
@@ -108,7 +108,7 @@ class ConversationManager {
                 }
             }
             window.electron.CreateNew(conversationData, model)
-            window.debounceRenderKaTeX(null, null, true);
+            //window.debounceRenderKaTeX(null, null, true);
         });
 
         window.implementUserCopy();
@@ -203,8 +203,8 @@ class ConversationManager {
         }
         const messageHtml = `
             <div data-id="${userMessageId}" class="${userMessageId} relative bg-[#566fdb] dark:bg-[#142384] text-black dark:text-white rounded-lg rounded-br-none p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl transition-colors duration-1000">
-                <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.escapeHTML(userText)}</p>
-                <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
+                <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.InputPurify(userText)}</p>
+                <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this, true)">
                 Copy
                 </button>
             </div>

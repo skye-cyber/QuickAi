@@ -1,5 +1,6 @@
 import { marked } from "marked";
 import hljs from 'highlight.js';
+import DOMPurify from 'dompurify'; // If using modules
 
 // Initialize highlight.js
 hljs.configure({ ignoreUnescapedHTML: true });
@@ -52,10 +53,11 @@ renderer.code = function(code) {
 	function getdgFunction() {
 		const mapper = {
 			'dot-draw': `window.handleDiagrams(this, 'dot', isPlainCode=true, trigger='click')`,
+			'dot': `window.handleDiagrams(this, 'dot', isPlainCode=true, trigger='click')`,
 			'json-draw': `window.handleDiagrams(this, 'json'}', isPlainCode=true, trigger='click')`,
 			'json-chart': `window.LoopRenderCharts(this, type='code', trigger='click')`
 		}
-		return mapper[dgLang]
+		return dgLang ? mapper[dgLang] : validLanguage === 'dot' ? mapper[validLanguage] : ''
 	}
 
 	return `
@@ -66,7 +68,7 @@ renderer.code = function(code) {
 		${validLanguage}
 		</p>
 		<div class="flex justify-between space-x-3"
-		${(dgCodeBlock) ? `
+		${(dgCodeBlock || validLanguage === 'dot') ? `
 			<!-- Render Button -->
 			<button
 			id="${renderButtonId}"
@@ -338,7 +340,7 @@ function implementUserCopy() {
 }
 
 // Copy function for the whole text block/aiMessage
-function CopyAll(UId, bt = null) {
+function CopyAll(UId, bt = null, html=false) {
 	//console.log(UId)
 	const textBlock = document.querySelector(UId);
 	//console.log(textBlock)
@@ -347,7 +349,7 @@ function CopyAll(UId, bt = null) {
 		return;
 	}
 
-	const textToCopy = textBlock.innerText;
+	const textToCopy = html===true ? textBlock.innerHTML : textBlock.textContent;
 	//console.log(textToCopy)
 
 	if (textToCopy.length >= 50) {
@@ -445,8 +447,28 @@ function copyBMan() {
 }
 
 
-function escapeHTML(unsafe) {
-	if (typeof unsafe !== 'string') {
+function InputPurify(unsafe) {
+	const cleanHTML = DOMPurify.sanitize(unsafe,{
+		ALLOWED_TAGS: ['br', 'strong', 'em'], // Allow paragraphs, line breaks, bold, italic, links
+		//ALLOWED_ATTR: ['href'], // Only allow the 'href' attribute (useful for 'a' tags)
+		//ADD_TAGS: ['img'], // Add the image tag
+		//ADD_ATTR: ['src', 'alt', 'data-id'] // Add these attributes (src/alt for img, data-id for any relevant tag)
+	});
+	return cleanHTML
+	// 2. Format: Collapse multiple <br> tags using regex
+	// This regex finds a <br> tag (with optional self-closing slash and whitespace)
+	// followed by one or more similar <br> tags (again with optional whitespace between them).
+	// It replaces the entire matched sequence with a single <br> tag.
+	.replace(/(<br\s*\/?>\s*){2,}/gi, '<br>')
+	// 3. Apply formatting: Collapse sequences of &nbsp; entities
+	// This regex finds a sequence of two or more consecutive &nbsp; entities,
+	// potentially separated by optional whitespace characters (\s*), and replaces
+	// the entire sequence with a single regular space (' ').
+	.replace(/(&nbsp;\s*){2,}/gi, ' ')
+	// Optional: Collapse sequences of regular spaces as well if they weren't handled by white-space: pre-wrap
+	// (white-space: pre-wrap should handle regular spaces, but this is a fallback)
+	.replace(/ {2,}/g, ' ')
+	/*if (typeof unsafe !== 'string') {
 		return '';
 	}
 	return unsafe
@@ -456,6 +478,8 @@ function escapeHTML(unsafe) {
 	.replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;")
 	.replace(/'/g, "&#039;");
+	*/
+
 }
 
 
@@ -584,7 +608,7 @@ window.Timer = Timer
 window.marked = marked;
 window.CopyAll = CopyAll
 window.copyBMan = copyBMan
-window.escapeHTML = escapeHTML
+window.InputPurify = InputPurify
 window.showCopyModal = showCopyModal
 window.handleCodeCopy = handleCodeCopy;
 window.showDeletionStatus = showCopyModal
