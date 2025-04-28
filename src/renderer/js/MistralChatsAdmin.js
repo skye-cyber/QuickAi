@@ -64,7 +64,7 @@ async function MistraChat(text, modelName) {
 		aiMessage = document.createElement("div");
 		// Add user message to the chat interface
 		addUserMessage(text)
-
+		return
 		// Add loading animation
 		addLoadingAnimation(aiMessage);
 
@@ -254,7 +254,7 @@ async function MistraChat(text, modelName) {
 		window.setutilityScriptisSet();
 
 		// Render katex immediately
-		window.debounceRenderKaTeX(null, null, true);
+		window.debounceRenderKaTeX(`.${aiMessageUId}`, null, true);
 		normaliZeMathDisplay(`.${aiMessageUId}`)
 
 		// Store conversation history
@@ -541,7 +541,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 		window.setutilityScriptisSet()
 
 		// Render katex immediately
-		window.debounceRenderKaTeX(null, null, true);
+		window.debounceRenderKaTeX(`.${VisionMessageUId}`, null, true);
 		normaliZeMathDisplay(`.${VisionMessageUId}`)
 
 		window.electron.addToVisionChat({ role: "assistant", content: [{ type: "text", text: output }] });
