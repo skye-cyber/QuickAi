@@ -96,11 +96,25 @@ jobs:
     - name: Build for specific platform
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          sudo npm run dist -- --linux
+          # Build DEB separately
+          sudo npm run dist -- --linux deb --x64
+          sudo npm run dist -- --linux deb --arm64
+
+          # Build AppImage separately
+          sudo npm run dist -- --linux appimage --x64
+          sudo npm run dist -- --linux appimage --arm64
+
+          # Build SNAP separately
+          sudo npm run dist -- --linux snap
         elif [ "${{ runner.os }}" == "macOS" ]; then
-          npm run dist -- --mac
+          # Build the macOS target
+          sudo npm run dist -- --mac --x64
+          sudo npm run dist -- --mac --arm64
         elif [ "${{ runner.os }}" == "Windows" ]; then
-          npm run dist -- --win
+          # Build the Windows target
+          npm run dist -- --win --x64
+          npm run dist -- --win --ia32
+          npm run dist -- --win --arm64
         else
           echo "Unsupported platform: ${{ runner.os }}"
           exit 1
@@ -117,43 +131,89 @@ jobs:
         fi
       shell: bash
 
-    - name: show dist contet
+    - name: show dist content
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
         ls dist
         fi
       shell: bash
-      
-    - name: Upload Linux artifacts
+
+    # Upload artifacts
+    # Upload .deb artifacts
+    - name: Upload DEB (x64)
+      if: runner.os == 'Linux' && runner.arch == 'x64'
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-amd64
+        path: dist/*amd64.deb
+        if-no-files-found: error
+
+    - name: Upload DEB (arm64)  
+      if: runner.os == 'Linux' && runner.arch == 'arm64'
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-arm64
+        path: dist/*arm64.deb
+        if-no-files-found: error
+
+    # Upload AppImage
+    - name: Upload AppImage (x64)
+      if: runner.os == 'Linux' && runner.arch == 'x64'
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-AppImage-x64
+        path: dist/*x86_64.AppImage
+        if-no-files-found: error
+
+    - name: Upload AppImage (arm64)
+      if: runner.os == 'Linux' && runner.arch == 'arm64'
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-AppImage-arm64
+        path: dist/*arm64.AppImage
+        if-no-files-found: error
+
+    # Upload Snap
+    - name: Upload Snap
       if: runner.os == 'Linux'
       uses: actions/upload-artifact@v4
       with:
-        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-${{ runner.arch }}
-        path: dist/*.deb
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Linux-Snap
+        path: dist/*.snap
         if-no-files-found: error
 
-    - name: Upload macOS artifacts
-      if: runner.os == 'macOS'
+    # Upload macOS .dmg (x64 + arm64)
+    - name: Upload macOS DMG (x64)
+      if: runner.os == 'macOS' && runner.arch == 'x64'
       uses: actions/upload-artifact@v4
       with:
-        name: QuickAi-${{ env.CURRENT_VERSION }}-macOS-${{ runner.arch }}
-        path: dist/*.dmg
+        name: QuickAi-${{ env.CURRENT_VERSION }}-macOS-x64
+        path: dist/*x64.dmg
         if-no-files-found: error
 
-    - name: Upload Windows artifacts
-      if: runner.os == 'Windows'
+    - name: Upload macOS DMG (arm64)
+      if: runner.os == 'macOS' && runner.arch == 'arm64'
       uses: actions/upload-artifact@v4
       with:
-        name: QuickAi-${{ env.CURRENT_VERSION }}-Windows-${{ runner.arch }}
-        path: dist/*.exe
+        name: QuickAi-${{ env.CURRENT_VERSION }}-macOS-arm64
+        path: dist/*arm64.dmg
         if-no-files-found: error
 
-    - name: Upload AppImage artifacts
-      if: runner.os == 'Linux'
+    # Upload Windows NSIS and Portable
+    - name: Upload Windows Installer (NSIS x64)
+      if: runner.os == 'Windows' && runner.arch == 'x64'
       uses: actions/upload-artifact@v4
       with:
-        name: QuickAi-${{ env.CURRENT_VERSION }}-AppImage-${{ runner.arch }}
-        path: dist/*.AppImage
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Windows-NSIS-x64
+        path: dist/*Setup*.exe
+        if-no-files-found: error
+
+    - name: Upload Windows Portable (x64)
+      if: runner.os == 'Windows' && runner.arch == 'x64'
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickAi-${{ env.CURRENT_VERSION }}-Windows-Portable-x64
+        path: dist/*portable*x64.exe
         if-no-files-found: error
 
     - name: Save current version
@@ -162,19 +222,20 @@ jobs:
 
     - name: Commit and push changes
       run: |
+        git config --global core.autocrlf false
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
     - name: Check for changes
       run: |
-        if [ -z "$(git status --porcelain)" ]; then
-          echo "No changes detected."
+        if [ -z "$(git diff --exit-code --quiet last_version.txt)" ]; then
+        echo "No changes detected in last_version.txt."
         else
-          echo "Changes detected. Proceeding with commit."
-          git add last_version.txt package-lock.json package.json
-          git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
-          git pull --rebase -X ours
-          git push
+        echo "Changes detected in last_version.txt. Proceeding with commit."
+        git add last_version.txt package-lock.json package.json
+        git commit -m "Update last_version.txt to ${{ env.CURRENT_VERSION }}"
+        git pull --rebase -X ours
+        git push
         fi
       shell: bash
       env:

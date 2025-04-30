@@ -59,7 +59,7 @@ let aiMessage = null;
 
 async function MistraChat(text, modelName) {
 	try {
-		console.log("Reached Mistral chat", MISTRAL_API_KEY)
+		//console.log("Reached Mistral chat", MISTRAL_API_KEY)
 
 		aiMessage = document.createElement("div");
 		// Add user message to the chat interface
@@ -89,7 +89,7 @@ async function MistraChat(text, modelName) {
 		const stream = await Mistarlclient.chat.stream({
 			model: modelName,
 			messages: window.electron.getChat(),
-			max_tokens: 2000
+			max_tokens: 3000
 		});
 
 		let output = ""
@@ -135,7 +135,7 @@ async function MistraChat(text, modelName) {
 			aiMessage.innerHTML = `
 						<section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
 						${isThinking || thinkContent ? `
-							<div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl">
+							<div class="think-section bg-blue-200 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl transition-colors duration-1000">
 							<div class="flex items-center justify-between">
 							<strong style="color: #007bff;">Thoughts:</strong>
 							<button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
@@ -148,15 +148,15 @@ async function MistraChat(text, modelName) {
 							</button>
 							</div>
 							<div id="${foldId}" class="">
-							<p style="color: #333;">${window.marked(thinkContent)}</p>
+							<p style="color: #333;">${window.marked(window.normalizeMathDelimiters(thinkContent))}</p>
 							</div>
 							</div>
 							` : ''}
 							${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
 							${actualResponse ? `
-								<div class="${aiMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
-								${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
-								<p style="color: #333;">${window.marked(actualResponse)}</p>
+								<div class="${aiMessageUId} bg-blue-200 py-4 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-1000">
+								${actualResponse && thinkContent ? `<strong class="text-[#28a745]">Response:</strong>` : ''}
+								<p style="color: #333;">${window.marked(window.normalizeMathDelimiters(actualResponse))}</p>
 								<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
 									<div class="group relative max-w-fit transition-all duration-300 hover:z-50">
 										<div
@@ -165,13 +165,13 @@ async function MistraChat(text, modelName) {
 											aria-expanded="false"
 											onclick="window.toggleExportOptions(this);"
 											aria-label="Export"
-											class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
+											class="relative overflow-hidden bg-white/80 backdrop-blur-md transition-all duration-700 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
 											style="border: 2px solid rgba(255,85,0,0); background-clip: padding-box, border-box; background-origin: border-box; background-image: linear-gradient(to bottom right, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.8)), linear-gradient(135deg, rgba(255,0,255,170) 0%, rgba(0,0,255,85) 50%, rgba(0,255,255,170) 100%);"
 										>
 											<div class="flex items-center space-x-2 px-4 py-1">
 											<div class="relative h-6 w-6">
 												<svg
-												class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-300 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
+												class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-700 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
 												viewBox="0 0 24 24"
 												style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1))"
 												>
@@ -181,7 +181,7 @@ async function MistraChat(text, modelName) {
 												/>
 												</svg>
 											</div>
-											<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
+											<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-500 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
 												Export
 											</span>
 											</div>
@@ -218,19 +218,19 @@ async function MistraChat(text, modelName) {
 									</div>
 								</section>
 								</div>
-								<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+								<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-[radial-gradient(closest-side,var(--tw-gradient-stops))] from-[#009393] dark:from-[#002f42] via-[#45cece] dark:via-[#002f42] to-blue-400 dark:to-[#002f42] dark:bg-gray-800 p-2 rounded shadow-md z-50 border border-[#0055ff] dark:border-[#009fe8] transition-colors duration-1000">
 								<ul class="list-none p-0">
 								<li class="mb-2">
-								<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageUId}')">Export to PDF</a>
+								<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Pdf(event, '.${aiMessageUId}')">Export to PDF</p>
 								</li>
 								<li class="mb-2">
-								<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageUId}')">Export to JPG</a>
+								<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Jpg(event, '.${aiMessageUId}')">Export to JPG</p>
 								</li>
 								<li>
-								<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageUId}')">Export to DOCX</a>
+								<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 cursor-pointer" onclick="HTML2Word(event, '.${aiMessageUId}')">Export to DOCX</p>
 								</li>
 								<li>
-								<a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${aiMessageUId}')">Word Export Advance</a>
+								<p class="cursor-not-allowed text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 decoration-underline" onclick="">Word Export Advance</p>
 								</li>
 								</ul>
 								</div>
@@ -239,6 +239,8 @@ async function MistraChat(text, modelName) {
 			`;
 
 			AutoScroll.checked ? scrollToBottom(chatArea) : null;
+			// Render mathjax immediately
+			window.debounceRenderKaTeX(`.${aiMessageUId}`, 3000, false);
 		}
 		//stop timer
 		_Timer.trackTime("stop");
@@ -251,10 +253,19 @@ async function MistraChat(text, modelName) {
 		// Sending a message to the main process if script does not exist already
 		window.setutilityScriptisSet();
 
-		// Render mathjax immediately
-		window.debounceRenderMathJax(aiMessageUId, 0, true);
+		// Render katex immediately
+		window.debounceRenderKaTeX(`.${aiMessageUId}`, null, true);
+		normaliZeMathDisplay(`.${aiMessageUId}`)
+
 		// Store conversation history
 		window.electron.addToChat({ role: "assistant", content: output });
+
+		//console.log(actualResponse, fullResponse, output)
+		// render diagrams fromthis response
+		window.handleDiagrams(output, 'both');
+		window.LoopRenderCharts(output)
+
+
 	} catch (err) {
 		window.handleRequestError(err, userMessage, aiMessage)
 	}
@@ -271,12 +282,13 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 	const VisionMessage = document.createElement("div");
 	aiMessage = VisionMessage
 	// Add user message to the chat interface
-	addUserMessage(text)
+	addUserMessage(text, fileType, fileDataUrl, fileContainerId)
 	// Add loading animation
 	addLoadingAnimation(aiMessage);
 
 	//Add Timestamp
 	text = `${text} [${window.electron.getDateTime()} UTC]`
+
 	//console.log(text)
 	// Determine the content based on fileDataUrl
 	let userContent;
@@ -285,7 +297,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 		if (fileType == "image") {
 			const imageContent = fileDataUrl.map(_url => ({
 				type: "image_url",
-				image_url: {
+				imageUrl: {
 					url: _url,
 				}
 			}));
@@ -301,8 +313,8 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 
 		else if (fileType == "document") {
 			const documentContent = fileDataUrl.map(_url => ({
-				type: "file_url",
-				image_url: {
+				type: "document_url",
+				documentUrl: {
 					url: _url,
 				}
 			}));
@@ -367,6 +379,9 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 		});
 
 
+		//console.log("Final VisionHistory:", JSON.stringify(window.electron.getVisionChat(), null, 2));
+		//console.log("Final VisionHistory:", JSON.stringify(window.electron.clearImages(window.electron.getVisionChat(), null, 2)));
+
 		// change send button appearance to processing status
 		window.HandleProcessingEventChanges('show')
 
@@ -412,7 +427,7 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 			VisionMessage.innerHTML = `
 				<section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
 					${isThinking || thinkContent ? `
-					<div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl">
+					<div class="think-section bg-blue-200 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl transition-colors duration-1000">
 						<div class="flex items-center justify-between">
 							<strong style="color: #007bff;">Thoughts:</strong>
 							<button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
@@ -425,37 +440,37 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 							</button>
 						</div>
 						<div id="${foldId}" class="">
-							<p style="color: #333;">${window.marked(thinkContent)}</p>
+							<p style="color: #333;">${window.marked(window.normalizeMathDelimiters(thinkContent))}</p>
 						</div>
 					</div>
 					` : ''}
 						${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
-						${actualResponse ? `<div class="${VisionMessageUId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
-							<p style="color: #333;">${window.marked(actualResponse)}</p>
+						${actualResponse ? `<div class="${VisionMessageUId} bg-blue-200 py-4 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-100">${actualResponse && thinkContent ? `<strong class="text-[#28a745]">Response:</strong>` : ''}
+							<p style="color: #333;">${window.marked(window.normalizeMathDelimiters(actualResponse))}</p>
 					<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
-						<div class="group relative max-w-fit transition-all duration-300 hover:z-50">
+						<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
 							<div
 								role="button"
 								id="${exportId}"
 								aria-expanded="false"
 								onclick="window.toggleExportOptions(this);"
-								class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
+								class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-700 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
 								style="border: 2px solid rgba(255,85,0,0); background-clip: padding-box, border-box; background-origin: border-box; background-image: linear-gradient(to bottom right, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.8)), linear-gradient(135deg, rgba(255,0,255,170) 0%, rgba(0,0,255,85) 50%, rgba(0,255,255,170) 100%);"
 							>
 								<div class="flex items-center space-x-2 px-4 py-1">
 								<div class="relative h-6 w-6">
 									<svg
-									class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-300 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
+									class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-700 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
 									viewBox="0 0 24 24"
 									style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1))"
 									>
 									<path
 										d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
-										class="origin-center transition-transform duration-300"
+										class="origin-center transition-transform duration-500"
 									/>
 									</svg>
 								</div>
-								<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
+								<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-700 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
 									Export
 								</span>
 								</div>
@@ -465,11 +480,11 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 							</div>
 
 						<!-- Hover enhancement effect -->
-						<div class="absolute -inset-2 -z-10 rounded-xl bg-blue-500/10 blur-xl transition-opacity duration-300 group-hover:opacity-100 dark:bg-blue-400/15"></div>
+						<div class="absolute -inset-2 -z-10 rounded-xl bg-blue-500/10 blur-xl transition-opacity duration-500 group-hover:opacity-100 dark:bg-blue-400/15"></div>
 					</div>
 					<div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${VisionMessageUId}');">
 						<svg
-							class="w-5 md:w-6 h-5 md:h-6 mt-1 transition-transform duration-200 ease-in-out hover:scale-110 cursor-pointer"
+							class="w-5 md:w-6 h-5 md:h-6 mt-1 transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer"
 							viewBox="0 0 24 24"
 							fill="none"
 							xmlns="http://www.w3.org/2000/svg"
@@ -492,34 +507,29 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 					</div>
 				</section>
 
-				<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
-
+				<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-[radial-gradient(closest-side,var(--tw-gradient-stops))] from-[#009393] dark:from-[#002f42] via-[#45cece] dark:via-[#002f42] to-blue-400 dark:to-[#002f42] dark:bg-gray-800 p-2 rounded shadow-md z-50 border border-[#0055ff] dark:border-[#009fe8] transition-colors duration-1000">
 				<ul class="list-none p-0">
 				<li class="mb-2">
-				<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${VisionMessageUId}')">1. Export to PDF</a>
+				<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Pdf(event, '.${VisionMessageUId}')">Export to PDF</p>
 				</li>
 				<li class="mb-2">
-				<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${VisionMessageUId}')">2. Export to JPG</a>
+				<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Jpg(event, '.${VisionMessageUId}')">Export to JPG</p>
 				</li>
 				<li>
-				<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${VisionMessageUId}')">3. Export to DOCX</a>
+				<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 cursor-pointer" onclick="HTML2Word(event, '.${VisionMessageUId}')">Export to DOCX</p>
 				</li>
 				<li>
-				<a href="" class="text-blue-500 dark:text-blue-400 decoration-underline" onclick="SuperHTML2Word(event, '.${VisionMessageUId}')">4. Word Export Advance</a>
+				<p class="cursor-not-allowed text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 decoration-underline" onclick="">Word Export Advance</p>
 				</li>
 				</ul>
 				</div>
-				</section>`:""}
+				</section>`: ""}
 				`;
 
 			AutoScroll.checked ? scrollToBottom(chatArea) : null;
 
-			//window.addCopyListeners();
-
 			// Debounce MathJax rendering to avoid freezing
-			window.debounceRenderMathJax(VisionMessageUId);
-
-			AutoScroll.checked ? scrollToBottom(chatArea) : null;
+			window.debounceRenderKaTeX(`.${VisionMessageUId}`, 3000, true);
 		}
 
 		//stop timer
@@ -530,10 +540,16 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 
 		window.setutilityScriptisSet()
 
-		// Render mathjax immediately
-		window.debounceRenderMathJax(VisionMessageUId, 0, true);
+		// Render katex immediately
+		window.debounceRenderKaTeX(`.${VisionMessageUId}`, null, true);
+		normaliZeMathDisplay(`.${VisionMessageUId}`)
+
 		window.electron.addToVisionChat({ role: "assistant", content: [{ type: "text", text: output }] });
-		//console.log("Final VisionHistory:", JSON.stringify(VisionHistory, null, 2));
+		//console.log("Final VisionHistory:", JSON.stringify(window.electron.getVisionChat(), null, 2));
+
+		// render diagrams fromthis response
+		window.handleDiagrams(output, 'both');
+		window.LoopRenderCharts(output)
 
 	} catch (error) {
 		window.handleRequestError(error, userMessage, VisionMessage, ["VS", fileType, fileContainerId])
@@ -541,21 +557,39 @@ async function MistraVision(text, fileType, fileDataUrl = null, modelName) {
 }
 
 
-function addUserMessage(text) {
+function addUserMessage(text, fileType, fileDataUrl, fileContainerId) {
 	//console.log("Date time + text:", text)
 	const userMessageId = `msg_${Math.random().toString(34).substring(3, 9)}`;
 	const copyButtonId = `copy-button-${Math.random().toString(36).substring(5, 9)}`;
 	userMessage = document.createElement("div");
 
 	userMessage.innerHTML = `
-	<div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
-	<p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.escapeHTML(text)}</p>
-	<button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80 " onclick="CopyAll('.${userMessageId}', this)">
+	<div data-id="${userMessageId}" class="${userMessageId} relative bg-[#566fdb] dark:bg-[#142384] text-black dark:text-white rounded-lg rounded-br-none p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
+	<p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.InputPurify(text)}</p>
+	<button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80 " onclick="CopyAll('.${userMessageId}', this, true)">
 	Copy
 	</button>
 	</div>
 	`;
+
+	// Create files container if they exist
+	if (fileDataUrl) {
+		const fileHtml = `
+		<div id="${fileContainerId}" class="flex justify-end">
+		<article class="flex flex-rows-1 md:flex-rows-3 bg-cyan-100 w-fit p-1 rounded-lg">
+		${fileDataUrl && fileType === "image" ? fileDataUrl.map(url => `<img src="${url}" alt="Uploaded Image" class="rounded-md w-14 h-14 my-auto mx-1" />`).join('') : fileType === "document" ? fileDataUrl.map(url => `<div class="inline-flex items-center"><svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+		<path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16V4a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2zm1-1h4v10h-4V4z"/></svg><span>${url}</span></div>`).join('') : ""}
+		</article>
+		</div>
+		`;
+		const filesContainer = document.createElement("div");
+		filesContainer.className = "flex justify-end";
+		filesContainer.innerHTML = fileHtml;
+		chatArea.appendChild(filesContainer);
+	}
+
 	userMessage.classList.add("flex", "justify-end", "mb-4", "overflow-wrap");
+	chatArea.appendChild(userMessage);
 	chatArea.appendChild(userMessage);
 
 	// Add Timestamp to user prompt

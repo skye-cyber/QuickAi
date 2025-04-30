@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class', /*'[data-mode="dark"]'],*/
-  content: ['*.html', '*.js', './src/renderer/js/*.js'],
+  content: ['./src/renderer/index.html', './src/renderer/js/**/*.js'],
   //content: ['loading.html'],
   theme: {
     screens: {
@@ -15,6 +15,7 @@ module.exports = {
     fontFamily: {
       display: ['Source Serif Pro', 'Georgia', 'serif'],
       body: ['Synonym', 'system-ui', 'sans-serif'],
+      mono: ['JetBrains Mono', 'monospace'], // Adding JetBrains Mono for monospaced text
     },
 
     extend: {
@@ -34,6 +35,21 @@ module.exports = {
         'h5': '300',  // Adjust as needed
         'h6': '200',  // Adjust as needed
       },
+      zIndex: {
+        '41': '41',
+        '45': '45',
+        '51': '51',
+        '55': '55',
+        '60': '60',
+        '65': '65',
+        '70': '70',
+        '75': '75',
+        '80': '80',
+        '85': '85',
+        '90': '90',
+        '95': '95',
+        '100': '100'
+      }
     },
 
       animation: {

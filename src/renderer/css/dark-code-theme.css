@@ -1,12 +1,8 @@
-.hljs {
-    background-color: #282c34;
-    color: #abb2bf;
-    padding: 15px;
+/*.hljs {
+    background-color: var('bg-blue-200');
     border-radius: 8px;
-    line-height: 1.5;
-    font-family: 'Fira Code', monospace;
 }
-
+*/
 .hljs-keyword {
     color: #c678dd;
     font-weight: bold;

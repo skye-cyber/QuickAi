@@ -1,8 +1,9 @@
 const modelChange = new CustomEvent('ModelChange');
 document.addEventListener('DOMContentLoaded', function() {
-    for (const item of ['chatStore', 'keyshortcuts', 'preference', 'fileHandler']) {
+    for (const item of ['chatStore', 'keyshortcuts', 'preference', 'fileHandler', 'diagraming/visualUtils', 'diagraming/packed_visualDGRenderer', 'diagraming/packed_visualChartsRenderer', 'OpStatus', 'setup/setup', 'MathBase/packed_mathHandler', 'MathBase/MathNormalize']) {
         addScripts(item);
     }
+
     const modal = document.getElementById("settingsModal");
     const themeSwitch = document.getElementById("themeSwitch");
     const rootElement = document.documentElement;
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function addScripts(packed_script) {
         const script = document.createElement('script');
-        script.src = `src/renderer/js/${packed_script}.js`;
+        script.src = `js/${packed_script}.js`;
         script.async = true; // Optional: load the script asynchronously
         document.body.appendChild(script);
         console.log(`Added ${packed_script} script`);
@@ -59,14 +60,21 @@ document.addEventListener('DOMContentLoaded', function() {
     //Set code these styleSheet
     window.electron.addCodeThemeSheet(currentTheme);
 
+
     // Function to set the theme
     function setTheme(theme) {
+
         if (theme === "dark") {
             rootElement.classList.add("dark");
             themeSwitch.checked = true;
+            window.isDark = true;
         } else {
             rootElement.classList.remove("dark");
+            window.isDark = false;
         }
+
+        window.electron.ThemeChangeDispatch()
+
         localStorage.setItem("theme", theme);
     }
 
@@ -201,7 +209,6 @@ function selectModel(value) {
 
 }
 
-window.selectModel = selectModel;
 // Event listener for button click to toggle dropdown
 modelButton.addEventListener('click', toggleDropdown);
 
@@ -228,6 +235,25 @@ modelItems.forEach(item => {
 
 // Initial selection based on the select element's default value
 selectModel(model.value);
+window.selectModel = selectModel;
+
+const animationToggle = document.getElementById('animation-toggle');
+
+//Set animation on innitially
+animationToggle.checked=true;
+
+const animationTogglePeer = document.getElementById('animation-toggle-peer');
+const bodyCanvas = document.getElementById('body-canvas');
+animationTogglePeer.addEventListener('click', ()=>{
+    if (animationToggle.checked !== true){
+        bodyCanvas.classList.remove('hidden');
+        window.electron.addScript('DotSphereAnim.js');
+        //window.electron.AnimationReadyDispatch();
+    }else{
+        bodyCanvas.classList.add('hidden');
+        window.electron.removeScript('DotSphereAnim.js');
+    }
+})
 });
 
 // Function to show the modal
@@ -260,9 +286,6 @@ function Notify(_color=null, time=null, text="") {
 }
 
 
-//Store Notify to window
-window.Notify = Notify;
-
 // Function to toggle the fold/unfold of the think section
 function toggleFold(event, selector) {
     const content = document.getElementById(selector);
@@ -272,3 +295,6 @@ function toggleFold(event, selector) {
 }
 // Make toggleFold available to the window
 window.toggleFold = toggleFold;
+
+//Store Notify to window
+window.Notify = Notify;

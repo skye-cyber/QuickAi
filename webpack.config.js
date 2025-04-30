@@ -1,74 +1,96 @@
 const path = require('path');
 const webpack = require('webpack');
-//const RemoveWithPlugin = require('./RemoveWithPlugin')
+const CopyPlugin = require("copy-webpack-plugin");
 
-module.exports = {
-  //target:'electron-renderer',
-  entry: {
+const entries = {
     hfaichat: './src/renderer/js/hfaichat.js',
-    utility: './src/renderer/js/exportUtilities.js',
+    //utility: './src/renderer/js/exportUtilities.js',
     MistralChatsAdmin: './src/renderer/js/MistralChatsAdmin.js',
     chatUtils: './src/renderer/js/chatUtils.js',
-    hfaudio: './src/renderer/js/hfaudio.js',
+    //hfaudio: './src/renderer/js/hfaudio.js',
+    //visualDGRenderer: './src/renderer/js/diagraming/visualDGRenderer.js',
+    //visualChartsRenderer: './src/renderer/js/diagraming/visualChartsRenderer.js',
     //preference: './src/renderer/js/preference.js',
-    //keyshortcuts:'./src/renderer/js/keyshortcuts.js',
-    //fileHandler:'./src/renderer/js/fileHandler.js'
-  },
-  output: {
-    filename: 'packed_[name].js', // This will generate files named after the entry points
-    path: path.resolve(__dirname, './src/renderer/js'),
-  },
-  plugins: [
-    //new RemoveWithPlugin(),
-    new webpack.ProvidePlugin({
-      process: 'process', // Provide process polyfill
-      Buffer: ['buffer', 'Buffer'], // Provide Buffer
-      crypto: ['crypto-browserify'],
-      }),
-  ],
-
-  optimization: {
-    usedExports: true,
-    minimize: true,
-    //splitChunks: {
-      //chunks: 'all',
-    //},
-  },
-
-  resolve: {
-    extensions: ['.js', '.mjs', '.json'],
-    fallback: {
-      buffer: require.resolve('buffer/'),
-      path: require.resolve('path-browserify'),
-      os: require.resolve('os-browserify/browser'),
-      crypto: require.resolve('crypto-browserify'),
-      vm: require.resolve('vm-browserify'),
-      stream: require.resolve('stream-browserify'),
-      fs: require.resolve('browserify-fs'),
-      util: require.resolve("util/"),
-      zlib: require.resolve("browserify-zlib"),
-      https: require.resolve("https-browserify"),
-      url: require.resolve("url/"),
-      http: require.resolve("stream-http"),
-      assert: require.resolve("assert/"),
-      process: require.resolve('process'),
-      child_process:false //'child-process-promise'
-    }
-  },
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          /*options: {
-            presets: ['@babel/preset-env', { targets: { browsers: ['last 2 versions'] }}]
-            }*/
-          }
-      },
-    ],
-  },
-  devtool: 'source-map', // Consider using source maps for better debugging
-  mode: 'production',
+    //keyshortcuts: './src/renderer/js/keyshortcuts.js',
+    //fileHandler: './src/renderer/js/fileHandler.js',
+    //mathHandler: './src/renderer/js/MathBase/mathHandler.js'
 };
+
+module.exports = Object.entries(entries).map(([name, entryPath]) => {
+    const absEntryPath = path.resolve(__dirname, entryPath);
+    const outputDir = path.dirname(absEntryPath); // Output to same folder as source
+
+    return {
+        name,
+        entry: absEntryPath,
+        output: {
+            filename: `packed_${name}.js`,
+            path: outputDir,
+        },
+        plugins: [
+            new webpack.ProvidePlugin({
+                process: 'process/browser',
+                Buffer: ['buffer', 'Buffer'],
+                crypto: ['crypto-browserify'],
+            }),
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: path.join(__dirname, "node_modules/katex/dist"),
+                        to: "katex"        // <-- this folder will appear in your `dist/`
+                    }
+                ]
+            }),
+        ],
+        optimization: {
+            usedExports: true,
+            minimize: true,
+        },
+        resolve: {
+            extensions: ['.js', '.mjs', '.json'],
+            fallback: {
+                buffer: require.resolve('buffer/'),
+                path: require.resolve('path-browserify'),
+                os: require.resolve('os-browserify/browser'),
+                crypto: require.resolve('crypto-browserify'),
+                vm: require.resolve('vm-browserify'),
+                stream: require.resolve('stream-browserify'),
+                fs: require.resolve('browserify-fs'),
+                util: require.resolve('util/'),
+                zlib: require.resolve('browserify-zlib'),
+                https: require.resolve('https-browserify'),
+                url: require.resolve('url/'),
+                http: require.resolve('stream-http'),
+                assert: require.resolve('assert/'),
+                process: require.resolve('process/browser'),
+                child_process: false
+            }
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: 'babel-loader',
+                    },
+                },
+                {
+                    test: /\.html$/i,
+                    loader: "html-loader",
+                    options: { sources: false }   // don’t rewrite <link>/@href URLs
+                },
+                {
+                    test: /\.css$/i,
+                    use: [
+                        'style-loader', // Injects CSS into <style> tags at runtime
+                        'css-loader'    // Resolves @import and url()
+                    ]
+                },
+            ],
+        },
+        devtool: 'source-map',
+        mode: 'production',
+        //watch: true, // Enable HMR for renderer
+    };
+});

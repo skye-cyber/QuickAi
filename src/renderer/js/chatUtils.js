@@ -1,5 +1,7 @@
 import { marked } from "marked";
 import hljs from 'highlight.js';
+import DOMPurify from 'dompurify'; // If using modules
+
 // Initialize highlight.js
 hljs.configure({ ignoreUnescapedHTML: true });
 
@@ -7,7 +9,7 @@ hljs.configure({ ignoreUnescapedHTML: true });
 const renderer = new marked.Renderer();
 renderer.code = function(code) {
 	// Handle case where `code` is an object
-	const validLanguage = code.lang || 'plaintext';
+	let validLanguage = code.lang || 'plaintext';
 	//console.log(`Language: ${validLanguage}`);
 	if (typeof code === "object" && code.text !== undefined) {
 		code = code.text; // Extract the actual code
@@ -19,10 +21,18 @@ renderer.code = function(code) {
 
 	}
 
+	let dgCodeBlock = ['dot-draw', 'json-draw', 'json-chart'].includes(validLanguage) ? true : false;
+
+	let dgLang = dgCodeBlock ? validLanguage : null;
+
+	validLanguage = dgLang ? (['json', 'dot'].includes(dgLang) ? validLanguage.slice(0, -5) : validLanguage.slice(0, -6)) : validLanguage;
+
 	// Highlight the code
 	let highlighted;
 	try {
+
 		highlighted = hljs.highlight(code, { language: validLanguage }).value;
+
 	} catch (error) {
 		if (error.message === "Unknown language") {
 			console.log("Undetermined language")
@@ -33,55 +43,90 @@ renderer.code = function(code) {
 		}
 	}
 
+	// Reset language to json-draw
+	validLanguage = dgLang ? dgLang : validLanguage
+
 	// Generate unique ID for the copy button
 	const copyButtonId = `copy-button-${Math.random().toString(36).substring(2, 9)}`;
-	//const bg = validLanguage && ['css', 'html'].includes(validLanguage) ? 'dark:bg-[#000000]' : 'dark:bg-[#161420]';
+	const renderButtonId = `render-button-${Math.random().toString(36).substring(2, 9)}`;
+
+	function getdgFunction() {
+		const mapper = {
+			'dot-draw': `window.handleDiagrams(this, 'dot', isPlainCode=true, trigger='click')`,
+			'dot': `window.handleDiagrams(this, 'dot', isPlainCode=true, trigger='click')`,
+			'json-draw': `window.handleDiagrams(this, 'json'}', isPlainCode=true, trigger='click')`,
+			'json-chart': `window.LoopRenderCharts(this, type='code', trigger='click')`
+		}
+		return dgLang ? mapper[dgLang] : validLanguage === 'dot' ? mapper[validLanguage] : ''
+	}
 
 	return `
-		<div class="my-2 block bg-gray-200 dark:bg-zinc-800  rounded-md">
-		<section class="flex justify-between top-1 p-1 w-full bg-gray-300 rounded-t-md dark:bg-slate-700 box-border">
+		<div class="my-2 block bg-blue-300 dark:bg-[#002f42]  rounded-md transition-colors duration-100">
+		<section class="flex justify-between top-1 p-1 w-full bg-sky-300 rounded-t-md dark:bg-[#001922] box-border transition-colors duration-700">
 		<!-- Language -->
 		<p class="code-language p-1 justify-start rounded-md text-slate-950 dark:text-white rounded-lg font-normal text-sm cursor-pointer opacity-80 hover:opacity-50">
 		${validLanguage}
 		</p>
-		<!-- Copy button -->
-		<button id="${copyButtonId}" onclick='window.handleCodeCopy(this);' class="copy-button flex justify-end rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 text-sm text-white cursor-pointer">
-		<svg class="mt-1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy mr-1">
-		<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-		<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-		</svg>
-		<p id="BtText">copy</p>
-		</button>
+		<div class="flex justify-between space-x-3"
+		${(dgCodeBlock || validLanguage === 'dot') ? `
+			<!-- Render Button -->
+			<button
+			id="${renderButtonId}"
+			onclick="${getdgFunction()}"
+			class="render-button flex items-center gap-1 rounded-md p-1 bg-gradient-to-r from-[#00aaff] to-purple-700 hover:to-[#55ff00] text-sm text-white cursor-pointer transform transition-all duration-700"
+			>
+			<!-- Network / Diagram Icon -->
+			<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+			<circle cx="12" cy="5" r="2" />
+			<circle cx="5" cy="19" r="2" />
+			<circle cx="19" cy="19" r="2" />
+			<line x1="12" y1="7" x2="5" y2="17" />
+			<line x1="12" y1="7" x2="19" y2="17" />
+			</svg>
+			<p id="BtText">Render</p>
+			</button>
+			` : ''}
+
+			<div class="flex justify-between space-x-3"
+			${(['html', 'svg'].includes(validLanguage)) ? `
+				<!-- Render html+svg -->
+				<button
+				id="${renderButtonId}"
+				onclick="window.renderHtml(this);"
+				class="render-button flex items-center gap-1 rounded-md p-1 bg-gradient-to-r from-[#00aaff] to-purple-700 hover:to-[#55ff00] text-sm text-white cursor-pointer transform transition-all duration-700"
+				>
+				<!-- Network / Diagram Icon -->
+				<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+				<circle cx="12" cy="5" r="2" />
+				<circle cx="5" cy="19" r="2" />
+				<circle cx="19" cy="19" r="2" />
+				<line x1="12" y1="7" x2="5" y2="17" />
+				<line x1="12" y1="7" x2="19" y2="17" />
+				</svg>
+				<p id="BtText">Render</p>
+				</button>
+				` : ''}
+
+			<!-- Copy button -->
+			<button id="${copyButtonId}" onclick="window.handleCodeCopy(this, '${renderButtonId}');" class="copy-button flex items-center rounded-md p-1 bg-gradient-to-r from-sky-800 to-purple-600 hover:to-green-400 dark:from-[#00a5ce] dark:to-[#5500ff] dark:hover:from-[#00557f] dark:hover:to-[#006ea1] text-sm text-white cursor-pointer transform transition-all duration-700">
+			<svg class="mt-1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy mr-1">
+			<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+			<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+			</svg>
+			<p id="BtText">copy</p>
+			</button>
+		</div>
 		</section>
-		<div class="p-2 border border-gray-300 dark:border-none w-full bg-white dark:bg-[#14121e] rounded-md rounded-t-none overflow-auto scrollbar-hide">
-		<code class="p-2 hljs ${validLanguage} block whitespace-pre bg-white dark:bg-[#14121e]">${highlighted}</code>
+		<div class="p-2 border border-[#00aaff] dark:border-[#00a5ce] w-full bg-cyan-100 dark:bg-[#001c24] rounded-md rounded-t-none overflow-auto scrollbar-hide transition-colors duration-700">
+		<code data-value=${renderButtonId} class="p-2 hljs ${validLanguage} block whitespace-pre rounded-md bg-cyan-100 dark:bg-[#001c24] font-mono transition-colors duration-700 overflow-x-auto">${highlighted}</code>
 		</div>
 		</div>
 		`;
 };
 
-// Configure marked.js
+// Configure marked.js white
 marked.setOptions({
 	renderer: renderer,
-	highlight: function(code) {
-		// Handle case where `code` is an object
-		const validLanguage = code.lang || 'plaintext';
-		if (typeof code === "object" && code.text !== undefined) {
-			code = code.text; // Extract the actual code
-		}
-
-		if (typeof code !== "string" || code.trim() === "") {
-			console.warn("Empty or invalid code provided:", code);
-			code = "// No code provided"; // Default fallback for empty code
-		}
-
-		try {
-			return hljs.highlight(code, { language: validLanguage }).value;
-		} catch (error) {
-			console.error("Highlighting error:", error);
-			return hljs.highlightAuto(code).value; // Fallback to auto-detection
-		}
-	},
 	breaks: true,
 });
 
@@ -89,7 +134,7 @@ marked.setOptions({
 function addCopyListeners() {
 	document.querySelectorAll('.copy-button').forEach(button => {
 		button.addEventListener('click', async function() {
-			const codeBlock = this.parentNode.nextElementSibling.querySelector('code');
+			const codeBlock = this.parentNode.parentNode.nextElementSibling.querySelector('code');
 			const textToCopy = codeBlock.innerText;
 			const button = document.getElementById(this.id);
 			try {
@@ -106,8 +151,10 @@ function addCopyListeners() {
 	});
 }
 
-async function handleCodeCopy(element){
-		const codeBlock = element.parentNode.nextElementSibling.querySelector('code');
+async function handleCodeCopy(element, id = null) {
+	console.log(id)
+	const codeBlock = document.querySelector(`[data-value="${id}"]`);
+	console.log(codeBlock)
 	const textToCopy = codeBlock.innerText;
 	const button = document.getElementById(element.id);
 	try {
@@ -123,34 +170,7 @@ async function handleCodeCopy(element){
 }
 
 
-// Function to ensure MathJax renders dynamically injected content
-let renderTimeout;
-
-function debounceRenderMathJax(_currentclass, delay = 1000, noDelay = false) {
-	if (renderTimeout) clearTimeout(renderTimeout);
-
-	if (noDelay) {
-		if (window.MathJax) {
-			MathJax.typesetPromise(Array.from(document.querySelectorAll('[class^="msg_"], [class*=" msg_"]')))
-			.then(() => console.log("MathJax rendering complete"))
-			.catch((err) => console.error("MathJax rendering error:", err.message));
-		} else {
-			console.error("MathJax is not loaded or available.");
-		}
-	} else {
-		renderTimeout = setTimeout(() => {
-			if (window.MathJax) {
-				MathJax.typesetPromise(Array.from(document.querySelectorAll('[class^="msg_"], [class*=" msg_"]')))
-				.then(() => console.log("MathJax rendering complete"))
-				.catch((err) => console.error("MathJax rendering error:", err.message));
-			} else {
-				console.error("MathJax is not loaded or available.");
-			}
-		}, delay);
-	}
-}
-
-function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
+function handleRequestError(error, userMessage, aiMessage, VS_url = null) {
 	try {
 		//start timer
 		const _Timer = new Timer();
@@ -163,7 +183,7 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 			console.log("History length:", conversationHistory.length);
 			console.log('Error:', JSON.stringify(error, null, 2));
 		} else {
-			if (error.message === "[object Object]"){
+			if (error.message === "[object Object]") {
 				console.log('Error:', error);
 				removeFirstConversationPairs(conversationHistory);
 			}
@@ -176,13 +196,13 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 			let lastMessage = conversationHistory.slice(-1); // Safely access the last message
 			//console.log(lastMessage)
 
-			function HideLoaderUserAiMs(all=false){
+			function HideLoaderUserAiMs(all = false) {
 				//Remove loading animation if present
-				if (aiMessage){
-					if (aiMessage.firstElementChild.id === "loader-parent"){
-						if (all){
+				if (aiMessage) {
+					if (aiMessage.firstElementChild.id === "loader-parent") {
+						if (all) {
 							userMessage.remove();
-						} else{
+						} else {
 							aiMessage.remove();
 						}
 					}
@@ -220,7 +240,7 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 					errorContainer.classList.add('left-1/2', 'opacity-100', 'pointer-events-auto');
 				}, 200); // 0.3 second delay
 				let ErrorMs = error.message === "Failed to fetch" ? "Connection Error: Check your Internet!" : error.message;
-				if (error.message === "[object Object]"){
+				if (error.message === "[object Object]") {
 					ErrorMs = "This model is unreachabble: It might be overloaded!"
 				}
 				errorArea.textContent = ErrorMs;
@@ -241,12 +261,12 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 				}, 0); // 1 second for reset
 			}
 			// Remove existing event listeners before adding a new one
-			async function retryHandler(){
+			async function retryHandler() {
 				await HideErrorModal()
 
 				if (VS_url) {
 
-					try{
+					try {
 						var text = lastMessage[0].content[0].text;
 						var fileDataUrl = [];
 
@@ -270,13 +290,13 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 						}
 					}
 
-					text = text.slice(-1)===']' ? text.slice(0, text.length - 22) : text;
+					text = text.slice(-1) === ']' ? text.slice(0, text.length - 22) : text;
 					fileDataUrl = fileDataUrl.length !== 0 ? fileDataUrl : null;
 					window.VisionChat(text, VS_url[1], fileDataUrl);
 				} else {
 
 					// Strip date && time from user message
-					lastMessage = lastMessage[0].content.slice(-1)===']' ? lastMessage[0].content.slice(0, lastMessage[0].content.length - 22) : lastMessage[0].content;
+					lastMessage = lastMessage[0].content.slice(-1) === ']' ? lastMessage[0].content.slice(0, lastMessage[0].content.length - 22) : lastMessage[0].content;
 
 					// Retry action
 					window.requestRouter(lastMessage.trim());
@@ -285,7 +305,7 @@ function handleRequestError(error, userMessage, aiMessage, VS_url=null) {
 				if (aiMessage) aiMessage.remove();
 				if (userMessage) userMessage.remove();
 			};
-				showError();
+			showError();
 		}
 	} catch (err) {
 		console.error('Error handling request error:', err);
@@ -320,7 +340,7 @@ function implementUserCopy() {
 }
 
 // Copy function for the whole text block/aiMessage
-function CopyAll(UId, bt = null) {
+function CopyAll(UId, bt = null, html=false) {
 	//console.log(UId)
 	const textBlock = document.querySelector(UId);
 	//console.log(textBlock)
@@ -329,13 +349,13 @@ function CopyAll(UId, bt = null) {
 		return;
 	}
 
-	const textToCopy = textBlock.innerText;
+	const textToCopy = html===true ? textBlock.innerHTML : textBlock.textContent;
 	//console.log(textToCopy)
 
 	if (textToCopy.length >= 50) {
 		try {
 			navigator.clipboard.writeText(textToCopy);
-			if (bt){
+			if (bt) {
 				bt.textContent = 'Copied!';
 				setTimeout(() => {
 					bt.textContent = 'Copy';
@@ -351,14 +371,14 @@ function CopyAll(UId, bt = null) {
 }
 
 // Function to show the modal
-function showCopyModal(_color=null, text="Text copied") {
+function showCopyModal(_color = null, text = "Text copied") {
 	const modal = document.getElementById('copyModal');
 	const txtSpace = document.getElementById("text-space")
 	txtSpace.textContent = text;
 	addRmColor();
-	function addRmColor(task="add"){
-		if (_color){
-			if (task==="add"){
+	function addRmColor(task = "add") {
+		if (_color) {
+			if (task === "add") {
 				txtSpace.classList.add(_color);
 				console.log("Added", _color)
 			}
@@ -371,14 +391,14 @@ function showCopyModal(_color=null, text="Text copied") {
 	// Slide modal to 20% height and make it visible after 1 second
 	setTimeout(() => {
 		modal.classList.add('top-1/5', 'opacity-100', 'pointer-events-auto');
-	}, 300); // 1 second delay
+	}, 500); // 1 second delay
 
 	// Slide modal to the left and fade out after 5 seconds
 	setTimeout(() => {
 		modal.classList.remove('top-1/5', 'left-1/2', '-translate-x-1/2');
 		modal.classList.add('left-0', '-translate-x-full', 'opacity-0', 'pointer-events-none');
 
-	}, 2000); // 5 seconds for staying in the middle plus 1 second delay
+	}, 4000); // 5 seconds for staying in the middle plus 1 second delay
 
 	// Reset transform after fully fading out and moving off-screen
 	setTimeout(() => {
@@ -406,7 +426,7 @@ function removeFirstConversationPairs(conversationHistory, count = 2) {
 }
 
 
-function copyBMan(){
+function copyBMan() {
 	document.querySelectorAll(".Vision-user-copy-button").forEach(button => {
 		//console.log("Adding copy control")
 		// Get the next sibling of the current element
@@ -427,31 +447,55 @@ function copyBMan(){
 }
 
 
-function escapeHTML(unsafe) {
-	if (typeof unsafe !== 'string') {
+function InputPurify(unsafe) {
+	const cleanHTML = DOMPurify.sanitize(unsafe,{
+		ALLOWED_TAGS: ['br', 'strong', 'em'], // Allow paragraphs, line breaks, bold, italic, links
+		//ALLOWED_ATTR: ['href'], // Only allow the 'href' attribute (useful for 'a' tags)
+		//ADD_TAGS: ['img'], // Add the image tag
+		//ADD_ATTR: ['src', 'alt', 'data-id'] // Add these attributes (src/alt for img, data-id for any relevant tag)
+	});
+	return cleanHTML
+	// 2. Format: Collapse multiple <br> tags using regex
+	// This regex finds a <br> tag (with optional self-closing slash and whitespace)
+	// followed by one or more similar <br> tags (again with optional whitespace between them).
+	// It replaces the entire matched sequence with a single <br> tag.
+	.replace(/(<br\s*\/?>\s*){2,}/gi, '<br>')
+	// 3. Apply formatting: Collapse sequences of &nbsp; entities
+	// This regex finds a sequence of two or more consecutive &nbsp; entities,
+	// potentially separated by optional whitespace characters (\s*), and replaces
+	// the entire sequence with a single regular space (' ').
+	.replace(/(&nbsp;\s*){2,}/gi, ' ')
+	// Optional: Collapse sequences of regular spaces as well if they weren't handled by white-space: pre-wrap
+	// (white-space: pre-wrap should handle regular spaces, but this is a fallback)
+	.replace(/ {2,}/g, ' ')
+	/*if (typeof unsafe !== 'string') {
 		return '';
 	}
 	return unsafe
 	.replace(/&/g, "&amp;")
+	.replace(/\n+/g, '\n')  // 1+ newlines → 1 newline
 	.replace(/</g, "&lt;")
 	.replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;")
 	.replace(/'/g, "&#039;");
+	*/
+
 }
 
 
-function HandleProcessingEventChanges(status){
+
+function HandleProcessingEventChanges(status) {
 	const sendBtn = document.getElementById("sendBtn");
 	const normalSend = document.getElementById("normalSend"); //initially displayed
 	const spinningSquares = document.getElementById("spinningSquares"); //inirially hidden
-	if (status === 'show'){
+	if (status === 'show') {
 		normalSend.classList.add('hidden')
 		spinningSquares.classList.remove('hidden')
 		//Disable the send button
 		sendBtn.disabled = true;
 		// Add Cursor prohibited/disabled cursor class
 		sendBtn.classList.add('cursor-disable');
-	} else if (status === 'hide'){
+	} else if (status === 'hide') {
 		spinningSquares.classList.add('hidden')
 		normalSend.classList.remove('hidden')
 		//re-enable the send button
@@ -531,7 +575,7 @@ previewBtn.addEventListener('click', function() {
 	//update system instructions
 	window.electron.updateSysInit()
 
-	if (isActive!=="true") {
+	if (isActive !== "true") {
 		// When activated: switch to vibrant green theme
 		this.classList.remove('border-sky-900', 'bg-blue-300', 'hover:bg-blue-400', 'dark:border-red-400', 'dark:bg-red-700', 'dark:hover:bg-red-600');
 		this.classList.add('border-green-500', 'bg-green-300', 'hover:bg-green-400', 'dark:border-green-400', 'dark:bg-green-700', 'dark:hover:bg-green-600');
@@ -558,12 +602,13 @@ function setutilityScriptisSet() {
 	return exists
 }
 
+
 //avail marked to the other scripts
 window.Timer = Timer
 window.marked = marked;
 window.CopyAll = CopyAll
 window.copyBMan = copyBMan
-window.escapeHTML = escapeHTML
+window.InputPurify = InputPurify
 window.showCopyModal = showCopyModal
 window.handleCodeCopy = handleCodeCopy;
 window.showDeletionStatus = showCopyModal
@@ -571,6 +616,5 @@ window.showDeletionStatus = showCopyModal
 window.implementUserCopy = implementUserCopy
 window.handleRequestError = handleRequestError
 window.setutilityScriptisSet = setutilityScriptisSet
-window.debounceRenderMathJax = debounceRenderMathJax
 window.removeFirstConversationPairs = removeFirstConversationPairs
 window.HandleProcessingEventChanges = HandleProcessingEventChanges;

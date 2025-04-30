@@ -1,7 +1,7 @@
 const storagePath = window.electron.joinPath(window.electron.home_dir(), '.quickai/.quickai.store');
 const chatArea = document.getElementById('chatArea');
 const conversationsPanel = document.getElementById('conversations');
-escapeHTML = window.escapeHTML;
+InputPurify = window.InputPurify;
 const modalTitle = document.getElementById('modalTitle');
 const newNameInput = document.getElementById('newName');
 const renameButton = document.getElementById('renameButton');
@@ -88,7 +88,7 @@ class ConversationManager {
     // Render the conversation in the web interface
     renderConversation(conversationData, model = "text") {
         chatArea.innerHTML = '';
-        const value = (model === "Vision") ? 'meta-llama/Llama-3.2-11B-Vision-Instruct' : 'Qwen/Qwen2.5-72B-Instruct';
+        const value = (model === "Vision") ? 'mistral-small-latest' : 'mistral-large-latest';
         const element = document.querySelector(`[data-value="${value}"]`);
         if (element) {
             element.click();
@@ -108,6 +108,7 @@ class ConversationManager {
                 }
             }
             window.electron.CreateNew(conversationData, model)
+            //window.debounceRenderKaTeX(null, null, true);
         });
 
         window.implementUserCopy();
@@ -130,7 +131,7 @@ class ConversationManager {
             };
 
             // Find the item with type "image_url" or "file_url"
-            const fileTypeItem = content.find(item => item.type === "image_url" || item.type === "file_url");
+            const fileTypeItem = content.find(item => item.type === "image_url" || item.type === "document_url");
 
             // Check if the found item exists and has a valid type
             if (fileTypeItem && fileDict[fileTypeItem.type]) {
@@ -157,7 +158,7 @@ class ConversationManager {
             const fileMessages = content.filter(item => item.type === "image_url");
 
             // Extract all URLs from the image_url properties
-            return fileMessages.map(fileMessage => fileMessage.image_url.url);
+            return fileMessages.map(fileMessage => fileMessage.imageUrl.url);
         } catch (error) {
             console.error("Error extracting file URL:", error);
             return [];
@@ -201,9 +202,9 @@ class ConversationManager {
             userText = content.slice(-1) === ']' ? content.substring(0, content.length - 22) : content
         }
         const messageHtml = `
-            <div data-id="${userMessageId}" class="${userMessageId} relative bg-blue-500 dark:bg-[#142384] text-black dark:text-white rounded-lg p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl">
-                <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.escapeHTML(userText)}</p>
-                <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this)">
+            <div data-id="${userMessageId}" class="${userMessageId} relative bg-[#566fdb] dark:bg-[#142384] text-black dark:text-white rounded-lg rounded-br-none p-2 md:p-3 shadow-md w-fit max-w-full lg:max-w-5xl transition-colors duration-1000">
+                <p class="whitespace-pre-wrap break-words max-w-xl md:max-w-2xl lg:max-w-3xl">${window.InputPurify(userText)}</p>
+                <button id="${copyButtonId}" class="user-copy-button absolute rounded-md px-2 py-2 right-1 bottom-0.5 bg-gradient-to-r from-indigo-400 to-pink-400 dark:from-gray-700 dark:to-gray-900 hover:bg-indigo-200 dark:hover:bg-gray-600 text-white dark:text-gray-100 rounded-lg font-semibold border border-2 cursor-pointer opacity-40 hover:opacity-80" onclick="CopyAll('.${userMessageId}', this, true)">
                 Copy
                 </button>
             </div>
@@ -232,7 +233,7 @@ class ConversationManager {
     }
 
     // Render text-based assistant message
-    renderTextAssistantMessage(content) {
+    async renderTextAssistantMessage(content) {
         const aiMessageId = `msg_${Math.random().toString(30).substring(3, 9)}`;
         const foldId = `think-content-${Math.random().toString(28).substring(3, 9)}`;
         const aiMessage = document.createElement('div');
@@ -257,7 +258,7 @@ class ConversationManager {
         aiMessage.innerHTML = `
                 <section class="relative w-fit max-w-full lg:max-w-6xl mb-8 p-2">
 					${hasThinkTag || thinkContent ? `
-						<div class="think-section bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl">
+						<div class="think-section bg-blue-200 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-t-lg px-4 pt-2 lg:max-w-6xl transition-colors duration-1000">
 						<div class="flex items-center justify-between">
 						<strong style="color: #007bff;">Thoughts:</strong>
 						<button class="text-sm text-gray-600 dark:text-gray-300" onclick="window.toggleFold(event, this.parentElement.nextElementSibling.id)">
@@ -270,40 +271,40 @@ class ConversationManager {
 						</button>
 						</div>
 						<div id="${foldId}" class="">
-						<p style="color: #333;">${window.marked(thinkContent)}</p>
+						<p style="color: #333;">${window.marked(window.normalizeMath(thinkContent))}</p>
 						</div>
 						</div>
 						` : ''}
 						${thinkContent && actualResponse ? `<p class="rounded-lg border-2 border-blue-400 dark:border-orange-400"></p>` : ""}
 						${actualResponse ? `
-							<div class="${aiMessageId} bg-gray-200 py-4 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pb-4">
-							${actualResponse && thinkContent ? `<strong style="color: #28a745;">Response:</strong>` : ''}
-							<p style="color: #333;">${window.marked(actualResponse)}</p>
+							<div class="${aiMessageId} bg-blue-200 py-4 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg rounded-bl-none px-4 mb-6 pb-4 transition-colors duration-1000">
+							${actualResponse && thinkContent ? `<strong class="text-[#28a745]">Response:</strong>` : ''}
+							<p class="text-white">${window.marked(window.normalizeMathDelimiters(actualResponse))}</p>
 							<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
-								<div class="group relative max-w-fit transition-all duration-300 hover:z-50">
+								<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
 									<div
 										role="button"
 										id="${exportId}"
 										aria-expanded="false"
 										onclick="window.toggleExportOptions(this);"
 										aria-label="Export"
-										class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
+										class="relative overflow-hidden bg-white/80 backdrop-blur-md transition-all duration-700 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
 										style="border: 2px solid rgba(255,85,0,0); background-clip: padding-box, border-box; background-origin: border-box; background-image: linear-gradient(to bottom right, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.8)), linear-gradient(135deg, rgba(255,0,255,170) 0%, rgba(0,0,255,85) 50%, rgba(0,255,255,170) 100%);"
 									>
 										<div class="flex items-center space-x-2 px-4 py-1">
 										<div class="relative h-6 w-6">
 											<svg
-											class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-300 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
+											class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-700 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
 											viewBox="0 0 24 24"
 											style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1))"
 											>
 											<path
 												d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
-												class="origin-center transition-transform duration-300"
+												class="origin-center transition-transform duration-500"
 											/>
 											</svg>
 										</div>
-										<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
+										<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-700 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
 											Export
 										</span>
 										</div>
@@ -313,11 +314,11 @@ class ConversationManager {
 									</div>
 
 									<!-- Hover enhancement effect -->
-									<div class="absolute -inset-2 -z-10 rounded-xl bg-blue-500/10 blur-xl transition-opacity duration-300 group-hover:opacity-100 dark:bg-blue-400/15"></div>
+									<div class="absolute -inset-2 -z-10 rounded-xl bg-blue-500/10 blur-xl transition-opacity duration-500 group-hover:opacity-100 dark:bg-blue-400/15"></div>
 								</div>
 								<div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${aiMessageId}');">
 									<svg
-										class="w-5 md:w-6 h-5 md:h-6 mt-1 transition-transform duration-200 ease-in-out hover:scale-110 cursor-pointer"
+										class="w-5 md:w-6 h-5 md:h-6 mt-1 transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer"
 										viewBox="0 0 24 24"
 										fill="none"
 										xmlns="http://www.w3.org/2000/svg"
@@ -340,28 +341,34 @@ class ConversationManager {
 								</div>
 							</section>
 							</div>
-							<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
+							<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-[radial-gradient(closest-side,var(--tw-gradient-stops))] from-[#009393] dark:from-[#002f42] via-[#45cece] dark:via-[#002f42] to-blue-400 dark:to-[#002f42] dark:bg-gray-800 p-2 rounded shadow-md z-50 border border-[#0055ff] dark:border-[#009fe8] transition-colors duration-1000">
 							<ul class="list-none p-0">
 							<li class="mb-2">
-							<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${aiMessageId}')">Export to PDF</a>
+							<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Pdf(event, '.${aiMessageId}')">Export to PDF</p>
 							</li>
 							<li class="mb-2">
-							<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${aiMessageId}')">Export to JPG</a>
+							<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Jpg(event, '.${aiMessageId}')">Export to JPG</p>
 							</li>
 							<li>
-							<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${aiMessageId}')">Export to DOCX</a>
+							<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 cursor-pointer" onclick="HTML2Word(event, '.${aiMessageId}')">Export to DOCX</p>
 							</li>
 							<li>
-							<a href="" class="cursor-not-allowed text-blue-500 dark:text-blue-400 decoration-underline" onclick="">Word Export Advance</a>
+							<p class="cursor-not-allowed text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 decoration-underline" onclick="">Word Export Advance</p>
 							</li>
 							</ul>
 							</div>
 							</section>`: ""}
                 `;
+        // render diagrams fromthis response
+        window.handleDiagrams(actualResponse, 'both');
+        window.LoopRenderCharts(actualResponse)
+        window.debounceRenderKaTeX(`.${aiMessageId}`, null, true);
+        normaliZeMathDisplay(`.${aiMessageId}`)
+
     }
 
     // Render vision-based assistant message
-    renderVisionAssistantMessage(content) {
+    async renderVisionAssistantMessage(content) {
         const visionMessageId = `msg_${Math.random().toString(30).substring(3, 9)}`;
         const visionMessage = document.createElement('div');
         const exportId = `export-${Math.random().toString(33).substring(3, 9)}`;
@@ -373,32 +380,32 @@ class ConversationManager {
         //const fileDataUrl = this.getFileUrl(content);
         visionMessage.innerHTML = `
                 <section class="relative w-fit max-w-full lg:max-w-6xl mb-8">
-					<div class="${visionMessageId} bg-gray-200 text-gray-800 dark:bg-[#28185a] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl">${window.marked(textContent)}
+					<div class="${visionMessageId} bg-blue-200 text-gray-800 dark:bg-[#002f42] dark:text-white rounded-lg px-4 mb-6 pt-2 pb-4 w-fit max-w-full lg:max-w-6xl transition-colors duration-1000">${window.marked(window.normalizeMathDelimiters(textContent))}
 					</div>
 					<section class="options absolute bottom-2 flex mt-6 space-x-4 cursor-pointer">
-						<div class="group relative max-w-fit transition-all duration-300 hover:z-50">
+						<div class="group relative max-w-fit transition-all duration-500 hover:z-50">
 							<div
 								role="button"
 								id="${exportId}"
 								aria-expanded="false"
 								onclick="window.toggleExportOptions(this);"
-								class="relative overflow-hidden bg-[white]/80 backdrop-blur-md transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
+								class="relative overflow-hidden bg-white/80 backdrop-blur-md transition-all duration-700 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 dark:bg-[#5500ff]/80 dark:hover:bg-[#00aa00]/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-900/50 rounded-full"
 								style="border: 2px solid rgba(255,85,0,0); background-clip: padding-box, border-box; background-origin: border-box; background-image: linear-gradient(to bottom right, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.8)), linear-gradient(135deg, rgba(255,0,255,170) 0%, rgba(0,0,255,85) 50%, rgba(0,255,255,170) 100%);"
 							>
 								<div class="flex items-center space-x-2 px-4 py-1">
 								<div class="relative h-6 w-6">
 									<svg
-									class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-300 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
+									class="absolute inset-0 h-full w-full fill-current text-blue-600 transition-all duration-700 group-hover:rotate-90 group-hover:scale-110 group-hover:text-blue-500 dark:text-[#00aaff] dark:group-hover:text-sky-800"
 									viewBox="0 0 24 24"
 									style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1))"
 									>
 									<path
 										d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
-										class="origin-center transition-transform duration-300"
+										class="origin-center transition-transform duration-500"
 									/>
 									</svg>
 								</div>
-								<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-300 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
+								<span class="bg-gradient-to-r from-blue-700 to-[#550000] bg-clip-text text-sm font-semibold text-transparent transition-all duration-700 group-hover:from-blue-600 group-hover:to-blue-400 dark:from-blue-600 dark:to-[#00007f] dark:group-hover:from-sky-700 dark:group-hover:to-[#984fff]">
 									Export
 								</span>
 								</div>
@@ -408,11 +415,11 @@ class ConversationManager {
 							</div>
 
 							<!-- Hover enhancement effect -->
-							<div class="absolute -inset-2 -z-10 rounded-xl bg-blue-500/10 blur-xl transition-opacity duration-300 group-hover:opacity-100 dark:bg-blue-400/15"></div>
+							<div class="absolute -inset-2 -z-10 rounded-xl bg-blue-500/10 blur-xl transition-opacity duration-700 group-hover:opacity-100 dark:bg-blue-400/15"></div>
 						</div>
 						<div class="rounded-lg p-1 cursor-pointer" aria-label="Copy" title="Copy" id="copy-all" onclick="CopyAll('.${visionMessageId}');">
 							<svg
-								class="w-5 md:w-6 h-5 md:h-6 mt-1 transition-transform duration-200 ease-in-out hover:scale-110 cursor-pointer"
+								class="w-5 md:w-6 h-5 md:h-6 mt-1 transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer"
 								viewBox="0 0 24 24"
 								fill="none"
 								xmlns="http://www.w3.org/2000/svg"
@@ -435,25 +442,31 @@ class ConversationManager {
 						</div>
 					</section>
 
-					<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-white dark:bg-gray-800 p-2 rounded shadow-md z-50 transition-300">
-
+					<div id="exportOptions-${exportId}" class="hidden block absolute bottom-10 left-0 bg-[radial-gradient(closest-side,var(--tw-gradient-stops))] from-[#009393] dark:from-[#002f42] via-[#45cece] dark:via-[#002f42] to-blue-400 dark:to-[#002f42] dark:bg-gray-800 p-2 rounded shadow-md z-50 border border-[#0055ff] dark:border-[#009fe8] transition-colors duration-1000">
 					<ul class="list-none p-0">
 					<li class="mb-2">
-					<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Pdf(event, '.${visionMessageId}')">1. Export to PDF</a>
+					<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Pdf(event, '.${visionMessageId}')">Export to PDF</p>
 					</li>
 					<li class="mb-2">
-					<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Jpg(event, '.${visionMessageId}')">2. Export to JPG</a>
+					<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-colors duration-1000 cursor-pointer" onclick="HTML2Jpg(event, '.${visionMessageId}')">Export to JPG</p>
 					</li>
 					<li>
-					<a href="" class="text-blue-500 dark:text-blue-400" onclick="HTML2Word(event, '.${visionMessageId}')">3. Export to DOCX</a>
+					<p class="text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 cursor-pointer" onclick="HTML2Word(event, '.${visionMessageId}')">Export to DOCX</p>
 					</li>
 					<li>
-					<a href="" class="text-blue-500 dark:text-blue-400 decoration-underline cursor-not-allowed" onclick="">4. Word Export Advance</a>
+					<p class="cursor-not-allowed text-[#222] dark:text-blue-300 hover:text-[#8900ce] dark:hover:text-[#aaaa00] border border-blue-400/0 hover:border-[#a1a100] dark:hover:border-[#00aeff] transition-all duration-1000 decoration-underline" onclick="">Word Export Advance</p>
 					</li>
 					</ul>
 					</div>
 					</section>
 					`;
+
+        // render diagrams from this response
+        window.handleDiagrams(textContent, 'both');
+        window.LoopRenderCharts(textContent);
+        window.debounceRenderKaTeX(`.${visionMessageId}`, null, true);
+        normaliZeMathDisplay(`.${visionMessageId}`)
+
     }
 }
 const conversationManager = new ConversationManager(storagePath);
@@ -477,7 +490,7 @@ async function fetchConversations() {
                     const conversationId = window.electron.getBasename(file, '.json');
                     const conversationItem = document.createElement('div');
                     const color = (index <= colors.length - 1) ? colors[index] : colors[Math.floor(Math.random() * colors.length)]
-                    conversationItem.classList.add('p-2', color, 'transition-transform', "text-black", 'tranform', 'hover:scale-105', 'transition', 'duration-600', 'ease-in-out', 'scale-100', 'infinite', 'hover:bg-blue-800', 'decoration-underline', 'decoration-pink-400', 'dark:decoration-fuchsia-500', 'dark:hover:bg-cyan-700', 'cursor-pointer', 'rounded-lg', "space-y-2", "w-full", "sm:w-[90%]", "md:w-[80%]", "lg:w-[90%]", "whitespace-nowrap", "max-w-full", "overflow-auto", "scrollbar-hide");
+                    conversationItem.classList.add('p-2', color, 'transition-transform', "text-black", 'tranform', 'hover:scale-105', 'transition', 'duration-700', 'ease-in-out', 'scale-100', 'infinite', 'hover:bg-blue-800', 'decoration-underline', 'decoration-pink-400', 'dark:decoration-fuchsia-500', 'dark:hover:bg-cyan-700', 'cursor-pointer', 'rounded-lg', "space-y-2", "w-full", "sm:w-[90%]", "md:w-[80%]", "lg:w-[90%]", "whitespace-nowrap", "max-w-full", "overflow-auto", "scrollbar-hide");
                     conversationItem.setAttribute('data-text', conversationId);
 
                     conversationItem.textContent = conversationId;
